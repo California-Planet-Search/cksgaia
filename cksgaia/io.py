@@ -278,7 +278,16 @@ def load_table(table, cache=0, cachefn='load_table_cache.hdf', verbose=False):
 
     elif table=='per-prad-population':
         p, nplanets = cksmet.population.load_pinky() 
-        df = cksmet.population.load_population(p, nplanets) 
+        df = cksmet.population.load_population(p, nplanets)
+
+    elif table == 'cks+kmag+fakegaia':
+        cks = load_table('cks+nea+iso-floor')
+        cks['iso_sparallax_err1'] /= 5
+        cks['iso_sparallax_err2'] /= 5
+        cks['iso_sparallax_err1'] = np.sqrt(cks['iso_sparallax_err1']**2 + (3e-5)**2)  # 30 microarcsec floor
+        cks['sio_sparallax_err2'] = -cks['iso_sparallax_err1']
+
+        df = cks
 
     else:
         assert False, "table {} not valid table name".format(table)

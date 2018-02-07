@@ -1,21 +1,18 @@
 #!/usr/bin/env python
 from argparse import ArgumentParser
-import glob
-import os
 from matplotlib.pylab import *
-import cPickle as pickle
 from collections import OrderedDict
 
-import cksmet.plotting.smet
-import cksmet.plotting.occur
-import cksmet.plotting.comp
-import cksmet.tables
-import cksmet.calibrate
-import cksmet.plotting.calibrate
-import cksmet.analysis
-import cksmet.io
-import cksmet.ttest
-import cksmet.values
+# import cksmet.plotting.smet
+# import cksmet.plotting.occur
+# import cksmet.plotting.comp
+# import cksmet.tables
+# import cksmet.calibrate
+# import cksmet.plotting.calibrate
+# import cksmet.analysis
+# import cksmet.io
+# import cksmet.ttest
+# import cksmet.values
 
 def main():
     psr = ArgumentParser()
