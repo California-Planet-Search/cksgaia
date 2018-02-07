@@ -3,26 +3,43 @@ from argparse import ArgumentParser
 import os
 from collections import OrderedDict
 
-import cksgaia.io # module for reading and writing datasets
-import cksgaia.value # module for computing scalar values for table
-import cksgaia.table # module for computing scalar values for table
-import cksgaia.plot # submodule for including plots
+import cksgaia.io     # module for reading and writing datasets
+import cksgaia.value  # module for computing scalar values for table
+import cksgaia.table  # module for computing scalar values for table
+import cksgaia.plot   # submodule for including plots
+
 
 def create_table(args):
     w = Workflow()
     w.create_file('table', args.name ) 
 
+
 def create_plot(args):
     w = Workflow()
     w.create_file('plot', args.name ) 
+
 
 def create_val(args):
     w = Workflow()
     w.create_file('val',args.name) 
 
+
 def update_paper(args):
     w = Workflow()
-    w.update_paper() 
+    w.update_paper()
+
+
+def create_iso_jobs(args):
+    if args.sample=='cks':
+        df = cksgaia.io.load_table('cks')
+    else:
+        print("Sample not defined: {}".format(args.sample))
+
+    for i, row in df.iterrows():
+        id_starname = row.id_starname
+        outdir = "{}/{}".format(args.baseoutdir, id_starname)
+        print "mkdir -p {}; run_cksphys.py run-iso {} {} {} &> {}/run-iso.log".format(outdir, args.driver, id_starname, outdir, outdir)
+
 
 class Workflow(object):
     def __init__(self):
