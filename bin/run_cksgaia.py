@@ -9,6 +9,29 @@ import cksgaia.table  # module for computing scalar values for table
 import cksgaia.plot   # submodule for including plots
 
 
+def main():
+    psr = ArgumentParser()
+    subpsr = psr.add_subparsers(title="subcommands", dest='subcommand')
+    psr_parent = ArgumentParser(add_help=False)
+
+    psr2 = subpsr.add_parser('create-val', parents=[psr_parent], )
+    psr2.add_argument('name',type=str)
+    psr2.set_defaults(func=create_val)
+
+    psr2 = subpsr.add_parser('create-plot', parents=[psr_parent], )
+    psr2.add_argument('name',type=str)
+    psr2.set_defaults(func=create_plot)
+
+    psr2 = subpsr.add_parser('create-table', parents=[psr_parent], )
+    psr2.add_argument('name',type=str)
+    psr2.set_defaults(func=create_table)
+
+    psr2 = subpsr.add_parser('update-paper', parents=[psr_parent])
+    psr2.set_defaults(func=update_paper)
+
+    args = psr.parse_args()
+    args.func(args)
+    
 def create_table(args):
     w = Workflow()
     w.create_file('table', args.name ) 
