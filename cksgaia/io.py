@@ -2,8 +2,10 @@ import os
 
 import pandas as pd
 import numpy as np
-import cksspec.io
+import pylab as pl
 import ebf
+
+import cksgaia.plot
 
 DATADIR = os.path.join(os.path.dirname(__file__),'../data/')
 
@@ -54,10 +56,9 @@ def load_table(table, cache=0, cachefn='load_table_cache.hdf', verbose=False):
 
     elif table=='johnson17':
         df = pd.read_csv('data/cks_physical_merged.csv',index_col=0)
-    elif table=='cks-physical-filtered':
-        df = load_table('cks-physical-merged')
+    elif table=='fulton17':
+        df = load_table('johnson17')
         df = apply_filters(df)
-
     elif table=='cks-physical-merged+mathur17':
         df = load_table('cks-physical-merged')
     elif table=='j17+m17':
@@ -122,7 +123,7 @@ def apply_filters(physmerge, mkplot=False, verbose=False):
             nea['iso_prad_err1'] = nea['koi_prad_err1']
 
             pl.subplot(nrow, ncol, left)
-            v_cks = cksrad.plotting.simplehist(physmerge, annotate='%s (%d)' % (atxt, len(physmerge)),
+            v_cks = cksgaia.plot.sample.simplehist(physmerge, annotate='%s (%d)' % (atxt, len(physmerge)),
                                                stacked=True, va_anno=False,
                                                eloc=eloc, aloc=aloc, fill_valley=False)
             if letters:

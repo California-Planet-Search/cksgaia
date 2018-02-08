@@ -1,0 +1,10 @@
+matplotlib==1.5.3
+astropysics
+numpy==1.10.4
+scipy==0.17.1
+pandas==0.20.3
+corner==2.0.1
+lmfit==0.9.7
+astropy==2.0.2
+ebfpy==0.0.14
+pp==1.6.5
