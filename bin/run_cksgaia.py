@@ -153,6 +153,7 @@ def update_paper(args):
     w = Workflow(outputdir=args.outputdir)
     w.update_paper() 
 
+
 class Workflow(object):
     def __init__(self, outputdir='./'):
         self.outputdir = outputdir
@@ -161,6 +162,7 @@ class Workflow(object):
 
         # register different plots here
         d['sample'] = cksgaia.plot.sample.hrplot
+        d['filters'] = cksgaia.plot.sample.filter_plot
 
         self.plot_dict = d
 
