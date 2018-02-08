@@ -14,6 +14,30 @@ def main():
     subpsr = psr.add_subparsers(title="subcommands", dest='subcommand')
     psr_parent = ArgumentParser(add_help=False)
 
+    psr2 = subpsr.add_parser(
+        'create-iso-jobs', parents=[psr_parent], 
+        description="Create isochrone processing batch jobs for all KOIs"
+    )
+    psr2.add_argument('driver')
+    psr2.add_argument('sample')
+    psr2.add_argument('baseoutdir',help='absolute path to output directory')
+    psr2.set_defaults(func=create_iso_jobs)
+
+    psr2 = subpsr.add_parser(
+        'run-iso', parents=[psr_parent], 
+        description="Run isochrones"
+    )
+
+    drivers = [
+        'isoclassify','isochrones','isocla+isochr-dsep','isocla+isochr-mist',
+        'isocla+isochr-dsep-jk','isocla+isochr-mist-jk'
+    ]
+    psr2.add_argument('driver', help='isochrone interp code',choices=drivers)
+    psr2.add_argument('id_starname', help='name of star')
+    psr2.add_argument('outdir')
+    psr2.add_argument('--debug',action='store_true')
+    psr2.set_defaults(func=run_iso)
+
     psr2 = subpsr.add_parser('create-val', parents=[psr_parent], )
     psr2.add_argument('name',type=str)
     psr2.set_defaults(func=create_val)
@@ -31,6 +55,23 @@ def main():
 
     args = psr.parse_args()
     args.func(args)
+
+def run_iso(args):
+    import cksgaia.iso
+    cksgaia.iso.run(args.driver, args.id_starname, args.outdir,debug=args.debug)
+
+def create_iso_jobs(args):
+    if args.sample=='cks':
+        df = cksgaia.io.load_table('j17+m17')
+    else:
+        import cksspec.io
+        df = cksspec.io.load_table(args.sample)
+        df['id_starname'] = df['name']
+
+    for i, row in df.iterrows():
+        id_starname = row.id_starname
+        outdir = "{}/{}".format(args.baseoutdir, id_starname)
+        print "mkdir -p {}; run_cksgaia.py run-iso {} {} {} &> {}/run-iso.log".format(outdir, args.driver, id_starname, outdir, outdir)
     
 def create_table(args):
     w = Workflow()
@@ -50,18 +91,6 @@ def create_val(args):
 def update_paper(args):
     w = Workflow()
     w.update_paper()
-
-
-def create_iso_jobs(args):
-    if args.sample=='cks':
-        df = cksgaia.io.load_table('cks')
-    else:
-        print("Sample not defined: {}".format(args.sample))
-
-    for i, row in df.iterrows():
-        id_starname = row.id_starname
-        outdir = "{}/{}".format(args.baseoutdir, id_starname)
-        print "mkdir -p {}; run_cksgaia.py run-iso {} {} {} &> {}/run-iso.log".format(outdir, args.driver, id_starname, outdir, outdir)
 
 
 class Workflow(object):
