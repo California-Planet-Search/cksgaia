@@ -4,6 +4,7 @@ import cPickle as pickle
 import pandas as pd
 import numpy as np
 import cksspec.io
+import ebf
 
 DATADIR = os.path.join(os.path.dirname(__file__),'../data/')
 
@@ -52,17 +53,25 @@ def load_table(table, cache=0, cachefn='load_table_cache.hdf', verbose=False):
                 namemap[col] = col.replace('kic','m17')
         df = df.rename(columns=namemap)
 
-    elif table=='cks-physical-merged':
+    elif table=='johnson17':
         df = pd.read_csv('data/cks_physical_merged.csv',index_col=0)
 
-    elif table=='cks-physical-merged+mathur17':
-        df = load_table('cks-physical-merged')
+    elif table=='j17+m17':
+        df = load_table('johnson17')
         m17 = load_table('mathur17')
-        df = pd.merge(df,m17, on='id_kic')
+        df = pd.merge(df,m17,on='id_kic')
+
+    elif table == 'j17+m17-fakegaia':
+        df = load_table('j17+m17')
+        df['iso_sparallax_err1'] /= 5
+        df['iso_sparallax_err2'] /= 5
+        df['iso_sparallax_err1'] = np.sqrt(
+            df['iso_sparallax_err1']**2 + (3e-5)**2
+        )  # 30 microarcsec floor
+        df['iso_sparallax_err2'] = -df['iso_sparallax_err1']
     else:
         assert False, "table {} not valid table name".format(table)
     return df
-
 
 def add_prefix(df,prefix,ignore=['id']):
     namemap = {}
@@ -88,3 +97,6 @@ def sub_prefix(df, prefix,ignore=['id']):
     df = df.rename(columns=namemap)
     return df
 
+def load_mist():
+    model = ebf.read(os.path.join(DATADIR,'mesa.ebf'))
+    return model
