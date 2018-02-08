@@ -70,7 +70,7 @@ def load_table(table, cache=0, cachefn='load_table_cache.hdf', verbose=False):
         df['iso_sparallax_err1'] /= 5
         df['iso_sparallax_err2'] /= 5
         df['iso_sparallax_err1'] = np.sqrt(
-            df['iso_sparallax_err1']**2 + (3e-5)**2
+            df.eval(['iso_sparallax_err1']**2 + (2e-2)**2
         )  # 30 microarcsec floor
         df['iso_sparallax_err2'] = -df['iso_sparallax_err1']
     else:

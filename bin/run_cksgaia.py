@@ -5,6 +5,9 @@ from collections import OrderedDict
 
 import pylab as pl
 
+import pandas as pd
+import glob
+
 import cksgaia.io     # module for reading and writing datasets
 import cksgaia.value  # module for computing scalar values for table
 import cksgaia.table  # module for computing scalar values for table
@@ -40,6 +43,19 @@ def main():
     psr2.add_argument('outdir')
     psr2.add_argument('--debug',action='store_true')
     psr2.set_defaults(func=run_iso)
+
+    psr2 = subpsr.add_parser(
+        'create-iso-table', parents=[psr_parent], 
+        description="Scrape the isochrones.csv files to make isochrones table"
+    )
+
+    modes = [
+        'isoclassify','isochrones'
+    ]
+    psr2.add_argument('mode',choices=modes)
+    psr2.add_argument('baseoutdir')
+    psr2.add_argument('outfile')
+    psr2.set_defaults(func=create_iso_table)
 
     psr2 = subpsr.add_parser('create-val', parents=[psr_parent], )
     psr2.add_argument('name',type=str)
@@ -80,6 +96,43 @@ def create_iso_jobs(args):
         outdir = "{}/{}".format(args.baseoutdir, id_starname)
         print "mkdir -p {}; run_cksgaia.py run-iso {} {} {} &> {}/run-iso.log".format(outdir, args.driver, id_starname, outdir, outdir)
     
+def create_iso_table(args):
+    """
+    Read in isochrones csvfiles 
+    Args:
+        outdir (str): where to look for isochrones.csv files
+    """
+    fL = glob.glob("{}/*/*.csv".format(args.baseoutdir))
+    df = []
+
+    import cksgaia._isoclassify
+        
+    if args.mode=='isoclassify':
+        _csv_reader = cksgaia._isoclassify._csv_reader
+    elif args.mode=='isochrones':
+        _csv_reader = cksgaia._isochrones._csv_reader
+    else:
+        assert False, "invalid mode"
+
+    for i, f in enumerate(fL):
+        if i%100==0:
+            print i
+            
+        try:
+            df.append(_csv_reader(f))
+        except:
+            print "{} failed".format(f)
+
+    df = pd.concat(df)
+    df.to_csv(args.outfile, index=False)
+    print "created {}".format(args.outfile)
+
+
+    
+
+
+
+
 def create_table(args):
     w = Workflow(outputdir=args.outputdir)
     w.create_file('table', args.name)
