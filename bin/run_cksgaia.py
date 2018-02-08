@@ -38,7 +38,7 @@ def create_iso_jobs(args):
     for i, row in df.iterrows():
         id_starname = row.id_starname
         outdir = "{}/{}".format(args.baseoutdir, id_starname)
-        print "mkdir -p {}; run_cksphys.py run-iso {} {} {} &> {}/run-iso.log".format(outdir, args.driver, id_starname, outdir, outdir)
+        print "mkdir -p {}; run_cksgaia.py run-iso {} {} {} &> {}/run-iso.log".format(outdir, args.driver, id_starname, outdir, outdir)
 
 
 class Workflow(object):
@@ -46,7 +46,10 @@ class Workflow(object):
         d = OrderedDict()
 
         # register different plots here
-        #d['lamo-on-cks'] = cksmet.plotting.calibrate.lamo_on_cks
+        # d['lamo-on-cks'] = cksmet.plotting.calibrate.lamo_on_cks
+        # run_cksgaia create-plot lamo-on-cks # fig_lamo-on-cks.pdf, fig_lamo-on-cks.pdf fig_lamo-on-cks.pdf
+        # run_cksgaia create-plot #
+
         self.plot_dict = d
 
         d = OrderedDict()
