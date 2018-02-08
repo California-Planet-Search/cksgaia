@@ -3,6 +3,7 @@ from argparse import ArgumentParser
 import os
 from collections import OrderedDict
 
+import pandas as pd
 import glob
 import cksgaia.io     # module for reading and writing datasets
 import cksgaia.value  # module for computing scalar values for table
