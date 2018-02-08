@@ -63,12 +63,10 @@ def load_table(table, cache=0, cachefn='load_table_cache.hdf', verbose=False):
 
     elif table == 'j17+m17-fakegaia':
         df = load_table('j17+m17')
-        df['iso_sparallax_err1'] /= 5
-        df['iso_sparallax_err2'] /= 5
-        df['iso_sparallax_err1'] = np.sqrt(
-            df.eval(['iso_sparallax_err1']**2 + (2e-2)**2
-        )  # 30 microarcsec floor
-        df['iso_sparallax_err2'] = -df['iso_sparallax_err1']
+        iso_err = df.iso_sparallax_err1 / 5 
+        gaia_err = np.sqrt(iso_err**2 + 0.02**2) # 20uas error floor
+        df['iso_sparallax_err1'] = gaia_err
+        df['iso_sparallax_err2'] = -1.0 * gaia_err
     else:
         assert False, "table {} not valid table name".format(table)
     return df
