@@ -7,7 +7,7 @@ import ebf
 
 import cksgaia.plot
 
-DATADIR = os.path.join(os.path.dirname(__file__),'../data/')
+DATADIR = os.path.join(os.path.dirname(__file__), '../data/')
 
 def load_table(table, cache=0, cachefn='load_table_cache.hdf', verbose=False):
     """Load tables used in cksmet
@@ -100,6 +100,10 @@ def sub_prefix(df, prefix,ignore=['id']):
             namemap[col] = col.replace(prefix,'') 
     df = df.rename(columns=namemap)
     return df
+
+def load_mist():
+    model = ebf.read(os.path.join(DATADIR,'mesa.ebf'))
+    return model
 
 
 def apply_filters(physmerge, mkplot=False, verbose=False):
@@ -251,8 +255,3 @@ def apply_filters(physmerge, mkplot=False, verbose=False):
         print "Final sample = %d planets." % len(crop)
 
     return crop
-
-
-def load_mist():
-    model = ebf.read(os.path.join(DATADIR,'mesa.ebf'))
-    return model

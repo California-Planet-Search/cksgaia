@@ -163,6 +163,9 @@ class Workflow(object):
         # register different plots here
         d['sample'] = cksgaia.plot.sample.hrplot
         d['filters'] = cksgaia.plot.sample.filter_plot
+        d['mag-hist'] = cksgaia.plot.sample.magcuts
+        d['depth-hist'] = cksgaia.plot.sample.depth_hist
+        d['srad-hist'] = cksgaia.plot.sample.srad_hist
 
         self.plot_dict = d
 

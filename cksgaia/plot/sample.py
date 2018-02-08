@@ -1,14 +1,16 @@
 import pylab as pl
-import matplotlib
 import numpy as np
+import matplotlib
 
 import cksgaia.io
 import cksgaia.misc
+from cksgaia.plot.config import *
+
 
 def hrplot():
 
-    physmerge = cksgaia.io.load_table('johnson17')
-    crop = cksgaia.io.load_table('fulton17')
+    physmerge = cksgaia.io.load_table(full_sample)
+    crop = cksgaia.io.load_table(filtered_sample)
 
     fig = pl.figure(figsize=(12,8))
 
@@ -45,7 +47,7 @@ def hrplot():
 def filter_plot():
     matplotlib.rcParams['font.size'] = 18
 
-    physmerge = cksgaia.io.load_table('johnson17')
+    physmerge = cksgaia.io.load_table(full_sample)
 
     _ = cksgaia.io.apply_filters(physmerge, mkplot=True)
 
@@ -164,3 +166,142 @@ def simplehist(physmerge, color='k', annotate='err', nbins=36, fill_valley=True,
     pl.grid(False)
 
     return v
+
+
+def magcuts():
+    physmerge = cksgaia.io.load_table(full_sample)
+
+    figure = pl.figure(figsize=(10, 12))
+    nrow = 3
+    ncol = 1
+    plti = 1
+
+    xticks = [.7, 1.0, 1.3, 1.75, 2.4, 3.5, 4.5, 6]
+
+    pl.subplot(nrow, ncol, plti)
+    pl.subplots_adjust(hspace=0, top=0.98, bottom=0.10, left=0.19)
+
+    bright = physmerge.query('kic_kepmag < 13.5')
+    medium = physmerge.query('kic_kepmag < 14.2 & kic_kepmag >= 13.5')
+    faint = physmerge.query('kic_kepmag >= 14.2')
+
+    f1 = physmerge.query('kic_kepmag <= 14.2')
+    f2 = physmerge.query('kic_kepmag <= 14.0')
+
+    v = simplehist(bright, fill_valley=False, nbins=36, color='k', unc=True, aloc=(0.85, 0.80),
+                                   annotate='$K_P < 13.5$', stacked=False, va_anno=False, eloc=(4.5, 50))
+
+    ax = pl.gca()
+    yticks = ax.yaxis.get_major_ticks()
+    yticks[0].label1.set_visible(False)
+    for label in ax.yaxis.get_ticklabels()[1::2]:
+        label.set_visible(False)
+    pl.xticks([])
+
+    pl.ylabel('')
+    pl.ylim(0, 70)
+    pl.xlim(0.7, 8)
+    pl.xticks([])
+    plti += 1
+
+    pl.subplot(nrow, ncol, plti)
+    v = simplehist(medium, fill_valley=False, nbins=36, color='k', unc=True, aloc=(0.85, 0.80),
+                                   annotate='$13.5 < K_P \leq 14.2$', stacked=False,
+                                   va_anno=False, weighted=False, eloc=(4.5, 45))
+
+    ax = pl.gca()
+    # yticks = ax.yaxis.get_major_ticks()
+    # yticks[0].label1.set_visible(False)
+    for label in ax.yaxis.get_ticklabels()[1::2]:
+        label.set_visible(False)
+    ax.yaxis.get_ticklabels()[0].set_visible(False)
+    # ax.yaxis.get_ticklabels()[-1].set_visible(False)
+    pl.xticks([])
+    pl.ylabel('')
+    pl.ylim(0, 70)
+    pl.xlim(0.7, 8)
+    pl.xticks([])
+    plti += 1
+
+    pl.ylabel('Number of Planets')
+
+    pl.subplot(nrow, ncol, plti)
+    v = simplehist(faint, fill_valley=False, nbins=36, color='k', unc=True, aloc=(0.85, 0.80),
+                                   annotate='$K_P \geq 14.2$', stacked=False,
+                                   va_anno=False, weighted=False, eloc=(4.5, 50))
+
+    ax = pl.gca()
+    # yticks = ax.yaxis.get_major_ticks()
+    # yticks[0].label1.set_visible(False)
+    for label in ax.yaxis.get_ticklabels()[1::2]:
+        label.set_visible(False)
+    pl.xticks([])
+
+    pl.ylabel('')
+    pl.ylim(0, 70)
+    pl.xlim(0.7, 8)
+    pl.xticks(xticks)
+
+
+def depth_hist():
+    physmerge = cksgaia.io.load_table(filtered_sample)
+
+    fig = pl.figure(figsize=(10, 7))
+
+    x = 7.0
+    y = 75.0
+    err1, err2 = cksgaia.misc.frac_err(physmerge, x, 'koi_ror')
+
+    xbins = np.logspace(np.log10(0.1), np.log10(30), 40)
+    pl.hist(physmerge['koi_ror'] * 100, bins=xbins, histtype='step', lw=4, color='k')
+    # physmerge['koi_ror'].hist(bins=xbins, histtype='step', lw=4, color='k')
+    _, caps, _ = pl.errorbar([x], [y], fmt='k.', xerr=[[err1], [err2]], capsize=6, lw=2, ms=0.1)
+    for cap in caps:
+        cap.set_markeredgewidth(2)
+    pl.annotate("typical\nuncert.", xy=(x, y), xytext=(0, -60),
+                xycoords="data", textcoords="offset points",
+                horizontalalignment='center')
+    pl.xlim(0.3, 30.0)
+    pl.ylim(0, 100)
+    pl.ylabel('Number of Planets')
+    pl.xlabel('Planet-star radius ratio [%]')
+    # pl.title('NEA')
+    pl.semilogx()
+    pl.xticks([0.3, 1.0, 3.0, 10.0, 30.0])
+    ax = pl.gca()
+    ax.xaxis.set_major_formatter(matplotlib.ticker.ScalarFormatter())
+    ax.xaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('%0.1f'))
+
+    pl.grid(False)
+
+
+def srad_hist():
+    physmerge = cksgaia.io.load_table(filtered_sample)
+
+    fig = pl.figure(figsize=(10, 7))
+
+    x = 2.2
+    y = 100.0
+    err1, err2 = cksgaia.misc.frac_err(physmerge, x, 'iso_prad')
+
+    xbins = np.logspace(np.log10(0.6), np.log10(3.0), 20)
+    physmerge['iso_srad'].hist(bins=xbins, histtype='step', lw=4, color='k')
+    _, caps, _ = pl.errorbar([x], [y], fmt='k.', xerr=[[err1], [err2]], capsize=6, lw=2, ms=0.1)
+    for cap in caps:
+        cap.set_markeredgewidth(2)
+    pl.annotate("typical\nuncert.", xy=(x, y), xytext=(0, -60),
+                xycoords="data", textcoords="offset points",
+                horizontalalignment='center')
+    pl.xlim(0.6, 3.0)
+    pl.ylim(0, 130)
+    pl.ylabel('Number of Planets')
+    pl.xlabel('Stellar Radius [Solar radii]')
+    # pl.title('NEA')
+    pl.semilogx()
+    ax = pl.gca()
+    ax.xaxis.set_major_formatter(matplotlib.ticker.ScalarFormatter())
+    ax.xaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('%0.1f'))
+    pl.xticks([0.6, 0.8, 1.0, 1.5, 2.0, 3.0])
+
+    pl.grid(False)
+
