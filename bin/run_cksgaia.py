@@ -36,20 +36,20 @@ def main():
     args.func(args)
     
 def create_table(args):
-    w = Workflow()
-    w.create_file('table', args.name ) 
+    w = Workflow(outputdir=args.outputdir)
+    w.create_file('table', args.name)
 
 
 def create_plot(args):
     w = Workflow(outputdir=args.outputdir)
-    w.create_file('plot', args.name ) 
+    w.create_file('plot', args.name)
 
 def create_val(args):
-    w = Workflow()
-    w.create_file('val',args.name) 
+    w = Workflow(outputdir=args.outputdir)
+    w.create_file('val', args.name)
 
 def update_paper(args):
-    w = Workflow()
+    w = Workflow(outputdir=args.outputdir)
     w.update_paper() 
 
 class Workflow(object):
@@ -60,6 +60,7 @@ class Workflow(object):
 
         # register different plots here
         d['sample'] = cksgaia.plot.sample.hrplot
+
         self.plot_dict = d
 
         d = OrderedDict()

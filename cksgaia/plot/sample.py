@@ -2,7 +2,6 @@ import pylab as pl
 import matplotlib
 import numpy as np
 
-
 import cksgaia.io
 
 
