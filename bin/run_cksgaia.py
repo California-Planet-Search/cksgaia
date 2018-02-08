@@ -12,6 +12,7 @@ def create_table(args):
     w = Workflow()
     w.create_file('table', args.name ) 
 
+
 def create_plot(args):
     w = Workflow()
     w.create_file('plot', args.name ) 
