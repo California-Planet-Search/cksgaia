@@ -9,7 +9,6 @@ https://github.com/jobovy/mwdust
 
 and install
 
-
 # Physical parameters
 
 This part of the code follows the CKS-Physical codebase
