@@ -3,6 +3,8 @@ from argparse import ArgumentParser
 import os
 from collections import OrderedDict
 
+import pylab as pl
+
 import cksgaia.io     # module for reading and writing datasets
 import cksgaia.value  # module for computing scalar values for table
 import cksgaia.table  # module for computing scalar values for table
@@ -13,6 +15,7 @@ def main():
     psr = ArgumentParser()
     subpsr = psr.add_subparsers(title="subcommands", dest='subcommand')
     psr_parent = ArgumentParser(add_help=False)
+    psr_parent.add_argument('-d', dest='outputdir', type=str, help="put files in this directory")
 
     psr2 = subpsr.add_parser(
         'create-iso-jobs', parents=[psr_parent], 
@@ -46,6 +49,10 @@ def main():
     psr2.add_argument('name',type=str)
     psr2.set_defaults(func=create_plot)
 
+    psr2 = subpsr.add_parser('create-val', parents=[psr_parent], )
+    psr2.add_argument('name',type=str)
+    psr2.set_defaults(func=create_val)
+
     psr2 = subpsr.add_parser('create-table', parents=[psr_parent], )
     psr2.add_argument('name',type=str)
     psr2.set_defaults(func=create_table)
@@ -74,33 +81,33 @@ def create_iso_jobs(args):
         print "mkdir -p {}; run_cksgaia.py run-iso {} {} {} &> {}/run-iso.log".format(outdir, args.driver, id_starname, outdir, outdir)
     
 def create_table(args):
-    w = Workflow()
-    w.create_file('table', args.name ) 
+    w = Workflow(outputdir=args.outputdir)
+    w.create_file('table', args.name)
+
 
 
 def create_plot(args):
-    w = Workflow()
-    w.create_file('plot', args.name ) 
+    w = Workflow(outputdir=args.outputdir)
+    w.create_file('plot', args.name)
 
 
 def create_val(args):
-    w = Workflow()
-    w.create_file('val',args.name) 
+    w = Workflow(outputdir=args.outputdir)
+    w.create_file('val', args.name)
 
 
 def update_paper(args):
-    w = Workflow()
-    w.update_paper()
-
+    w = Workflow(outputdir=args.outputdir)
+    w.update_paper() 
 
 class Workflow(object):
-    def __init__(self):
+    def __init__(self, outputdir='./'):
+        self.outputdir = outputdir
+
         d = OrderedDict()
 
         # register different plots here
-        # d['lamo-on-cks'] = cksmet.plotting.calibrate.lamo_on_cks
-        # run_cksgaia create-plot lamo-on-cks # fig_lamo-on-cks.pdf, fig_lamo-on-cks.pdf fig_lamo-on-cks.pdf
-        # run_cksgaia create-plot #
+        d['sample'] = cksgaia.plot.sample.hrplot
 
         self.plot_dict = d
 
@@ -121,7 +128,7 @@ class Workflow(object):
 
     def key2fn(self, key, kind):
         if kind=='plot':
-            return 'fig_'+key+'.pdf'
+            return os.path.join(self.outputdir, 'fig_'+key+'.pdf')
         if kind=='table':
             return 'tab_'+key+'.tex'
         if kind=='val':
@@ -140,7 +147,7 @@ class Workflow(object):
                     continue
                     
                 fn = self.key2fn(key, 'plot')
-                gcf().savefig(fn)
+                pl.gcf().savefig(fn)
 
             elif kind=='table':
                 if name=='all':
