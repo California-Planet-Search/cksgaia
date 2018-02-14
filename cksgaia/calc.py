@@ -29,15 +29,15 @@ def update_planet_parameters(df):
         # stellar radius
         unc_rad = np.mean([row['iso_srad_err1'], -row['iso_srad_err2']])
         # 8% floor on stellar radius uncertainty
-        if unc_rad / row['iso_srad'] < 0.08:
-            unc_rad = 0.08 * row['iso_srad']
+        # if unc_rad / row['iso_srad'] < 0.08:
+        #     unc_rad = 0.08 * row['iso_srad']
         e_rad = rand.normal(row['iso_srad'], unc_rad, size=10000)
 
         # stellar mass
         unc_mstar = np.mean([row['iso_smass_err1'], -row['iso_smass_err2']])
         # 5% floor on stellar mass uncertainty
-        if unc_mstar / row['iso_smass'] < 0.05:
-            unc_mstar = 0.05 * row['iso_smass']
+        # if unc_mstar / row['iso_smass'] < 0.05:
+        #     unc_mstar = 0.05 * row['iso_smass']
         e_mstar = rand.normal(row['iso_smass'], unc_mstar, size=10000)
 
         # period

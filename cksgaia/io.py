@@ -11,8 +11,8 @@ from cksgaia.config import *
 
 DATADIR = os.path.join(os.path.dirname(__file__), '../data/')
 
-def load_table(table, cache=0, cachefn='load_table_cache.hdf', verbose=False):
-    """Load tables used in cksmet
+def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
+    """Load tables used in cksgaia
 
     Args:
         table (str): name of table. must be one of
@@ -162,13 +162,26 @@ def load_table(table, cache=0, cachefn='load_table_cache.hdf', verbose=False):
         iso = load_table('iso-floor')
         df = pd.merge(cksnea,iso,on='id_starname')
 
-        #df = df[np.isfinite(df['koi_depth'])]
-        #df = df[df['koi_disposition'] != "FALSE POSITIVE"]
+        if verbose:
+            print "Updating planet parameters"
+        df = cksgaia.calc.update_planet_parameters(df)
+        df = order_columns(df,verbose=False)
+
+    elif table=='cks+nea+iso':
+        if verbose:
+            print "Merging CKS and NEA tables"
+        cksnea = load_table('cks+nea')
+
+        if verbose:
+            print "Merging with ISO table"
+        iso = load_table('iso')
+        df = pd.merge(cksnea, iso, on='id_starname')
 
         if verbose:
             print "Updating planet parameters"
         df = cksgaia.calc.update_planet_parameters(df)
         df = order_columns(df,verbose=False)
+
 
     elif table == 'nea':
         csvfn = os.path.join(DATADIR, 'q1_q16_koi.csv')
@@ -212,10 +225,19 @@ def load_table(table, cache=0, cachefn='load_table_cache.hdf', verbose=False):
         df.index = df.id_starname
         df = cksgaia.errors.add_frac_err(df)
 
+    elif table == 'iso-old':
+        df = pd.read_csv(os.path.join(DATADIR,'isochrones_old.csv'), index_col=None, skipinitialspace=True)
+        df.index = df.id_starname
+        df = cksgaia.errors.add_equad(df)
+        df = cksgaia.errors.add_frac_err(df)
+
     elif table == 'iso-floor':
         df = load_table('iso')
         df = cksgaia.errors.add_equad(df)
         df = cksgaia.errors.add_frac_err(df)
+
+    elif table == 'fakegaia-merged':
+        df = pd.read_csv(MERGED_TABLE, index_col=None, skipinitialspace=True)
 
 
     else:

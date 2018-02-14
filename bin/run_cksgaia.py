@@ -4,6 +4,7 @@ import os
 from collections import OrderedDict
 
 import pylab as pl
+import numpy as np
 
 import pandas as pd
 import glob
@@ -147,7 +148,8 @@ def create_iso_table(args):
 
 
 def create_merged_table(args):
-    df = cksgaia.io.load_table('cks+nea+iso-floor', verbose=True, cache=0)
+    df = cksgaia.io.load_table('cks+nea+iso', verbose=True, cache=0)
+
     csvfn = os.path.join(cksgaia.io.DATADIR, 'cks_fakegaia_merged.csv')
     df.to_csv(csvfn)
 
@@ -191,6 +193,8 @@ class Workflow(object):
         d['mag-hist'] = cksgaia.plot.sample.magcuts
         d['depth-hist'] = cksgaia.plot.sample.depth_hist
         d['srad-hist'] = cksgaia.plot.sample.srad_hist
+        d['srad-err-hist'] = cksgaia.plot.sample.srad_err_hist
+        d['prad-err-hist'] = cksgaia.plot.sample.prad_err_hist
         d['insol-hist'] = cksgaia.plot.occur.insol_hist
         d['radius-hist-fit'] = cksgaia.plot.occur.money_plot_fit
         d['radius-hist-plain'] = cksgaia.plot.occur.money_plot_plain
