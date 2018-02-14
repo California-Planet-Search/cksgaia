@@ -1,31 +1,62 @@
-# Code from EAP's K2-24 paper, use as template
-'''
-def tab_rv():
-    df = ktwo24.io.load_table('rv')
+import os
+
+import cksgaia.io
+import cksgaia.fitting
+
+def weight_table(lines='all'):
+    physmerge = cksgaia.io.load_table('fulton17-weights')
+
+    cols = ['id_koicand', 'koi_period', 'iso_prad', 'koi_snr', 'det_prob', 'tr_prob', 'weight']
+
+    if lines == 'all':
+        outstr = physmerge.to_latex(columns=cols, escape=False, header=False,
+                                    index=False, float_format='%4.2f')
+    else:
+        outstr = physmerge.iloc[0:int(lines)].to_latex(columns=cols, escape=False, header=False,
+                                                       index=False, float_format='%4.2f')
+
+    return outstr.split('\n')
+
+def weight_table_machine():
+    physmerge = cksgaia.io.load_table('fulton17-weights')
+
+    full_cols = ['id_koicand', 'koi_period', 'koi_period_err1', 'koi_period_err2',
+                 'iso_prad', 'iso_prad_err1', 'iso_prad_err2',
+                 'koi_snr', 'det_prob', 'tr_prob', 'weight']
+
     lines = []
-    for i, row in df.iterrows():
-        line = r""
-        line+=r"{time:.6f} & {mnvel:.2f} & {errvel:.2f} \\"
-        line = line.format(**row)
-        lines.append(line)
+    lines.append(", ".join(full_cols))
+
+    for i, row in physmerge.iterrows():
+        row_str = "{:s}, {:10.8f}, {:.1e}, {:.1e}, {:.2f}, {:.2f}, {:.2f}, {:.2f}, {:.3f}, {:.4f}, {:.2f}".format(
+            row['id_koicand'], row['koi_period'], row['koi_period_err1'], row['koi_period_err2'],
+            row['iso_prad'], row['iso_prad_err1'], row['iso_prad_err2'],
+            row['koi_snr'], row['det_prob'], row['tr_prob'], row['weight']
+        )
+        lines.append(row_str)
+
     return lines
 
-def tab_transit_times_predict():
-    df = ktwo24.io.load_table('times-predict',cache=1)
-    df = df.reset_index(drop=True)
-    df['s_planet'] = df.i_planet.astype(str).str.replace('1','b').\
-                     str.replace('2','c')
-    df['date'] = pd.Series(Time(df.tc+bjd0,format='jd').iso).str.slice(stop=10)
-    df['tc_err'] = 0.5 * (df.tc_err1 - df.tc_err2)
-    df = df[~df.date.str.contains('2024')]
+def bins_table():
     lines = []
-    for i, row in df.iterrows():
-        line = r""
-#        line+=r"{s_planet:s} & {i_epoch:.0f} & {date:s} & ${{{tc:.4f}}}^{{+{tc_err1:.4f}}}_{{{tc_err2:.4f}}}$ \\"
-        line+=r"{s_planet:s} & {i_epoch:.0f} & {date:s} & {tc:.4f} & {tc_err:.4f} \\"
-        line = line.format(**row)
-        lines.append(line)
+
+    for i, rad in enumerate(cksgaia.fitting.Redges[:-1]):
+        lines.append("%4.2f--%4.2f  &  %4.2f \\\\" % (rad, cksgaia.fitting.Redges[i + 1], cksgaia.fitting.efudge[i]))
+
     return lines
 
-'''
 
+def filters_table():
+    physmerge = cksgaia.io.load_table('fulton17')
+
+    crop = cksgaia.io.apply_filters(physmerge, mkplot=True, textable=True)
+
+    f = open('tmp.tex', 'r')
+    lines = f.readlines()
+    f.close()
+
+    os.system('rm tmp.tex')
+
+    lines = [l.replace('\n', '') for l in lines]
+
+    return lines

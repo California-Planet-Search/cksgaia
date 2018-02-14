@@ -146,12 +146,13 @@ def load_mist():
     return model
 
 
-def apply_filters(physmerge, mkplot=False, verbose=False):
+def apply_filters(physmerge, mkplot=False, verbose=False, textable=False):
     # slope and intercept for subgiant filter
     ls, li = 0.00025, 0.20
 
     def _bipanel(physmerge, nrow, ncol, plti, eloc=(12.0, 100), aloc=(0.95, 0.85), atxt='full CKS sample',
                  letters=True):
+
         if mkplot:
             left = plti
             right = plti + 1
@@ -176,7 +177,13 @@ def apply_filters(physmerge, mkplot=False, verbose=False):
             ax = pl.gca()
             plti += 1
 
-            print "%s  &  %4.3f  \\\\" % (atxt, v_cks)
+            texline = "%s  &  %4.3f  \\\\" % (atxt, v_cks)
+            if textable:
+                f = open('tmp.tex', 'a')
+                print >>f, texline
+                f.close()
+
+            print texline
 
             ylimits = [0, ymax_left]
             pl.subplot(nrow, ncol, left)
@@ -293,5 +300,7 @@ def apply_filters(physmerge, mkplot=False, verbose=False):
     if verbose:
         print
         print "Final sample = %d planets." % len(crop)
+
+
 
     return crop

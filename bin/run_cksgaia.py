@@ -73,6 +73,10 @@ def main():
     psr2.add_argument('name',type=str)
     psr2.set_defaults(func=create_table)
 
+    psr2 = subpsr.add_parser('create-csv', parents=[psr_parent], )
+    psr2.add_argument('name',type=str)
+    psr2.set_defaults(func=create_csv)
+
     psr2 = subpsr.add_parser('update-paper', parents=[psr_parent])
     psr2.set_defaults(func=update_paper)
 
@@ -137,7 +141,9 @@ def create_table(args):
     w = Workflow(outputdir=args.outputdir)
     w.create_file('table', args.name)
 
-
+def create_csv(args):
+    w = Workflow(outputdir=args.outputdir)
+    w.create_file('csv', args.name)
 
 def create_plot(args):
     w = Workflow(outputdir=args.outputdir)
@@ -179,8 +185,16 @@ class Workflow(object):
 
         d = OrderedDict()
         # register different tables here
-        # d['population-stub'] = lambda : cksmet.tables.population(stub=True)
+        d['weight-tex-stub'] = lambda : cksgaia.table.weight_table(lines=10)
+        d['weight-tex-full'] = lambda: cksgaia.table.weight_table(lines='all')
+        d['histbins'] = lambda: cksgaia.table.bins_table()
+        d['filters'] = lambda: cksgaia.table.filters_table()
         self.table_dict = d
+
+        d = OrderedDict()
+        # register machine-readable tables here
+        d['weight-machine'] = lambda: cksgaia.table.weight_table_machine()
+        self.csv_dict = d
 
         d = OrderedDict()
         #d['fit'] = cksmet.values.val_fit
@@ -188,6 +202,7 @@ class Workflow(object):
 
         d = OrderedDict()
         d['table'] = self.table_dict
+        d['csv'] = self.csv_dict
         d['plot'] = self.plot_dict
         d['val'] = self.val_dict
         self.all_dict = d
@@ -196,7 +211,9 @@ class Workflow(object):
         if kind=='plot':
             return os.path.join(self.outputdir, 'fig_'+key+'.pdf')
         if kind=='table':
-            return 'tab_'+key+'.tex'
+            return os.path.join(self.outputdir, 'tab_'+key+'.tex')
+        if kind=='csv':
+            return os.path.join(self.outputdir, 'tab_'+key+'.csv')
         if kind=='val':
             return 'val_'+key+'.tex'
             
@@ -215,7 +232,7 @@ class Workflow(object):
                 fn = self.key2fn(key, 'plot')
                 pl.gcf().savefig(fn)
 
-            elif kind=='table':
+            elif kind=='table' or kind == 'csv':
                 if name=='all':
                     lines = func()
                 elif name==key:
@@ -224,7 +241,7 @@ class Workflow(object):
                     continue
                     
                 # Remove last \\
-                fn = self.key2fn(key, 'table')
+                fn = self.key2fn(key, kind)
                 with open(fn,'w') as f:
                     f.writelines("\n".join(lines))
 
