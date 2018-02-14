@@ -6,10 +6,12 @@ import pylab as pl
 import ebf
 
 import cksgaia.plot
+import cksgaia.completeness
+from cksgaia.config import *
 
 DATADIR = os.path.join(os.path.dirname(__file__), '../data/')
 
-def load_table(table, cache=0, cachefn='load_table_cache.hdf', verbose=False):
+def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
     """Load tables used in cksmet
 
     Args:
@@ -46,8 +48,21 @@ def load_table(table, cache=0, cachefn='load_table_cache.hdf', verbose=False):
         df.to_hdf(cachefn,table)
         return df
 
+    elif table=='stellar17':
+        tablefn = os.path.join(DATADIR, 'kepler_stellar17.csv.gz')
+        df = pd.read_csv(tablefn,sep='|',dtype={'st_quarters':'str'})
+        namemap = {
+            'kepid':'id_kic','kepmag':'kic_kepmag', 'teff': 'kic_steff',
+            'st_quarters':'st_quarters','mass':'kic_smass',
+            'st_radius':'kic_srad', 'jmag':'kic_jmag',
+            'jmag_err':'kic_jmag_err','hmag':'kic_hmag',
+            'hmag_err':'kic_hmag_err','kmag':'kic_kmag',
+            'kmag_err':'kic_kmag_err'
+        }
+        df = df.rename(columns=namemap)[namemap.values()]
+
     elif table=='mathur17':
-        df = cksspec.io.load_table('stellar17')
+        df = cksgaia.io.load_table('stellar17')
         namemap = {}
         for col in list(df.columns):
             if col[:3]=='kic':
@@ -56,15 +71,23 @@ def load_table(table, cache=0, cachefn='load_table_cache.hdf', verbose=False):
 
     elif table=='johnson17':
         df = pd.read_csv('data/cks_physical_merged.csv',index_col=0)
+
     elif table=='fulton17':
         df = load_table('johnson17')
         df = apply_filters(df)
+
+    elif table=='fulton17-weights':
+        df = load_table('johnson17')
+        df = apply_filters(df)
+        df = cksgaia.completeness.weight_merge(df)
+
     elif table=='cks-physical-merged+mathur17':
         df = load_table('cks-physical-merged')
+
     elif table=='j17+m17':
         df = load_table('johnson17')
         m17 = load_table('mathur17')
-        df = pd.merge(df,m17,on='id_kic')
+        df = pd.merge(df, m17, on='id_kic')
 
     elif table == 'j17+m17-fakegaia':
         df = load_table('j17+m17')
@@ -72,6 +95,23 @@ def load_table(table, cache=0, cachefn='load_table_cache.hdf', verbose=False):
         gaia_err = np.sqrt(iso_err**2 + 0.02**2) # 20uas error floor
         df['iso_sparallax_err1'] = gaia_err
         df['iso_sparallax_err2'] = -1.0 * gaia_err
+
+    elif table == 'kic':
+        fname = os.path.join(DATADIR, 'kic_q0_q17.hdf')
+        kic = pd.read_hdf(fname)
+        s17 = load_table('stellar17')
+        kicmerge = pd.merge(s17, kic, left_on='id_kic', right_on='KICID')
+        df = kicmerge
+
+    elif table == 'kic-filtered':
+        df = load_table('kic')
+
+        kicselect = df.query('kic_kepmag <= 14.2 & kic_steff >= 4700 & kic_steff <= 6500')
+        kicselect = kicselect[kicselect['kic_srad'] <= 10**(ls*(kicselect['kic_steff']-5500)+li)]
+        kicselect = kicselect.dropna(subset=['kic_smass']).reset_index()
+
+        df = kicselect
+
     else:
         assert False, "table {} not valid table name".format(table)
     return df

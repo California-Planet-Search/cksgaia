@@ -166,6 +166,14 @@ class Workflow(object):
         d['mag-hist'] = cksgaia.plot.sample.magcuts
         d['depth-hist'] = cksgaia.plot.sample.depth_hist
         d['srad-hist'] = cksgaia.plot.sample.srad_hist
+        d['insol-hist'] = cksgaia.plot.occur.insol_hist
+        d['radius-hist-fit'] = cksgaia.plot.occur.money_plot_fit
+        d['radius-hist-plain'] = cksgaia.plot.occur.money_plot_plain
+        d['period-contour-q16'] = cksgaia.plot.contour.period_contour_q16
+        d['period-contour-cks'] = cksgaia.plot.contour.period_contour_cks
+        d['insol-contour-anno'] = cksgaia.plot.contour.insol_contour_anno
+        d['insol-contour-data'] = cksgaia.plot.contour.insol_contour_data
+        d['srad-contour'] = cksgaia.plot.contour.srad_contour
 
         self.plot_dict = d
 
