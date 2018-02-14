@@ -345,7 +345,7 @@ def srad_err_hist():
 
     pl.grid(False)
 
-    pl.legend(['Petigura+17', 'this work'], loc='upper left')
+    pl.legend(['Johnson+17', 'this work'], loc='upper left')
 
 
 def prad_err_hist():
