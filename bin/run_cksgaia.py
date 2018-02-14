@@ -147,7 +147,13 @@ def create_iso_table(args):
 
 
 def create_merged_table(args):
-    df = cksgaia.io.load_table('cks+nea+iso-floor', verbose=True, cache=0)
+    df = cksgaia.io.load_table('johnson17', verbose=True, cache=0)
+    iso = cksgaia.io.load_table('iso', verbose=True, cache=0)
+    print len(df), len(iso)
+
+    for col in iso.columns:
+        df[col] = iso[col].values
+
     csvfn = os.path.join(cksgaia.io.DATADIR, 'cks_fakegaia_merged.csv')
     df.to_csv(csvfn)
 

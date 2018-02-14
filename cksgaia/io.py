@@ -11,7 +11,7 @@ from cksgaia.config import *
 
 DATADIR = os.path.join(os.path.dirname(__file__), '../data/')
 
-def load_table(table, cache=0, cachefn='load_table_cache.hdf', verbose=False):
+def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
     """Load tables used in cksmet
 
     Args:
@@ -56,6 +56,23 @@ def load_table(table, cache=0, cachefn='load_table_cache.hdf', verbose=False):
             names=['column','description']
         )
 
+    elif table=='petigura17':
+        # Adding in the specmatch uncerts
+        df = pd.read_csv(CKS_CSVFN)
+        namemap = {
+            'name':'id_starname',
+            'id_koi':'id_koi',
+            'cks_steff_err':'cks_steff_err1',
+            'cks_slogg_err':'cks_slogg_err1',
+            'cks_smet_err':'cks_smet_err1',
+            'cks_svsini_err':'cks_svsini_err1',
+        }
+
+        df = df.rename(columns=namemap)
+        for k in 'steff slogg smet svsini'.split():
+            df['cks_'+k+'_err2'] = -1.0 * df['cks_'+k+'_err1']
+        df = order_columns(df)
+
     elif table=='stellar17':
         tablefn = os.path.join(DATADIR, 'kepler_stellar17.csv.gz')
         df = pd.read_csv(tablefn,sep='|',dtype={'st_quarters':'str'})
@@ -89,9 +106,6 @@ def load_table(table, cache=0, cachefn='load_table_cache.hdf', verbose=False):
         df = apply_filters(df)
         df = cksgaia.completeness.weight_merge(df)
 
-    elif table=='cks-physical-merged+mathur17':
-        df = load_table('cks-physical-merged')
-
     elif table=='j17+m17':
         df = load_table('johnson17')
         m17 = load_table('mathur17')
@@ -119,93 +133,6 @@ def load_table(table, cache=0, cachefn='load_table_cache.hdf', verbose=False):
         kicselect = kicselect.dropna(subset=['kic_smass']).reset_index()
 
         df = kicselect
-
-    elif table=='cks':
-        # Adding in the specmatch uncerts
-        df = pd.read_csv(CKS_CSVFN)
-        namemap = {
-            'name':'id_starname',
-            'id_koi':'id_koi',
-            'cks_steff_err':'cks_steff_err1',
-            'cks_slogg_err':'cks_slogg_err1',
-            'cks_smet_err':'cks_smet_err1',
-            'cks_svsini_err':'cks_svsini_err1',
-        }
-
-        df = df.rename(columns=namemap)
-        for k in 'steff slogg smet svsini'.split():
-            df['cks_'+k+'_err2'] = -1.0 * df['cks_'+k+'_err1']
-        df = order_columns(df)
-
-    elif table=='cks+kmag':
-        # Load up CKS sample and merge in kmag
-        cks = load_table('cks')
-        df = load_table('stellar17')
-        df = df['id_kic kic_kepmag kic_jmag kic_hmag kic_kmag'.split()]
-        df = pd.merge(cks, df, how='left', on='id_kic')
-        df = order_columns(df,verbose=False)
-
-    elif table=='cks+nea':
-        cks = load_table('cks+kmag')
-        nea = load_table('nea')
-        # Drop mags from nea table to prevent naming collisions
-        df = pd.merge(cks, nea, on='id_kic',)
-        df = order_columns(df,verbose=False)
-
-    elif table=='cks+nea+iso-floor':
-        if verbose:
-            print "Merging CKS and NEA tables"
-        cksnea = load_table('cks+nea')
-
-        if verbose:
-            print "Merging with ISO table"
-        iso = load_table('iso-floor')
-        df = pd.merge(cksnea,iso,on='id_starname')
-
-        #df = df[np.isfinite(df['koi_depth'])]
-        #df = df[df['koi_disposition'] != "FALSE POSITIVE"]
-
-        if verbose:
-            print "Updating planet parameters"
-        df = cksgaia.calc.update_planet_parameters(df)
-        df = order_columns(df,verbose=False)
-
-    elif table == 'nea':
-        csvfn = os.path.join(DATADIR, 'q1_q16_koi.csv')
-        df = pd.read_csv(csvfn, comment='#', skipinitialspace=True)
-        namemap = {
-            'kepid': 'id_kic',
-            'kepoi_name': 'id_koicand',
-            'kepler_name': 'id_kepler_name',
-        }
-
-        df = df.rename(columns=namemap)
-
-        # Get MES from cummulative table
-        cum = load_table('nea-cum')
-        cum = cum.rename(columns=namemap)
-        m = pd.merge(df, cum, on='id_koicand', suffixes=['', '_cum'])
-        df['koi_max_mult_ev'] = m['koi_max_mult_ev_cum']
-
-        # Get CKS dispositions
-        fn = os.path.join(DATADIR, 'tab_dispositions.csv')
-        disp = pd.read_csv(fn, index_col=None)
-        disp['cks_fp'] = disp['cks_disp'] == 'FP'
-        df = pd.merge(df, disp, on='id_koicand')
-        df['id_koi'] = df.id_koicand.str.slice(start=1, stop=6).astype(int)
-        df = order_columns(df, verbose=False)
-
-    elif table == 'nea-cum':
-        csvfn = os.path.join(DATADIR, 'cumulative_koi_20170215.csv')
-        df = pd.read_csv(csvfn, comment='#', skipinitialspace=True)
-        namemap = {
-            'kepid': 'id_kic',
-            'kepoi_name': 'id_koicand',
-            'kepler_name': 'id_kepler_name',
-        }
-        df = df.rename(columns=namemap)
-        df['id_koi'] = df.id_koicand.str.slice(start=1, stop=6).astype(int)
-        df = order_columns(df, verbose=False)
 
     elif table == 'iso':
         df = pd.read_csv(ISO_CSVFN, index_col=None, skipinitialspace=True)
