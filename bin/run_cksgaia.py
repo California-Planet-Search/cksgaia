@@ -12,6 +12,8 @@ import cksgaia.io     # module for reading and writing datasets
 import cksgaia.value  # module for computing scalar values for table
 import cksgaia.table  # module for computing scalar values for table
 import cksgaia.plot   # submodule for including plots
+import cksgaia.errors
+import cksgaia.calc
 
 
 def main():
@@ -56,6 +58,18 @@ def main():
     psr2.add_argument('baseoutdir')
     psr2.add_argument('outfile')
     psr2.set_defaults(func=create_iso_table)
+
+    psr_merge = subpsr.add_parser(
+        'create-merged-table', parents=[psr_parent],
+        description="Generate merged table with all of the columns."
+    )
+    psr_merge.set_defaults(func=create_merged_table)
+
+    psr_stats = subpsr.add_parser(
+        'tex-stats', parents=[psr_parent],
+        description="Generate merged table with all of the columns."
+    )
+    psr_stats.set_defaults(func=tex_stats)
 
     psr2 = subpsr.add_parser('create-val', parents=[psr_parent], )
     psr2.add_argument('name',type=str)
@@ -132,9 +146,14 @@ def create_iso_table(args):
     print "created {}".format(args.outfile)
 
 
-    
+def create_merged_table(args):
+    df = cksgaia.io.load_table('cks+nea+iso-floor', verbose=True, cache=0)
+    csvfn = os.path.join(cksgaia.io.DATADIR, 'cks_fakegaia_merged.csv')
+    df.to_csv(csvfn)
 
 
+def tex_stats(args):
+    cksgaia.calc.table_statistics()
 
 
 def create_table(args):
