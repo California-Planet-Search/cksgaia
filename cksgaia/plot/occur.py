@@ -288,3 +288,91 @@ def money_plot_plain():
     # pl.axvspan(1.75, 3.5, color=c2, alpha=0.1)
 
     pl.ylim(0, 0.125)
+
+
+def mass_cuts():
+    physmerge = cksgaia.io.load_table('fulton17-weights')
+
+    # cx, cy = np.loadtxt('/Users/bfulton/code/cksrad/data/detectability_p1.txt', unpack=True)
+    cx, cy = np.loadtxt(os.path.join(modpath, 'data/sensitivity_p25.txt'), unpack=True)
+    # cx, cy = np.loadtxt('/Users/bfulton/code/cksrad/data/sensitivity_p50.txt', unpack=True)
+    a = (physmerge['iso_smass'].max() * (cx / 365.) ** 2) ** (1 / 3.)
+    sx = (physmerge['cks_steff'].max() / 5778) ** 4.0 * (physmerge['iso_srad'].max() / a) ** 2.0
+    sx = np.append(sx, 10)
+    cy = np.append(cy, 6)
+
+    figure = pl.figure(figsize=(10, 12))
+    nrow = 3
+    ncol = 1
+    plti = 1
+
+    xticks = [.7, 1.0, 1.3, 1.75, 2.4, 3.5, 4.5, 6]
+
+    pl.subplot(nrow, ncol, plti)
+    pl.subplots_adjust(hspace=0, top=0.98, bottom=0.10, left=0.19)
+
+    high = physmerge.query('iso_smass > 1.2')
+    medium = physmerge.query('iso_smass <= 1.2 & iso_smass >= 0.8')
+    low = physmerge.query('iso_smass < 0.8')
+
+    lim = cy[np.argmin(np.abs(sx - 200))]
+    print lim
+    v = cksgaia.plot.sample.simplehist(high, fill_valley=False, nbins=36, color='k', unc=True, aloc=(0.9, 0.8),
+                                   annotate='$S_{\\rm inc} > 200 S_{\oplus}$', stacked=False, va_anno=False,
+                                   weighted=True,
+                                   nstars=num_stars, eloc=(4.5, 0.04), clim=lim)
+
+    ax = pl.gca()
+    yticks = ax.yaxis.get_major_ticks()
+    yticks[0].label1.set_visible(False)
+    for label in ax.yaxis.get_ticklabels()[1::2]:
+        label.set_visible(False)
+    pl.xticks([])
+
+    pl.ylabel('')
+    pl.ylim(0, 0.06)
+    pl.xlim(0.7, 8)
+    pl.xticks([])
+    plti += 1
+
+    lim = cy[np.argmin(np.abs(sx - 80))]
+    print lim
+    pl.subplot(nrow, ncol, plti)
+    v = cksgaia.plot.sample.simplehist(medium, fill_valley=False, nbins=36, color='k', unc=True, aloc=(0.9, 0.8),
+                                   annotate='$80 S_{\oplus} \leq S_{\\rm inc} \leq 200 S_{\oplus}$', stacked=False,
+                                   va_anno=False, weighted=True, nstars=num_stars, eloc=(4.5, 0.04), clim=lim)
+
+    ax = pl.gca()
+    # yticks = ax.yaxis.get_major_ticks()
+    # yticks[0].label1.set_visible(False)
+    for label in ax.yaxis.get_ticklabels()[1::2]:
+        label.set_visible(False)
+    ax.yaxis.get_ticklabels()[0].set_visible(False)
+    ax.yaxis.get_ticklabels()[-1].set_visible(False)
+    pl.xticks([])
+    pl.ylabel('')
+    pl.ylim(0, 0.06)
+    pl.xlim(0.7, 8)
+    pl.xticks([])
+    plti += 1
+
+    pl.ylabel('Number of Planets per Star')
+
+    lim = cy[-2]
+    print lim
+    pl.subplot(nrow, ncol, plti)
+    v = cksgaia.plot.sample.simplehist(low, fill_valley=False, nbins=36, color='k', unc=True, aloc=(0.9, 0.85),
+                                   annotate='$10 S_{\oplus} \leq S_{\\rm inc} \leq 50 S_{\oplus}$', stacked=False,
+                                   va_anno=False, weighted=True, nstars=num_stars, eloc=(4.5, 0.04), clim=lim)
+
+    ax = pl.gca()
+    # yticks = ax.yaxis.get_major_ticks()
+    # yticks[0].label1.set_visible(False)
+    for label in ax.yaxis.get_ticklabels()[1::2]:
+        label.set_visible(False)
+    pl.xticks([])
+
+    pl.ylabel('')
+    pl.ylim(0, 0.06)
+    pl.xlim(0.7, 8)
+    pl.xticks(xticks)
