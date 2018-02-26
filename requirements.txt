@@ -8,3 +8,4 @@ lmfit==0.9.7
 astropy==2.0.2
 ebfpy==0.0.14
 pp==1.6.5
+astropysics
