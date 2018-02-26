@@ -60,7 +60,6 @@ def main():
     psr2.add_argument('outfile')
     psr2.set_defaults(func=create_iso_table)
 
-<<<<<<< HEAD
     psr2 = subpsr.add_parser('create-extinction-jobs', parents=[psr_parent])
     psr2.set_defaults(func=create_extinction_jobs)
 
@@ -68,7 +67,7 @@ def main():
     psr2.add_argument('table', help='name of star')
     psr2.add_argument('key')
     psr2.set_defaults(func=compute_extinction)
-=======
+
     psr_merge = subpsr.add_parser(
         'create-merged-table', parents=[psr_parent],
         description="Generate merged table with all of the columns."
@@ -80,7 +79,6 @@ def main():
         description="Generate merged table with all of the columns."
     )
     psr_stats.set_defaults(func=tex_stats)
->>>>>>> 81fd1ecc1ae971041d4a075a085cb1433588b17c
 
     psr2 = subpsr.add_parser('create-val', parents=[psr_parent], )
     psr2.add_argument('name',type=str)
