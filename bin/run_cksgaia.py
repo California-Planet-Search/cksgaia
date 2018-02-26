@@ -3,18 +3,25 @@ from argparse import ArgumentParser
 import os
 from collections import OrderedDict
 
+import pylab as pl
+import numpy as np
+
 import pandas as pd
 import glob
+
 import cksgaia.io     # module for reading and writing datasets
 import cksgaia.value  # module for computing scalar values for table
 import cksgaia.table  # module for computing scalar values for table
 import cksgaia.plot   # submodule for including plots
+import cksgaia.errors
+import cksgaia.calc
 
 
 def main():
     psr = ArgumentParser()
     subpsr = psr.add_subparsers(title="subcommands", dest='subcommand')
     psr_parent = ArgumentParser(add_help=False)
+    psr_parent.add_argument('-d', dest='outputdir', type=str, help="put files in this directory")
 
     psr2 = subpsr.add_parser(
         'create-iso-jobs', parents=[psr_parent], 
@@ -53,6 +60,7 @@ def main():
     psr2.add_argument('outfile')
     psr2.set_defaults(func=create_iso_table)
 
+<<<<<<< HEAD
     psr2 = subpsr.add_parser('create-extinction-jobs', parents=[psr_parent])
     psr2.set_defaults(func=create_extinction_jobs)
 
@@ -60,6 +68,19 @@ def main():
     psr2.add_argument('table', help='name of star')
     psr2.add_argument('key')
     psr2.set_defaults(func=compute_extinction)
+=======
+    psr_merge = subpsr.add_parser(
+        'create-merged-table', parents=[psr_parent],
+        description="Generate merged table with all of the columns."
+    )
+    psr_merge.set_defaults(func=create_merged_table)
+
+    psr_stats = subpsr.add_parser(
+        'tex-stats', parents=[psr_parent],
+        description="Generate merged table with all of the columns."
+    )
+    psr_stats.set_defaults(func=tex_stats)
+>>>>>>> 81fd1ecc1ae971041d4a075a085cb1433588b17c
 
     psr2 = subpsr.add_parser('create-val', parents=[psr_parent], )
     psr2.add_argument('name',type=str)
@@ -69,9 +90,17 @@ def main():
     psr2.add_argument('name',type=str)
     psr2.set_defaults(func=create_plot)
 
+    psr2 = subpsr.add_parser('create-val', parents=[psr_parent], )
+    psr2.add_argument('name',type=str)
+    psr2.set_defaults(func=create_val)
+
     psr2 = subpsr.add_parser('create-table', parents=[psr_parent], )
     psr2.add_argument('name',type=str)
     psr2.set_defaults(func=create_table)
+
+    psr2 = subpsr.add_parser('create-csv', parents=[psr_parent], )
+    psr2.add_argument('name',type=str)
+    psr2.set_defaults(func=create_csv)
 
     psr2 = subpsr.add_parser('update-paper', parents=[psr_parent])
     psr2.set_defaults(func=update_paper)
@@ -142,46 +171,77 @@ def create_iso_table(args):
     print "created {}".format(args.outfile)
 
 
-    
+def create_merged_table(args):
+    df = cksgaia.io.load_table('cks+nea+iso', verbose=True, cache=0)
+
+    csvfn = os.path.join(cksgaia.io.DATADIR, 'cks_fakegaia_merged.csv')
+    df.to_csv(csvfn)
 
 
+def tex_stats(args):
+    cksgaia.calc.table_statistics()
 
 
 def create_table(args):
-    w = Workflow()
-    w.create_file('table', args.name ) 
+    w = Workflow(outputdir=args.outputdir)
+    w.create_file('table', args.name)
 
+def create_csv(args):
+    w = Workflow(outputdir=args.outputdir)
+    w.create_file('csv', args.name)
 
 def create_plot(args):
-    w = Workflow()
-    w.create_file('plot', args.name ) 
+    w = Workflow(outputdir=args.outputdir)
+    w.create_file('plot', args.name)
 
 
 def create_val(args):
-    w = Workflow()
-    w.create_file('val',args.name) 
+    w = Workflow(outputdir=args.outputdir)
+    w.create_file('val', args.name)
 
 
 def update_paper(args):
-    w = Workflow()
-    w.update_paper()
+    w = Workflow(outputdir=args.outputdir)
+    w.update_paper() 
 
 
 class Workflow(object):
-    def __init__(self):
+    def __init__(self, outputdir='./'):
+        self.outputdir = outputdir
+
         d = OrderedDict()
 
         # register different plots here
-        # d['lamo-on-cks'] = cksmet.plotting.calibrate.lamo_on_cks
-        # run_cksgaia create-plot lamo-on-cks # fig_lamo-on-cks.pdf, fig_lamo-on-cks.pdf fig_lamo-on-cks.pdf
-        # run_cksgaia create-plot #
+        d['sample'] = cksgaia.plot.sample.hrplot
+        d['filters'] = cksgaia.plot.sample.filter_plot
+        d['mag-hist'] = cksgaia.plot.sample.magcuts
+        d['depth-hist'] = cksgaia.plot.sample.depth_hist
+        d['srad-hist'] = cksgaia.plot.sample.srad_hist
+        d['srad-err-hist'] = cksgaia.plot.sample.srad_err_hist
+        d['prad-err-hist'] = cksgaia.plot.sample.prad_err_hist
+        d['insol-hist'] = cksgaia.plot.occur.insol_hist
+        d['radius-hist-fit'] = cksgaia.plot.occur.money_plot_fit
+        d['radius-hist-plain'] = cksgaia.plot.occur.money_plot_plain
+        d['period-contour-q16'] = cksgaia.plot.contour.period_contour_q16
+        d['period-contour-cks'] = cksgaia.plot.contour.period_contour_cks
+        d['insol-contour-anno'] = cksgaia.plot.contour.insol_contour_anno
+        d['insol-contour-data'] = cksgaia.plot.contour.insol_contour_data
+        d['srad-contour'] = cksgaia.plot.contour.srad_contour
 
         self.plot_dict = d
 
         d = OrderedDict()
         # register different tables here
-        # d['population-stub'] = lambda : cksmet.tables.population(stub=True)
+        d['weight-tex-stub'] = lambda : cksgaia.table.weight_table(lines=10)
+        d['weight-tex-full'] = lambda: cksgaia.table.weight_table(lines='all')
+        d['histbins'] = lambda: cksgaia.table.bins_table()
+        d['filters'] = lambda: cksgaia.table.filters_table()
         self.table_dict = d
+
+        d = OrderedDict()
+        # register machine-readable tables here
+        d['weight-machine'] = lambda: cksgaia.table.weight_table_machine()
+        self.csv_dict = d
 
         d = OrderedDict()
         #d['fit'] = cksmet.values.val_fit
@@ -189,15 +249,18 @@ class Workflow(object):
 
         d = OrderedDict()
         d['table'] = self.table_dict
+        d['csv'] = self.csv_dict
         d['plot'] = self.plot_dict
         d['val'] = self.val_dict
         self.all_dict = d
 
     def key2fn(self, key, kind):
         if kind=='plot':
-            return 'fig_'+key+'.pdf'
+            return os.path.join(self.outputdir, 'fig_'+key+'.pdf')
         if kind=='table':
-            return 'tab_'+key+'.tex'
+            return os.path.join(self.outputdir, 'tab_'+key+'.tex')
+        if kind=='csv':
+            return os.path.join(self.outputdir, 'tab_'+key+'.csv')
         if kind=='val':
             return 'val_'+key+'.tex'
             
@@ -214,9 +277,9 @@ class Workflow(object):
                     continue
                     
                 fn = self.key2fn(key, 'plot')
-                gcf().savefig(fn)
+                pl.gcf().savefig(fn)
 
-            elif kind=='table':
+            elif kind=='table' or kind == 'csv':
                 if name=='all':
                     lines = func()
                 elif name==key:
@@ -225,7 +288,7 @@ class Workflow(object):
                     continue
                     
                 # Remove last \\
-                fn = self.key2fn(key, 'table')
+                fn = self.key2fn(key, kind)
                 with open(fn,'w') as f:
                     f.writelines("\n".join(lines))
 
