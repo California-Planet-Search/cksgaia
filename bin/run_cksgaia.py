@@ -53,6 +53,14 @@ def main():
     psr2.add_argument('outfile')
     psr2.set_defaults(func=create_iso_table)
 
+    psr2 = subpsr.add_parser('create-extinction-jobs', parents=[psr_parent])
+    psr2.set_defaults(func=create_extinction_jobs)
+
+    psr2 = subpsr.add_parser('compute-extinction', parents=[psr_parent])
+    psr2.add_argument('table', help='name of star')
+    psr2.add_argument('key')
+    psr2.set_defaults(func=compute_extinction)
+
     psr2 = subpsr.add_parser('create-val', parents=[psr_parent], )
     psr2.add_argument('name',type=str)
     psr2.set_defaults(func=create_val)
@@ -87,7 +95,21 @@ def create_iso_jobs(args):
         id_starname = row.id_starname
         outdir = "{}/{}".format(args.baseoutdir, id_starname)
         print "mkdir -p {}; run_cksgaia.py run-iso {} {} {} &> {}/run-iso.log".format(outdir, args.driver, id_starname, outdir, outdir)
-    
+
+import cksgaia.extinction
+
+def create_extinction_jobs(args):
+    for table in cksgaia.extinction.TABLES:
+        for key in cksgaia.extinction.KEYS:
+            print "run_cksgaia.py compute-extinction {} {}".format(table,key)
+
+def compute_extinction(args):
+    outdir = os.path.join(cksgaia.io.DATADIR,'extinction/')
+    cmd = 'mkdir -p {}'.format(outdir)
+    print cmd
+    os.system(cmd)
+    cksgaia.extinction.compute(args.table,args.key,outdir=outdir)
+
 def create_iso_table(args):
     """
     Read in isochrones csvfiles 
