@@ -203,6 +203,7 @@ class Workflow(object):
         d['insol-contour-anno'] = cksgaia.plot.contour.insol_contour_anno
         d['insol-contour-data'] = cksgaia.plot.contour.insol_contour_data
         d['srad-contour'] = cksgaia.plot.contour.srad_contour
+        d['smass-cuts'] = cksgaia.plot.occur.mass_cuts
 
         self.plot_dict = d
 
