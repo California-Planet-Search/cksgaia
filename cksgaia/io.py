@@ -4,7 +4,6 @@ import pandas as pd
 import numpy as np
 import pylab as pl
 import ebf
-
 import cksgaia.plot
 import cksgaia.completeness
 from cksgaia.config import *
@@ -96,6 +95,12 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
         df = load_table('johnson17')
         m17 = load_table('mathur17')
         df = pd.merge(df, m17, on='id_kic')
+
+    elif table=='j17+m17+extinct':
+        files = glob.glob('data/extinction/j17+m17-*.csv')
+        df = [pd.read_csv(fn,index_col=0).T for fn in files]
+        df = pd.concat(df).drop_duplicates().T
+
 
     elif table == 'j17+m17-fakegaia':
         df = load_table('j17+m17')

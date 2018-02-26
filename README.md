@@ -1,5 +1,6 @@
-# cksgaia
-Code for a reanalysis of CKS data with Gaia constraints
+# CKS-Gaia
+
+A re-analysis of the CKS dataset using Gaia constrained parallaxes.
 
 # Installation
 
@@ -8,6 +9,10 @@ Download a bunch of Milky Way dust models compiled by Bovy et al. (2015a)
 https://github.com/jobovy/mwdust
 
 and install
+
+# Compute expected extinction
+
+We use the 3D extinction maps compiled by Jo Bovy
 
 # Physical parameters
 
@@ -42,15 +47,9 @@ $ run_cksgaia.py create-iso-table isoclassify isocla-j17-fakegaia isocla-j17-fak
 $ run_cksgaia.py create-iso-table isochrones isocla+isochr-dsep data/isochrones.csv
 ```
 
-## 2. Create Master CSV Table
 
-Then create the overall table.
 
-```
-$ run_cksgaia.py create-merged-table
-```
 
-## 3. Update paper 
 
 ```
 $ run_cksgaia.py tex-tables # LaTeX tables
@@ -59,4 +58,4 @@ $ run_cksgaia.py create-plots # Make figures
 $ run_cksgaia.py update-paper # Move files to paper directory
 ```
 
-###
+#
