@@ -1,29 +1,34 @@
 # Put plotting code here
 
 from matplotlib import ticker
-from scipy.interpolate import griddata
-import scipy.stats
-from scipy.optimize import leastsq
-import matplotlib.pyplot as plt
+import matplotlib.lines as mlines
 
 import os
-import warnings
-import copy
 
 import pylab as pl
 import matplotlib
-import pandas as pd
 import numpy as np
-
-import lmfit
-from astropy.io import fits
-import astropysics.constants as C
 
 import cksgaia.io
 import cksgaia.plot.sample
 from cksgaia.plot.config import modpath
 from cksgaia.completeness import num_stars
 
+def get_mass_samples():
+    physmerge = cksgaia.io.load_table('fulton17-weights').query('iso_prad > 1.75 & iso_prad < 4')
+
+    highcut = np.percentile(physmerge['iso_smass'], 67)
+    lowcut = np.percentile(physmerge['iso_smass'], 33)
+
+    high = physmerge.query('iso_smass > @highcut')
+    medium = physmerge.query('iso_smass <= @highcut & iso_smass >= @lowcut')
+    low = physmerge.query('iso_smass < @lowcut')
+
+    annotations = ['$M_{\star} > %3.2f M_{\odot}$' % highcut,
+                   '$%3.2f M_{\odot} \leq M_{\star} \leq %3.2f M_{\odot}$' % (highcut, lowcut),
+                   '$M_{\star} < %3.2f M_{\odot}$' % lowcut]
+
+    return (highcut, lowcut, high, medium, low, annotations)
 
 def histfitplot(physmerge, bin_centers, N, e, mask, result, result2, completeness=False, plotmod=True,
                 eloc=[10.0, 0.10], alpha=1.0, unc=True):
@@ -311,14 +316,18 @@ def mass_cuts():
     pl.subplot(nrow, ncol, plti)
     pl.subplots_adjust(hspace=0, top=0.98, bottom=0.10, left=0.19)
 
-    high = physmerge.query('iso_smass > 1.2')
-    medium = physmerge.query('iso_smass <= 1.2 & iso_smass >= 0.8')
-    low = physmerge.query('iso_smass < 0.8')
+    highcut = np.percentile(physmerge['iso_smass'], 67)
+    lowcut = np.percentile(physmerge['iso_smass'], 33)
 
-    lim = cy[np.argmin(np.abs(sx - 200))]
+    high = physmerge.query('iso_smass > @highcut')
+    medium = physmerge.query('iso_smass <= @highcut & iso_smass >= @lowcut')
+    low = physmerge.query('iso_smass < @lowcut')
+
+    # lim = cy[np.argmin(np.abs(sx - 200))]
+    lim = 1.14
     print lim
     v = cksgaia.plot.sample.simplehist(high, fill_valley=False, nbins=36, color='k', unc=True, aloc=(0.9, 0.8),
-                                   annotate='$S_{\\rm inc} > 200 S_{\oplus}$', stacked=False, va_anno=False,
+                                   annotate='$M_{\\star} > %3.2f M_{\odot}$' %highcut, stacked=False, va_anno=False,
                                    weighted=True,
                                    nstars=num_stars, eloc=(4.5, 0.04), clim=lim)
 
@@ -335,12 +344,14 @@ def mass_cuts():
     pl.xticks([])
     plti += 1
 
-    lim = cy[np.argmin(np.abs(sx - 80))]
+    # lim = cy[np.argmin(np.abs(sx - 80))]
+    lim = 1.14
     print lim
     pl.subplot(nrow, ncol, plti)
     v = cksgaia.plot.sample.simplehist(medium, fill_valley=False, nbins=36, color='k', unc=True, aloc=(0.9, 0.8),
-                                   annotate='$80 S_{\oplus} \leq S_{\\rm inc} \leq 200 S_{\oplus}$', stacked=False,
-                                   va_anno=False, weighted=True, nstars=num_stars, eloc=(4.5, 0.04), clim=lim)
+                                   annotate='$%3.2f M_{\odot} \leq M_{\\star} \leq %3.2f M_{\odot}$' % (highcut, lowcut),
+                                   stacked=False, va_anno=False, weighted=True, nstars=num_stars,
+                                   eloc=(4.5, 0.04), clim=lim)
 
     ax = pl.gca()
     # yticks = ax.yaxis.get_major_ticks()
@@ -359,10 +370,11 @@ def mass_cuts():
     pl.ylabel('Number of Planets per Star')
 
     lim = cy[-2]
-    print lim
+    lim = 1.14
+    # print lim
     pl.subplot(nrow, ncol, plti)
     v = cksgaia.plot.sample.simplehist(low, fill_valley=False, nbins=36, color='k', unc=True, aloc=(0.9, 0.85),
-                                   annotate='$10 S_{\oplus} \leq S_{\\rm inc} \leq 50 S_{\oplus}$', stacked=False,
+                                   annotate='$M_{\star} < %3.2f M_{\odot}$' % lowcut, stacked=False,
                                    va_anno=False, weighted=True, nstars=num_stars, eloc=(4.5, 0.04), clim=lim)
 
     ax = pl.gca()
@@ -376,3 +388,204 @@ def mass_cuts():
     pl.ylim(0, 0.06)
     pl.xlim(0.7, 8)
     pl.xticks(xticks)
+
+def desert_edge():
+    physmerge = cksgaia.io.load_table('fulton17-weights').query('iso_prad > 1.75 & iso_prad < 4')
+
+    aloc = (0.1, 0.85)
+
+    # cx, cy = np.loadtxt('/Users/bfulton/code/cksrad/data/detectability_p1.txt', unpack=True)
+    cx, cy = np.loadtxt(os.path.join(modpath, 'data/sensitivity_p25.txt'), unpack=True)
+    # cx, cy = np.loadtxt('/Users/bfulton/code/cksrad/data/sensitivity_p50.txt', unpack=True)
+    a = (physmerge['iso_smass'].max() * (cx / 365.) ** 2) ** (1 / 3.)
+    sx = (physmerge['cks_steff'].max() / 5778) ** 4.0 * (physmerge['iso_srad'].max() / a) ** 2.0
+    sx = np.append(sx, 10)
+    cy = np.append(cy, 6)
+
+    figure = pl.figure(figsize=(10.1, 12))
+    nrow = 3
+    ncol = 1
+    plti = 1
+
+    xticks = [10000, 3000, 1000, 300, 100, 30, 10]
+
+    pl.subplot(nrow, ncol, plti)
+    pl.subplots_adjust(hspace=0, top=0.98, bottom=0.10, left=0.19)
+
+    high = physmerge.query('iso_smass > @highcut')
+    medium = physmerge.query('iso_smass <= @highcut & iso_smass >= @lowcut')
+    low = physmerge.query('iso_smass < @lowcut')
+
+    # lim = cy[np.argmin(np.abs(sx - 200))]
+    lim = 1.14
+    print lim
+
+    insolbins = np.logspace(np.log10(10), np.log10(10000), 20)
+
+    cut = high
+    N, edges = np.histogram(cut['iso_insol'].dropna().values, bins=insolbins, weights=cut['weight'])
+    Nd, edges = np.histogram(cut['iso_insol'].dropna().values, bins=insolbins)
+    centers = 0.5 * (edges[1:] + edges[:-1])
+    pl.step(centers, N / num_stars, lw=3, color='k', where='mid')
+    pl.annotate('$M_{\\star} > %3.2f M_{\odot}$' %highcut, xy=aloc, xycoords='axes fraction', fontsize=20,
+                horizontalalignment='left')
+
+    err = (np.sqrt(Nd) * (N / Nd)) / num_stars
+    err[np.isnan(err)] = 0
+    _, caps, _ = pl.errorbar(centers, N / num_stars, fmt='.', yerr=err, lw=2, capsize=6, color='k')
+    for cap in caps:
+        cap.set_markeredgewidth(2)
+
+    pl.semilogx()
+
+
+    ax = pl.gca()
+    ax.xaxis.set_major_formatter(matplotlib.ticker.ScalarFormatter())
+    ax.xaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('%0.0f'))
+    ax.xaxis.set_ticks(np.logspace(1, 4, 8))
+
+    yticks = ax.yaxis.get_major_ticks()
+    yticks[0].label1.set_visible(False)
+    for label in ax.yaxis.get_ticklabels()[1::2]:
+        label.set_visible(False)
+    for label in ax.xaxis.get_ticklabels():
+        label.set_visible(False)
+    pl.xticks(xticks)
+
+
+    pl.ylabel('')
+    #pl.ylim(0, 0.06)
+    pl.xlim(10000, 10)
+    #pl.xticks([])
+    plti += 1
+
+    # lim = cy[np.argmin(np.abs(sx - 80))]
+    lim = 1.14
+    print lim
+    pl.subplot(nrow, ncol, plti)
+
+    cut = medium
+    N, edges = np.histogram(cut['iso_insol'].dropna().values, bins=insolbins, weights=cut['weight'])
+    Nd, edges = np.histogram(cut['iso_insol'].dropna().values, bins=insolbins)
+    centers = 0.5 * (edges[1:] + edges[:-1])
+    pl.step(centers, N / num_stars, lw=3, color='k', where='mid')
+    pl.annotate('$%3.2f M_{\odot} \leq M_{\\star} \leq %3.2f M_{\odot}$' % (highcut, lowcut), xy=aloc, xycoords='axes fraction', fontsize=20,
+                horizontalalignment='left')
+
+    err = (np.sqrt(Nd) * (N / Nd)) / num_stars
+    err[np.isnan(err)] = 0
+    _, caps, _ = pl.errorbar(centers, N / num_stars, fmt='.', yerr=err, lw=2, capsize=6, color='k')
+    for cap in caps:
+        cap.set_markeredgewidth(2)
+
+    pl.semilogx()
+
+    ax = pl.gca()
+    ax.xaxis.set_major_formatter(matplotlib.ticker.ScalarFormatter())
+    ax.xaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('%0.0f'))
+    ax.xaxis.set_ticks(np.logspace(1, 4, 8))
+
+    # yticks = ax.yaxis.get_major_ticks()
+    # yticks[0].label1.set_visible(False)
+    for label in ax.yaxis.get_ticklabels()[1::2]:
+        label.set_visible(False)
+    for label in ax.xaxis.get_ticklabels():
+        label.set_visible(False)
+    ax.yaxis.get_ticklabels()[0].set_visible(False)
+    ax.yaxis.get_ticklabels()[-1].set_visible(False)
+    pl.xticks(xticks)
+    pl.ylabel('')
+    #pl.ylim(0, 0.06)
+    pl.xlim(10000, 10)
+    pl.xticks(xticks)
+    plti += 1
+
+    pl.ylabel('Number of Planets per Star')
+
+    lim = cy[-2]
+    lim = 1.14
+    # print lim
+    pl.subplot(nrow, ncol, plti)
+
+    cut = low
+    N, edges = np.histogram(cut['iso_insol'].dropna().values, bins=insolbins, weights=cut['weight'])
+    Nd, edges = np.histogram(cut['iso_insol'].dropna().values, bins=insolbins)
+    centers = 0.5 * (edges[1:] + edges[:-1])
+    pl.step(centers, N / num_stars, lw=3, color='k', where='mid')
+    pl.annotate('$M_{\star} < %3.2f M_{\odot}$' % lowcut, xy=aloc, xycoords='axes fraction', fontsize=20,
+                horizontalalignment='left')
+
+    err = (np.sqrt(Nd) * (N / Nd)) / num_stars
+    err[np.isnan(err)] = 0
+    _, caps, _ = pl.errorbar(centers, N / num_stars, fmt='.', yerr=err, lw=2, capsize=6, color='k')
+    for cap in caps:
+        cap.set_markeredgewidth(2)
+
+    pl.semilogx()
+
+    ax = pl.gca()
+    ax.xaxis.set_major_formatter(matplotlib.ticker.ScalarFormatter())
+    ax.xaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('%0.0f'))
+    ax.xaxis.set_ticks(np.logspace(1, 4, 8))
+
+    # yticks = ax.yaxis.get_major_ticks()
+    # yticks[0].label1.set_visible(False)
+    for label in ax.yaxis.get_ticklabels()[1::2]:
+        label.set_visible(False)
+    pl.xticks([])
+
+    pl.ylabel('')
+    #pl.ylim(0, 0.06)
+    pl.xlim(10000, 10)
+    pl.xticks(xticks)
+
+    pl.xlabel('Stellar light intensity relative to Earth')
+
+
+def desert_edge_cum():
+
+    def _cumdist(sample, annotation='', color='k'):
+        order = np.argsort(sample['iso_insol'].values)[::-1]
+        w = np.cumsum(sample['weight'].values[order]) / num_stars
+        n = np.array(range(len(sample['weight'].values))) / float(len(sample))
+        f = sample['iso_insol'].values[order]
+
+        pl.step(f, n, 'k-', lw=3, linestyle='dashed', alpha=0.25, color=color, label=None)
+        pl.step(f, w / np.max(w), 'k-', lw=3, color=color)
+
+        aloc = (0.1, 0.85)
+        #pl.annotate(annotation, xy=aloc, xycoords='axes fraction', fontsize=20,
+        #            horizontalalignment='left')
+
+        pl.semilogx()
+
+        pl.xlim(3000, 10)
+        pl.ylim(0, 1)
+
+        ax = pl.gca()
+        ax.xaxis.set_major_formatter(matplotlib.ticker.ScalarFormatter())
+        ax.xaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('%0.0f'))
+        ax.xaxis.set_ticks([10, 30, 100, 300, 1000, 3000])
+
+        pl.xlabel('Stellar light intensity relative to Earth')
+        pl.ylabel('cumulative fraction of planet detections')
+
+    highcut, lowcut, high, medium, low, annotations = get_mass_samples()
+
+    colors = ['blue', 'green', 'red']
+
+    fig = pl.figure(figsize=(12, 8))
+    handles = []
+    for i, sample in enumerate([high, medium, low]):
+        sample = sample.query('iso_prad > 1.75 & iso_prad < 4')
+
+        _cumdist(sample, color=colors[i])
+        handles.append(mlines.Line2D([], [], color=colors[i], lw=3,
+                                     label=annotations[i]))
+
+    pl.legend(handles=handles, fontsize=14, loc='best')
+
+    pl.annotate('$1.75 < R_p < 4 R_{\oplus}$', xy=(0.03, 0.75),
+                xycoords='axes fraction', fontsize=16)
+
+

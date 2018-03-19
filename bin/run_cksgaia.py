@@ -15,6 +15,7 @@ import cksgaia.table  # module for computing scalar values for table
 import cksgaia.plot   # submodule for including plots
 import cksgaia.errors
 import cksgaia.calc
+import cksgaia.extinction
 
 
 def main():
@@ -53,7 +54,7 @@ def main():
     )
 
     modes = [
-        'isoclassify','isochrones'
+        'isoclassify', 'isochrones'
     ]
     psr2.add_argument('mode',choices=modes)
     psr2.add_argument('baseoutdir')
@@ -122,8 +123,6 @@ def create_iso_jobs(args):
         id_starname = row.id_starname
         outdir = "{}/{}".format(args.baseoutdir, id_starname)
         print "mkdir -p {}; run_cksgaia.py run-iso {} {} {} &> {}/run-iso.log".format(outdir, args.driver, id_starname, outdir, outdir)
-
-import cksgaia.extinction
 
 def create_extinction_jobs(args):
     for table in cksgaia.extinction.TABLES:
@@ -224,8 +223,12 @@ class Workflow(object):
         d['period-contour-cks'] = cksgaia.plot.contour.period_contour_cks
         d['insol-contour-anno'] = cksgaia.plot.contour.insol_contour_anno
         d['insol-contour-data'] = cksgaia.plot.contour.insol_contour_data
+        d['insol-contour-masscuts'] = cksgaia.plot.contour.contour_masscuts
         d['srad-contour'] = cksgaia.plot.contour.srad_contour
         d['smass-cuts'] = cksgaia.plot.occur.mass_cuts
+        d['desert-edge'] = cksgaia.plot.occur.desert_edge
+        d['desert-edge-cum'] = cksgaia.plot.occur.desert_edge_cum
+
 
         self.plot_dict = d
 
