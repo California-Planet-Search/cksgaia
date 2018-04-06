@@ -7,6 +7,7 @@ import ebf
 import cksgaia.plot
 import cksgaia.completeness
 from cksgaia.config import *
+import glob
 
 DATADIR = os.path.join(os.path.dirname(__file__), '../data/')
 
@@ -96,11 +97,39 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
         m17 = load_table('mathur17')
         df = pd.merge(df, m17, on='id_kic')
 
+    elif table=='xmatch':
+        df = load_table('j17+m17')
+        df = df['id_kic m17_ra m17_dec'.split()]
+        df = df.groupby('id_kic',as_index=False).first()
+        #namemap = {'m17_ra':'RA','m17_dec':'DEC'}
+        #df = df.rename(columns=namemap)
+        #df = df['RA DEC'.split()]
+
+    elif table=='xmatch-results':
+        fn = os.path.join(DATADIR,'cks-xmatch-results.csv')
+        df = pd.read_csv(fn)
+        namemap = {
+            'angDist':'gaia1_angdist',
+            'ra_ep2000':'gaia1_ra', 
+            'dec_ep2000':'gaia1_dec',
+            'parallax':'gaia1_sparallax', 
+            'parallax_error':'gaia1_sparallax_err', 
+            'phot_g_mean_flux':'gaia1_gflux',
+            'phot_g_mean_flux_error':'gaia1_gflux_err',
+            'phot_g_mean_mag':'gaia1_gmag',
+            'source_id':'id_gaia',
+            'id_kic':'id_kic'
+        }
+        df = df.rename(columns=namemap)
+        df = df[namemap.values()]
+
     elif table=='j17+m17+extinct':
         files = glob.glob('data/extinction/j17+m17-*.csv')
         df = [pd.read_csv(fn,index_col=0).T for fn in files]
         df = pd.concat(df).drop_duplicates().T
-
+        
+        df2 = load_table('j17+m17')
+        df = pd.merge(df,df2 )
 
     elif table == 'j17+m17-fakegaia':
         df = load_table('j17+m17')
@@ -244,35 +273,15 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
     elif table == 'fakegaia-merged':
         df = pd.read_csv(MERGED_TABLE, index_col=None, skipinitialspace=True)
 
-
     else:
         assert False, "table {} not valid table name".format(table)
     return df
 
-def add_prefix(df,prefix,ignore=['id']):
-    namemap = {}
-    for col in list(df.columns):
-        skip=False
-        for _ignore in ignore:
-            if col.count(_ignore) > 0:
-                skip = True
-        if not skip:
-            namemap[col] = prefix + col 
-    df = df.rename(columns=namemap)
-    return df
-
-
-def sub_prefix(df, prefix,ignore=['id']):
-    namemap = {}
-    for col in list(df.columns):
-        skip=False
-        for _ignore in ignore:
-            if col.count(_ignore) > 0:
-                skip = True
-        if not skip:
-            namemap[col] = col.replace(prefix,'') 
-    df = df.rename(columns=namemap)
-    return df
+def create_xmatch_table():
+    df = load_table('xmatch',cache=2)
+    fn = os.path.join(DATADIR,'cks-xmatch.csv')
+    print "created {}".format(fn)
+    df.to_csv(fn,index=False)
 
 def load_mist():
     model = ebf.read(os.path.join(DATADIR,'mesa.ebf'))
@@ -434,10 +443,35 @@ def apply_filters(physmerge, mkplot=False, verbose=False, textable=False):
         print
         print "Final sample = %d planets." % len(crop)
 
-
-
     return crop
 
+
+
+# General table manipulation helper functions
+
+def add_prefix(df,prefix,ignore=['id']):
+    namemap = {}
+    for col in list(df.columns):
+        skip=False
+        for _ignore in ignore:
+            if col.count(_ignore) > 0:
+                skip = True
+        if not skip:
+            namemap[col] = prefix + col 
+    df = df.rename(columns=namemap)
+    return df
+
+def sub_prefix(df, prefix,ignore=['id']):
+    namemap = {}
+    for col in list(df.columns):
+        skip=False
+        for _ignore in ignore:
+            if col.count(_ignore) > 0:
+                skip = True
+        if not skip:
+            namemap[col] = col.replace(prefix,'') 
+    df = df.rename(columns=namemap)
+    return df
 
 def order_columns(df, verbose=False, drop=True):
     columns = list(df.columns)
