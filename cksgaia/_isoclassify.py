@@ -9,8 +9,10 @@ import grid.classify_grid
 import cksgaia.io
 import cksgaia.iso
 
+import mwdust
+
 class Pipeline(cksgaia.iso.Pipeline):
-    def run(self):
+    def run(self, dmodel=None):
 
         print "teff ", self.teff, self.teff_err
         print "logg ", self.logg, self.logg_err
@@ -26,6 +28,15 @@ class Pipeline(cksgaia.iso.Pipeline):
         model['fdnu'][:]=1.
         model['avs']=np.zeros(len(model['teff']))
         model['dis']=np.zeros(len(model['teff']))
+
+        if dmodel == "g15":
+            dustmodel = mwdust.Green15
+        elif dmodel == "d03":
+            dustmodel = mwdust.Drimmel03
+        else:
+            print("{} dust model not supported".format(dmodel))
+            print("Continuing without dust model")
+            dustmodel=0
 
         # Instantiate model
         x = grid.classify_grid.obsdata()
@@ -43,7 +54,7 @@ class Pipeline(cksgaia.iso.Pipeline):
         # Sloan photometry
         #x.addgriz([11.776,11.354,11.238,11.178],[0.02,0.02,0.02,0.02])
         paras = grid.classify_grid.classify(
-            input=x,model=model,dustmodel=0, doplot=0
+            input=x,model=model,dustmodel=dustmodel, doplot=0
         )
         
         #gcf('posteriors').savefig(self.pngfn)

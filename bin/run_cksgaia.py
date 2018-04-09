@@ -109,7 +109,7 @@ def main():
 
 def run_iso(args):
     import cksgaia.iso
-    cksgaia.iso.run(args.driver, args.id_starname, args.outdir,debug=args.debug)
+    cksgaia.iso.run(args.driver, args.id_starname, args.outdir, debug=args.debug)
 
 def create_iso_jobs(args):
     if args.sample=='cks':
@@ -122,7 +122,10 @@ def create_iso_jobs(args):
     for i, row in df.iterrows():
         id_starname = row.id_starname
         outdir = "{}/{}".format(args.baseoutdir, id_starname)
-        print "mkdir -p {}; run_cksgaia.py run-iso {} {} {} &> {}/run-iso.log".format(outdir, args.driver, id_starname, outdir, outdir)
+        print "mkdir -p {}; run_cksgaia.py run-iso {} {} {} &> {}/run-iso.log".format(outdir,
+                                                                                      args.driver,
+                                                                                      id_starname,
+                                                                                      outdir, outdir)
 
 def create_extinction_jobs(args):
     for table in cksgaia.extinction.TABLES:
