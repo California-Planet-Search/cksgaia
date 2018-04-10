@@ -27,6 +27,8 @@ class Pipeline(object):
         self.jmag_err = 0.02
         self.parallax = star['iso_sparallax'] / 1e3
         self.parallax_err = star['iso_sparallax_err1'] / 1e3
+        self.ra = star.m17_ra
+        self.dec = star.m17_dec
 
         self.pngfn = os.path.join(outdir,'isochrones.png')
         self.csvfn = os.path.join(outdir,'isochrones.csv')

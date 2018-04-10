@@ -42,7 +42,9 @@ class Pipeline(cksgaia.iso.Pipeline):
         x.addplx(self.parallax, self.parallax_err)
 
         # Get extinction from bayestar model
-        
+        edf = pd.DataFrame([], columns=['ra', 'dec', 'parallax'])
+        edf['ra'] = self.ra
+        edf['dec'] = self.dec
 
         x.addjhk([-99,-99, self.kmag],[0,0,self.kmag_err])
         # Sloan photometry
