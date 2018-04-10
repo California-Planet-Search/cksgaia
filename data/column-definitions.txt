@@ -129,3 +129,15 @@ iso_insol_err2
 iso_teq               CKS+Isochrone-constrained Planet equilibrium temperature (bond albedo = 0.3)
 iso_teq_err1	      
 iso_teq_err2	      
+# Gaia DR1 columns
+gaia1_angdist         Distance between KIC position and Gaia position [arcsec]
+gaia1_ra              Right ascension [deg]
+gaia1_dec             Declination [deg]
+gaia1_sparallax       Parallax in [mas]
+gaia1_sparallax_err   
+gaia1_gflux           Mean flux in Gaia bandpass [e-/s]
+gaia1_gflux_err       
+gaia1_gmag            Mean magnitude in Gaia bandpass [mag]
+
+
+

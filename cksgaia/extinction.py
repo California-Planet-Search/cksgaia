@@ -6,73 +6,59 @@ from astropy.coordinates import SkyCoord
 from astropy import units as u
 import os
 import numpy as np
-KEYS = [
-    'd03_a2massk', # Drimmel (2003) 2MASS-K
-    'd03_a2massj', # Drimmel (2003) 2MASS-J
-    'd03_a2massh', # Drimmel (2003) 2MASS-H
-    'd03_airac1', # Drimmel (2003) IRAC-1
-    'd03_airac2', # Drimmel (2003) IRAC-2
-    'g15_a2massk', # Green (2015) 
-    'g15_a2massj', 
-    'g15_a2massh',
-    'g15_airac1', 
-    'g15_airac2'
-]
+import pandas as pd
+from dustmaps.bayestar import BayestarWebQuery
 
-TABLES = [
-    'j17+m17'
-]
+def add_extinction(df, mode):
+    """
+    add_extinction
+    
+    Args:
+        df (pandas.DataFrame): must have following columns:
+            - ra (decimal degrees)
+            - dec (decimal degrees)
+            - parallax (mas)
+        mode (str): which dust model to use
+            - bayestar2017 (Green et al. 2018)
+            - bayestar2015 (Green et al. 2015)
+    
+    Returns:
+        pandas.DataFrame: with following columns added
+            - ak: extinction in K
+            - ak_err: error on extinction in K including Rv and E(B-V)
+    """
+    dist = np.array(1 / df.iso_sparallax * 1000) * u.pc
 
-def compute(table, key, outdir='./', debug=False):
-    print key
-    smodel, sfilter = key.split('_') 
-
-    if smodel=="g15":
-        import mwdust.Green15 as model 
-    elif smodel=="d03":
-        import mwdust.Drimmel03 as model 
-    else:
-        assert False, "{} not supported".format(smodel)
+    coords = SkyCoord(ra=np.array(df.ra)*u.degree, dec=np.array(df.dec)*u.degree, distance=dist, frame='icrs')
+    rk_frac_err = 0.3 # Fractional uncertainty in R_K
+    if mode=='bayestar2017':
+        bayestar = BayestarWebQuery(version='bayestar2017')
+        rk = 0.224 # A_K / E(B-V) 
         
-    if sfilter=='a2massj':
-        sfilter='2MASS J'
-    elif sfilter=='a2massh':
-        sfilter='2MASS H'
-    elif sfilter=='a2massk':
-        sfilter='2MASS Ks'
-    elif sfilter=='airac1':
-        sfilter='IRAC-1'
-    elif sfilter=='airac2':
-        sfilter='IRAC-2'
+    if mode=='bayestar2015':
+        bayestar = BayestarWebQuery(version='bayestar2017')
+        rk = 0.310 # A_K / E(B-V) 
 
-    if table=='j17+m17':
-        df = cksgaia.io.load_table('j17+m17',cache=1)
-        df = df.groupby('id_kic',as_index=False).first()
-        df = df['id_kic m17_ra m17_dec iso_sparallax'.split()]
-        df = df.rename(columns={'iso_sparallax':'sparallax'}) 
+    ebv = bayestar(coords, mode='percentile', pct=[16., 50., 84.])
 
-    print "computing {} band extinction using {} parallax and {} model".format(sfilter, table, smodel)
-
-    mod = model(filter=sfilter)
-
-    c = SkyCoord(ra=np.array(df.m17_ra)*u.degree, dec=df.m17_dec*u.degree, frame='icrs')
-    df['m17_l'] = c.galactic.l.deg
-    df['m17_b'] = c.galactic.b.deg
-    df['sdistance'] = 1 / (df.sparallax * 1e-3)
-
-    if debug:
-        df = df.head()
-
-    icount = 0 
-    for i,row in df.iterrows():
-        df.loc[i,key] = mod(row.m17_l,row.m17_b,row.sdistance)
-        icount+=1
-        if (icount % 100)==0:
-            print "completed {}/{}".format(icount,len(df))
+    ak = rk * ebv
     
-    fn = os.path.join(outdir, '{}-{}.csv'.format(table,key))
-    print "saving to {}".format(fn)
-    df.to_csv(fn)
+    ak_err1_map = ak[:,2] - ak[:,1] # formal A_K due to E(B-V)
+    ak_err2_map = ak[:,0] - ak[:,1] # formal A_K due to E(B-V)
+    ak_err_map = 0.5*(ak[:,2] - ak[:,0])
 
-    
+    ak_err_rk = ak[:,1] * rk_frac_err
+    ak_err = ak[:,1] * np.sqrt( (ak_err_map / ak[:,1])**2 + rk_frac_err**2 )
+
+    df['ak'] = ak[:,1]
+    df['ak_err'] = ak_err
+    df['ak_err_map'] = ak_err_map
+    df['ebv'] = ebv[:,1]
+    df['ebv_err'] = 0.5*(ebv[:,2] - ebv[:,0])
+    df = pd.DataFrame(df)
+    return df
+
+
+
+
 

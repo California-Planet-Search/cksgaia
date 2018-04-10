@@ -7,6 +7,10 @@ import ebf
 import cksgaia.plot
 import cksgaia.completeness
 from cksgaia.config import *
+import glob
+import cksgaia.extinction
+import cksgaia.xmatch
+from astropy import units as u
 
 DATADIR = os.path.join(os.path.dirname(__file__), '../data/')
 
@@ -64,11 +68,12 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
             'st_radius':'kic_srad', 'jmag':'kic_jmag',
             'jmag_err':'kic_jmag_err','hmag':'kic_hmag',
             'hmag_err':'kic_hmag_err','kmag':'kic_kmag',
-            'kmag_err':'kic_kmag_err'
+            'kmag_err':'kic_kmag_err',
+            'degree_ra':'kic_ra', 'degree_dec':'kic_dec'
         }
         df = df.rename(columns=namemap)[namemap.values()]
 
-    elif table=='mathur17':
+    elif table=='m17':
         df = cksgaia.io.load_table('stellar17')
         namemap = {}
         for col in list(df.columns):
@@ -76,31 +81,65 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
                 namemap[col] = col.replace('kic','m17')
         df = df.rename(columns=namemap)
 
-    elif table=='johnson17':
-        df = pd.read_csv(os.path.join(DATADIR, 'cks_physical_merged.csv'),index_col=0)
+    elif table=='j17':
+        fn = os.path.join(DATADIR, 'cks_physical_merged.csv')
+        df = pd.read_csv(fn,index_col=0)
 
     elif table=='fulton17':
-        df = load_table('johnson17')
+        df = load_table('j17')
         df = apply_filters(df)
 
     elif table=='fulton17-weights':
-        df = load_table('johnson17')
+        df = load_table('j17')
         df = apply_filters(df)
         df = cksgaia.completeness.weight_merge(df)
 
-    elif table=='cks-physical-merged+mathur17':
-        df = load_table('cks-physical-merged')
-
     elif table=='j17+m17':
-        df = load_table('johnson17')
-        m17 = load_table('mathur17')
+        df = load_table('j17')
+        m17 = load_table('m17')
         df = pd.merge(df, m17, on='id_kic')
 
-    elif table=='j17+m17+extinct':
-        files = glob.glob('data/extinction/j17+m17-*.csv')
-        df = [pd.read_csv(fn,index_col=0).T for fn in files]
-        df = pd.concat(df).drop_duplicates().T
+    elif table=='xmatch':
+        df = load_table('j17+m17')
+        df = df['id_kic m17_ra m17_dec'.split()]
+        df = df.groupby('id_kic',as_index=False).first()
+        #namemap = {'m17_ra':'RA','m17_dec':'DEC'}
+        #df = df.rename(columns=namemap)
+        #df = df['RA DEC'.split()]
 
+    elif table=='j17+m17+gaia1':
+        df = load_table('j17+m17')
+        gaia = cksgaia.io.load_table('xmatch-results')
+        stars = df[['id_kic']].drop_duplicates()
+        temp = cksgaia.xmatch.gaia1(stars,gaia,'id_kic')
+        df = pd.merge(df,temp)
+
+    elif table=='xmatch-results':
+        fn = os.path.join(DATADIR,'cks-xmatch-results.csv')
+        df = pd.read_csv(fn)
+        namemap = {
+            'angDist':'gaia1_angdist',
+            'ra_ep2000':'gaia1_ra', 
+            'dec_ep2000':'gaia1_dec',
+            'parallax':'gaia1_sparallax', 
+            'parallax_error':'gaia1_sparallax_err', 
+            'phot_g_mean_flux':'gaia1_gflux',
+            'phot_g_mean_flux_error':'gaia1_gflux_err',
+            'phot_g_mean_mag':'gaia1_gmag',
+            'source_id':'id_gaia',
+            'id_kic':'id_kic'
+        }
+        df = df.rename(columns=namemap)
+        df = df[namemap.values()]
+
+    elif table=='j17+m17+extinct':
+        df = load_table('j17+m17')
+        df['distance'] = np.array(1 / df.iso_sparallax * 1000) * u.pc
+        df['ra'] = df['m17_ra']
+        df['dec'] = df['m17_dec']
+        df = cksgaia.extinction.add_extinction(df,'bayestar2017')
+        df = df.drop('distance ra dec'.split(),axis=1)
+        
 
     elif table == 'j17+m17-fakegaia':
         df = load_table('j17+m17')
@@ -244,35 +283,15 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
     elif table == 'fakegaia-merged':
         df = pd.read_csv(MERGED_TABLE, index_col=None, skipinitialspace=True)
 
-
     else:
         assert False, "table {} not valid table name".format(table)
     return df
 
-def add_prefix(df,prefix,ignore=['id']):
-    namemap = {}
-    for col in list(df.columns):
-        skip=False
-        for _ignore in ignore:
-            if col.count(_ignore) > 0:
-                skip = True
-        if not skip:
-            namemap[col] = prefix + col 
-    df = df.rename(columns=namemap)
-    return df
-
-
-def sub_prefix(df, prefix,ignore=['id']):
-    namemap = {}
-    for col in list(df.columns):
-        skip=False
-        for _ignore in ignore:
-            if col.count(_ignore) > 0:
-                skip = True
-        if not skip:
-            namemap[col] = col.replace(prefix,'') 
-    df = df.rename(columns=namemap)
-    return df
+def create_xmatch_table():
+    df = load_table('xmatch',cache=2)
+    fn = os.path.join(DATADIR,'cks-xmatch.csv')
+    print "created {}".format(fn)
+    df.to_csv(fn,index=False)
 
 def load_mist():
     model = ebf.read(os.path.join(DATADIR,'mesa.ebf'))
@@ -434,10 +453,35 @@ def apply_filters(physmerge, mkplot=False, verbose=False, textable=False):
         print
         print "Final sample = %d planets." % len(crop)
 
-
-
     return crop
 
+
+
+# General table manipulation helper functions
+
+def add_prefix(df,prefix,ignore=['id']):
+    namemap = {}
+    for col in list(df.columns):
+        skip=False
+        for _ignore in ignore:
+            if col.count(_ignore) > 0:
+                skip = True
+        if not skip:
+            namemap[col] = prefix + col 
+    df = df.rename(columns=namemap)
+    return df
+
+def sub_prefix(df, prefix,ignore=['id']):
+    namemap = {}
+    for col in list(df.columns):
+        skip=False
+        for _ignore in ignore:
+            if col.count(_ignore) > 0:
+                skip = True
+        if not skip:
+            namemap[col] = col.replace(prefix,'') 
+    df = df.rename(columns=namemap)
+    return df
 
 def order_columns(df, verbose=False, drop=True):
     columns = list(df.columns)

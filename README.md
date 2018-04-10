@@ -14,6 +14,22 @@ and install
 
 We use the 3D extinction maps compiled by Jo Bovy
 
+# Cross-match the CKS stars with Gaia IDs.
+
+```
+run_cksgaia.py create-xmatch-table
+```
+
+upload to xmatch. cross-reference with Gaia (search size of 8 arcsec)
+
+save as
+
+data/cks-xmatch-results.csv
+
+
+
+
+
 # Physical parameters
 
 This part of the code follows the CKS-Physical codebase
