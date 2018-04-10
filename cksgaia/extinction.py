@@ -11,7 +11,21 @@ from dustmaps.bayestar import BayestarWebQuery
 
 def add_extinction(df, mode):
     """
-    distance 
+    add_extinction
+    
+    Args:
+        df (pandas.DataFrame): must have following columns:
+            - ra (decimal degrees)
+            - dec (decimal degrees)
+            - parallax (mas)
+        mode (str): which dust model to use
+            - bayestar2017 (Green et al. 2018)
+            - bayestar2015 (Green et al. 2015)
+    
+    Returns:
+        pandas.DataFrame: with following columns added
+            - ak: extinction in K
+            - ak_err: error on extinction in K including Rv and E(B-V)
     """
     dist = np.array(1 / df.iso_sparallax * 1000) * u.pc
 
