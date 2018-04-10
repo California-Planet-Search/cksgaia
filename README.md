@@ -4,31 +4,7 @@ A re-analysis of the CKS dataset using Gaia constrained parallaxes.
 
 # Installation
 
-Download a bunch of Milky Way dust models compiled by Bovy et al. (2015a)
-
-https://github.com/jobovy/mwdust
-
-and install
-
-# Compute expected extinction
-
-We use the 3D extinction maps compiled by Jo Bovy
-
 # Cross-match the CKS stars with Gaia IDs.
-
-```
-run_cksgaia.py create-xmatch-table
-```
-
-upload to xmatch. cross-reference with Gaia (search size of 8 arcsec)
-
-save as
-
-data/cks-xmatch-results.csv
-
-
-
-
 
 # Physical parameters
 
@@ -62,10 +38,6 @@ $ run_cksgaia.py create-iso-table isoclassify isocla-j17-fakegaia isocla-j17-fak
 # This will put it in the right place for the table generation
 $ run_cksgaia.py create-iso-table isochrones isocla+isochr-dsep data/isochrones.csv
 ```
-
-
-
-
 
 ```
 $ run_cksgaia.py tex-tables # LaTeX tables
