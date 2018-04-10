@@ -15,8 +15,8 @@ import cksgaia.table  # module for computing scalar values for table
 import cksgaia.plot   # submodule for including plots
 import cksgaia.errors
 import cksgaia.calc
+import cksgaia.plot.extinction
 import cksgaia.extinction
-
 
 def main():
     psr = ArgumentParser()
@@ -61,6 +61,9 @@ def main():
     psr2.add_argument('outfile')
     psr2.set_defaults(func=create_iso_table)
 
+    psr2 = subpsr.add_parser('create-xmatch-table', parents=[psr_parent])
+    psr2.set_defaults(func=create_xmatch_table)
+
     psr2 = subpsr.add_parser('create-extinction-jobs', parents=[psr_parent])
     psr2.set_defaults(func=create_extinction_jobs)
 
@@ -97,10 +100,6 @@ def main():
     psr2.add_argument('name',type=str)
     psr2.set_defaults(func=create_table)
 
-    psr2 = subpsr.add_parser('create-csv', parents=[psr_parent], )
-    psr2.add_argument('name',type=str)
-    psr2.set_defaults(func=create_csv)
-
     psr2 = subpsr.add_parser('update-paper', parents=[psr_parent])
     psr2.set_defaults(func=update_paper)
 
@@ -110,6 +109,9 @@ def main():
 def run_iso(args):
     import cksgaia.iso
     cksgaia.iso.run(args.driver, args.id_starname, args.outdir, debug=args.debug)
+
+def create_xmatch_table(args):
+    cksgaia.io.create_xmatch_table()
 
 def create_iso_jobs(args):
     if args.sample=='cks':
@@ -212,6 +214,7 @@ class Workflow(object):
         d = OrderedDict()
 
         # register different plots here
+        d['extinction'] = cksgaia.plot.extinction.fig_extinction
         d['sample'] = cksgaia.plot.sample.hrplot
         d['filters'] = cksgaia.plot.sample.filter_plot
         d['mag-hist'] = cksgaia.plot.sample.magcuts
@@ -249,7 +252,7 @@ class Workflow(object):
         self.csv_dict = d
 
         d = OrderedDict()
-        #d['fit'] = cksmet.values.val_fit
+        d['stat'] = cksgaia.value.val_stat
         self.val_dict = d
 
         d = OrderedDict()
@@ -267,7 +270,7 @@ class Workflow(object):
         if kind=='csv':
             return os.path.join(self.outputdir, 'tab_'+key+'.csv')
         if kind=='val':
-            return 'val_'+key+'.tex'
+            return os.path.join(self.outputdir, 'val_'+key+'.tex')
             
     def create_file(self, kind, name):
         i = 0
