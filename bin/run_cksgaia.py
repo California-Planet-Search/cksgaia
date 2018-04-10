@@ -214,7 +214,7 @@ class Workflow(object):
         d = OrderedDict()
 
         # register different plots here
-        d['extinction'] = cksgaia.plot.extinction.fig_extinction
+        # d['extinction'] = cksgaia.plot.extinction.fig_extinction
         d['sample'] = cksgaia.plot.sample.hrplot
         d['filters'] = cksgaia.plot.sample.filter_plot
         d['mag-hist'] = cksgaia.plot.sample.magcuts

@@ -44,7 +44,7 @@ class Pipeline(cksgaia.iso.Pipeline):
         edf = pd.DataFrame([], columns=['ra', 'dec', 'parallax'])
         edf['ra'] = [self.ra]
         edf['dec'] = [self.dec]
-        edf['parallax'] = [self.parallax]
+        edf['iso_sparallax'] = [self.parallax]
         edf = cksgaia.extinction.add_extinction(edf, 'bayestar2017')
 
         self.kmag_ext = self.kmag + edf['ak'].values[0]

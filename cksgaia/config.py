@@ -3,7 +3,7 @@ import os
 DATADIR = os.path.join(os.path.dirname(__file__),'../data/')
 
 # Path to where the isochrones are stored
-ISO_CSVFN = os.path.join(DATADIR,'isochrones_fakegaia.csv')
+ISO_CSVFN = os.path.join(DATADIR,'isochrones_fakegaia_ext.csv')
 CKS_CSVFN = os.path.join(DATADIR,'cks_v2.csv')
 MERGED_TABLE = os.path.join(DATADIR,'cks_fakegaia_merged.csv')
 

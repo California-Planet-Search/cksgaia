@@ -13,6 +13,8 @@ import cksgaia.io
 import cksgaia.plot.sample
 from cksgaia.plot.config import modpath
 from cksgaia.completeness import num_stars
+from cksgaia.plot.config import *
+
 
 def get_mass_samples():
     physmerge = cksgaia.io.load_table('fulton17-weights').query('iso_prad > 1.75 & iso_prad < 4')

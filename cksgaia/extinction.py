@@ -27,7 +27,7 @@ def add_extinction(df, mode):
             - ak: extinction in K
             - ak_err: error on extinction in K including Rv and E(B-V)
     """
-    dist = np.array(1 / df.parallax * 1000) * u.pc
+    dist = np.array(1 / df.iso_sparallax * 1000) * u.pc
 
     coords = SkyCoord(ra=np.array(df.ra)*u.degree, dec=np.array(df.dec)*u.degree, distance=dist, frame='icrs')
     rk_frac_err = 0.3 # Fractional uncertainty in R_K
