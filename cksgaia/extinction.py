@@ -27,7 +27,7 @@ def add_extinction(df, mode):
             - ak: extinction in K
             - ak_err: error on extinction in K including Rv and E(B-V)
     """
-    dist = np.array(1 / df.iso_sparallax * 1000) * u.pc
+    dist = np.array(1 / df.parallax * 1000) * u.pc
 
     coords = SkyCoord(ra=np.array(df.ra)*u.degree, dec=np.array(df.dec)*u.degree, distance=dist, frame='icrs')
     rk_frac_err = 0.3 # Fractional uncertainty in R_K
@@ -42,7 +42,7 @@ def add_extinction(df, mode):
     ebv = bayestar(coords, mode='percentile', pct=[16., 50., 84.])
 
     ak = rk * ebv
-    
+
     ak_err1_map = ak[:,2] - ak[:,1] # formal A_K due to E(B-V)
     ak_err2_map = ak[:,0] - ak[:,1] # formal A_K due to E(B-V)
     ak_err_map = 0.5*(ak[:,2] - ak[:,0])

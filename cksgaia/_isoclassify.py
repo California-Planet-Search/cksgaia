@@ -8,8 +8,7 @@ import grid.classify_grid
 
 import cksgaia.io
 import cksgaia.iso
-
-import mwdust
+import cksgaia.extinction
 
 class Pipeline(cksgaia.iso.Pipeline):
     def run(self, dmodel=None):
@@ -43,14 +42,21 @@ class Pipeline(cksgaia.iso.Pipeline):
 
         # Get extinction from bayestar model
         edf = pd.DataFrame([], columns=['ra', 'dec', 'parallax'])
-        edf['ra'] = self.ra
-        edf['dec'] = self.dec
+        edf['ra'] = [self.ra]
+        edf['dec'] = [self.dec]
+        edf['parallax'] = [self.parallax]
+        edf = cksgaia.extinction.add_extinction(edf, 'bayestar2017')
 
-        x.addjhk([-99,-99, self.kmag],[0,0,self.kmag_err])
+        self.kmag_ext = self.kmag + edf['ak'].values[0]
+        self.kmag_ext_err = np.sqrt(self.kmag_err**2 +
+                                    edf['ak_err'].values[0]**2)
+        print "Kmag_ext ", self.kmag_ext, self.kmag_ext_err
+
+        x.addjhk([-99,-99, self.kmag_ext],[0,0,self.kmag_ext_err])
         # Sloan photometry
         #x.addgriz([11.776,11.354,11.238,11.178],[0.02,0.02,0.02,0.02])
         paras = grid.classify_grid.classify(
-            input=x,model=model,dustmodel=0, doplot=0
+            input=x, model=model, dustmodel=0, doplot=0, useav=0
         )
         
         #gcf('posteriors').savefig(self.pngfn)
