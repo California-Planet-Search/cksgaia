@@ -7,11 +7,16 @@ We have two methods for cross-matching Gaia catalogs
 
 Validated against Gaia DR1. For DR2 change gaiadr1 -> gaiadr2
 
+## CKS
+
 1. Generate VOTables and upload to Gaia Archive
 2. Log into Gaia archive as `epetigur`
 3. Perform the following joins that query all gaia sources within 8 arcsec of each CKS source, or stellar17 source.
+4. Give the job a sensible name like `xmatch_cks_gaiadr1`
+5. Run the query
+6. Download results as a votable
+7. Move into data
 
-## CKS
 ```
 SELECT *,distance(
   POINT('ICRS', cks.m17_ra, cks.m17_dec),
@@ -24,6 +29,8 @@ WHERE 1=CONTAINS(
 ```
 
 ## Mathur17
+
+Same as CKS, but with this query
 
 ```
 SELECT *,distance(
