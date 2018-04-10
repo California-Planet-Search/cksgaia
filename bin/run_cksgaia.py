@@ -222,6 +222,7 @@ class Workflow(object):
         d['srad-hist'] = cksgaia.plot.sample.srad_hist
         d['srad-err-hist'] = cksgaia.plot.sample.srad_err_hist
         d['prad-err-hist'] = cksgaia.plot.sample.prad_err_hist
+        d['parallax-err-hist'] = cksgaia.plot.sample.parallax_err_hist
         d['insol-hist'] = cksgaia.plot.occur.insol_hist
         d['radius-hist-fit'] = cksgaia.plot.occur.money_plot_fit
         d['radius-hist-plain'] = cksgaia.plot.occur.money_plot_plain
@@ -234,7 +235,6 @@ class Workflow(object):
         d['smass-cuts'] = cksgaia.plot.occur.mass_cuts
         d['desert-edge'] = cksgaia.plot.occur.desert_edge
         d['desert-edge-cum'] = cksgaia.plot.occur.desert_edge_cum
-
 
         self.plot_dict = d
 
@@ -286,6 +286,7 @@ class Workflow(object):
                     
                 fn = self.key2fn(key, 'plot')
                 pl.gcf().savefig(fn)
+                pl.clf()
 
             elif kind=='table' or kind == 'csv':
                 if name=='all':

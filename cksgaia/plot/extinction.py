@@ -1,8 +1,8 @@
 import cksgaia.io
 import seaborn as sns
 from matplotlib.pylab import *
-sns.set_context('paper',font_scale=1.2)
-sns.set_style('ticks')
+# sns.set_context('paper',font_scale=1.2)
+# sns.set_style('ticks')
 
 def fig_extinction():
     fig, axL = subplots(ncols=3,figsize=(7.5,2.5))

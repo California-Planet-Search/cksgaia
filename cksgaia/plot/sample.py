@@ -7,7 +7,6 @@ import cksgaia.misc
 import cksgaia.errors
 from cksgaia.plot.config import *
 
-
 def hrplot():
 
     physmerge = cksgaia.io.load_table(full_sample)
@@ -389,3 +388,37 @@ def prad_err_hist():
     pl.grid(False)
 
     pl.legend(['Johnson+17', 'this work'], loc='upper left')
+
+
+def parallax_err_hist():
+    old = cksgaia.io.load_table('iso-old')
+    new = cksgaia.io.load_table('iso')
+
+    fig = pl.figure(figsize=(12, 8))
+
+    new['iso_sparallax_err1'] *= 1e6
+
+    med_new = np.nanmedian(new['iso_sparallax_err1'])
+
+    #xbins = np.logspace(np.log10(1.0), np.log10(30.0), 30)
+    new['iso_sparallax_err1'].hist(bins=60, histtype='step', lw=4, color='k')
+
+    pl.axvline(med_new, color='k', linestyle='dashed', lw=4)
+
+    pl.annotate("median = {:.0f}$\mu$\"".format(np.round(med_new)), xy=(med_new, 125), xycoords='data',
+                xytext=(-22, 0), textcoords='offset points', rotation=90, verticalalignment='left')
+
+    pl.xlim(10.0, 300.0)
+    # pl.ylim(0, 130)
+    pl.ylabel('Number of Stars')
+    pl.xlabel('Parallax Uncertainty [$\mu$ arcseconds]')
+    # pl.title('NEA')
+    pl.semilogx()
+    ax = pl.gca()
+    ax.xaxis.set_major_formatter(matplotlib.ticker.ScalarFormatter())
+    ax.xaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('%0.1f'))
+    pl.xticks([10.0, 30.0, 100.0, 300.0])
+
+    pl.grid(False)
+
+    # pl.legend(['Johnson+17', 'this work'], loc='upper left')
