@@ -8,6 +8,8 @@ import cksgaia.io
 from cksgaia.config import *
 from cksgaia.plot.config import *
 
+matplotlib.rcParams['figure.figsize'] = (13, 8)
+
 def contour_plot_kde(physmerge, xcol, ycol, xlim, ylim, ylog=True, pltxlim=None, pltylim=None, epos=[3000, 5],
                      cont=True, nodata=False, weighted=False, nstars=36075., eaoff=(0, -70), clabel=None,
                      vlims=(0.0, 0.05)):
@@ -39,7 +41,7 @@ def contour_plot_kde(physmerge, xcol, ycol, xlim, ylim, ylog=True, pltxlim=None,
 
     """
 
-    fig = pl.figure(figsize=(13, 8))
+    # fig = pl.figure(figsize=(13, 8))
 
     crop = physmerge[(physmerge[ycol] < ylim[1]) & (physmerge[ycol] > ylim[0]) &
                      (physmerge[xcol] < xlim[1]) & (physmerge[xcol] < xlim[1])]
@@ -226,8 +228,11 @@ def insol_contour_anno():
     pl.xlim(pl.xlim()[::-1])
 
 
-def insol_contour_data():
-    physmerge = cksgaia.io.load_table('fulton17-weights')
+def insol_contour_data(sample=None, vlims=None):
+    if sample is None:
+        physmerge = cksgaia.io.load_table('fulton17-weights')
+    else:
+        physmerge = sample
 
     # cx, cy = np.loadtxt('/Users/bfulton/code/cksrad/data/detectability_p1.txt', unpack=True)
     cx, cy = np.loadtxt(os.path.join(modpath, 'data/sensitivity_p25.txt'), unpack=True)
@@ -237,10 +242,15 @@ def insol_contour_data():
     sx = np.append(sx, 10)
     cy = np.append(cy, 6)
 
+    if vlims is None:
+        vlims = (0.0, 0.05)
+    else:
+        vlims = vlims
+
     ax, xi, yi, zi_iso = contour_plot_kde(physmerge, 'iso_insol', 'iso_prad', xlim=[3, 30000],
                                                           ylim=[0.5, 20], ylog=True,
                                                           pltxlim=[10, 3000], pltylim=[1, 4], epos=[1800, 3.0],
-                                                          weighted=True, vlims=(0.0, 0.05))
+                                                          weighted=True, vlims=vlims)
 
     pl.fill_between(sx, cy, y2=0.1, color='0.5', zorder=10, alpha=0.5, hatch='\\\\')
     pl.annotate('      low\ncompleteness', xy=(30, 1.03), xycoords='data', color='0.2', fontsize=afs - 2)
@@ -272,3 +282,24 @@ def srad_contour():
 
     ax.xaxis.set_major_formatter(matplotlib.ticker.ScalarFormatter())
     ax.xaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('%.1f'))
+
+
+def contour_masscuts():
+    physmerge = cksgaia.io.load_table('fulton17-weights')
+
+    highcut, lowcut, _, _, _, annotations = cksgaia.plot.occur.get_mass_samples()
+
+    high = physmerge.query('iso_smass > @highcut')
+    medium = physmerge.query('iso_smass <= @highcut & iso_smass >= @lowcut')
+    low = physmerge.query('iso_smass < @lowcut')
+
+    fig = pl.figure(figsize=(36, 8))
+
+    pl.subplot(1, 3, 1)
+
+    pl.subplots_adjust(left=0.05, right=0.95)
+
+    for i, sample in enumerate([high, medium, low]):
+        pl.subplot(1, 3, i+1)
+        insol_contour_data(sample=sample, vlims=(0, 0.025))
+        pl.title(annotations[i], fontsize=afs + 6)
