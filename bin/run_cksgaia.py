@@ -246,7 +246,7 @@ class Workflow(object):
         self.csv_dict = d
 
         d = OrderedDict()
-        #d['fit'] = cksmet.values.val_fit
+        d['stat'] = cksgaia.value.val_stat
         self.val_dict = d
 
         d = OrderedDict()
@@ -264,7 +264,7 @@ class Workflow(object):
         if kind=='csv':
             return os.path.join(self.outputdir, 'tab_'+key+'.csv')
         if kind=='val':
-            return 'val_'+key+'.tex'
+            return os.path.join(self.outputdir, 'val_'+key+'.tex')
             
     def create_file(self, kind, name):
         i = 0

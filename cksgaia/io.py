@@ -8,6 +8,9 @@ import cksgaia.plot
 import cksgaia.completeness
 from cksgaia.config import *
 import glob
+import cksgaia.extinction
+import cksgaia.xmatch
+from astropy import units as u
 
 DATADIR = os.path.join(os.path.dirname(__file__), '../data/')
 
@@ -65,11 +68,12 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
             'st_radius':'kic_srad', 'jmag':'kic_jmag',
             'jmag_err':'kic_jmag_err','hmag':'kic_hmag',
             'hmag_err':'kic_hmag_err','kmag':'kic_kmag',
-            'kmag_err':'kic_kmag_err'
+            'kmag_err':'kic_kmag_err',
+            'degree_ra':'kic_ra', 'degree_dec':'kic_dec'
         }
         df = df.rename(columns=namemap)[namemap.values()]
 
-    elif table=='mathur17':
+    elif table=='m17':
         df = cksgaia.io.load_table('stellar17')
         namemap = {}
         for col in list(df.columns):
@@ -77,24 +81,22 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
                 namemap[col] = col.replace('kic','m17')
         df = df.rename(columns=namemap)
 
-    elif table=='johnson17':
-        df = pd.read_csv(os.path.join(DATADIR, 'cks_physical_merged.csv'),index_col=0)
+    elif table=='j17':
+        fn = os.path.join(DATADIR, 'cks_physical_merged.csv')
+        df = pd.read_csv(fn,index_col=0)
 
     elif table=='fulton17':
-        df = load_table('johnson17')
+        df = load_table('j17')
         df = apply_filters(df)
 
     elif table=='fulton17-weights':
-        df = load_table('johnson17')
+        df = load_table('j17')
         df = apply_filters(df)
         df = cksgaia.completeness.weight_merge(df)
 
-    elif table=='cks-physical-merged+mathur17':
-        df = load_table('cks-physical-merged')
-
     elif table=='j17+m17':
-        df = load_table('johnson17')
-        m17 = load_table('mathur17')
+        df = load_table('j17')
+        m17 = load_table('m17')
         df = pd.merge(df, m17, on='id_kic')
 
     elif table=='xmatch':
@@ -104,6 +106,13 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
         #namemap = {'m17_ra':'RA','m17_dec':'DEC'}
         #df = df.rename(columns=namemap)
         #df = df['RA DEC'.split()]
+
+    elif table=='j17+m17+gaia1':
+        df = load_table('j17+m17')
+        gaia = cksgaia.io.load_table('xmatch-results')
+        stars = df[['id_kic']].drop_duplicates()
+        temp = cksgaia.xmatch.gaia1(stars,gaia,'id_kic')
+        df = pd.merge(df,temp)
 
     elif table=='xmatch-results':
         fn = os.path.join(DATADIR,'cks-xmatch-results.csv')
@@ -124,12 +133,13 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
         df = df[namemap.values()]
 
     elif table=='j17+m17+extinct':
-        files = glob.glob('data/extinction/j17+m17-*.csv')
-        df = [pd.read_csv(fn,index_col=0).T for fn in files]
-        df = pd.concat(df).drop_duplicates().T
+        df = load_table('j17+m17')
+        df['distance'] = np.array(1 / df.iso_sparallax * 1000) * u.pc
+        df['ra'] = df['m17_ra']
+        df['dec'] = df['m17_dec']
+        df = cksgaia.extinction.add_extinction(df,'bayestar2017')
+        df = df.drop('distance ra dec'.split(),axis=1)
         
-        df2 = load_table('j17+m17')
-        df = pd.merge(df,df2 )
 
     elif table == 'j17+m17-fakegaia':
         df = load_table('j17+m17')
