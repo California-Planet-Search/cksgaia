@@ -16,7 +16,7 @@ Validated against Gaia DR1. For DR2 change gaiadr1 -> gaiadr2
 SELECT *,distance(
   POINT('ICRS', cks.m17_ra, cks.m17_dec),
   POINT('ICRS', gaia.ra, gaia.dec)) AS dist
-FROM gaiadr1.gaia_source AS gaia, user_epetigur.table1 AS cks
+FROM gaiadr1.gaia_source AS gaia, user_epetigur.cks AS cks
 WHERE 1=CONTAINS(
   POINT('ICRS', cks.m17_ra, cks.m17_dec),
   CIRCLE('ICRS', gaia.ra, gaia.dec, 0.00222)
@@ -37,10 +37,6 @@ WHERE 1=CONTAINS(
 ```
 
 ## Method 2: XMatch at CDS
-
-```
-run_cksgaia.py create-xmatch-table
-```
 
 upload to xmatch. cross-reference with Gaia (search size of 8 arcsec)
 
