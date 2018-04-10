@@ -6,6 +6,8 @@ A re-analysis of the CKS dataset using Gaia constrained parallaxes.
 
 # Cross-match the CKS stars with Gaia IDs.
 
+Follow instructions [here](docs/gaia-xmatch.md)
+
 # Physical parameters
 
 This part of the code follows the CKS-Physical codebase
