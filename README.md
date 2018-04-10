@@ -2,13 +2,13 @@
 
 A re-analysis of the CKS dataset using Gaia constrained parallaxes.
 
-# Installation
+## Installation
 
-# Cross-match the CKS stars with Gaia IDs.
+## Cross-match the CKS stars with Gaia IDs.
 
 Follow instructions [here](docs/gaia-xmatch.md)
 
-# Physical parameters
+## Physical parameters
 
 This part of the code follows the CKS-Physical codebase
 
@@ -47,5 +47,3 @@ $ run_cksgaia.py tex-stats # Summary statistics
 $ run_cksgaia.py create-plots # Make figures
 $ run_cksgaia.py update-paper # Move files to paper directory
 ```
-
-#
