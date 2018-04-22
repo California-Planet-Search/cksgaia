@@ -111,7 +111,7 @@ def run_iso(args):
     cksgaia.iso.run(args.driver, args.id_starname, args.outdir, debug=args.debug)
 
 def create_xmatch_table(args):
-    cksgaia.io.create_xmatch_table()
+    cksgaia.xmatch.create_xmatch_table()
 
 def create_iso_jobs(args):
     if args.sample=='cks':
