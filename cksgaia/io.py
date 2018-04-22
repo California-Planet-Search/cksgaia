@@ -99,13 +99,6 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
         m17 = load_table('m17')
         df = pd.merge(df, m17, on='id_kic')
 
-    elif table=='xmatch':
-        df = load_table('j17+m17')
-        df = df['id_kic m17_ra m17_dec'.split()]
-        df = df.groupby('id_kic',as_index=False).first()
-        #namemap = {'m17_ra':'RA','m17_dec':'DEC'}
-        #df = df.rename(columns=namemap)
-        #df = df['RA DEC'.split()]
 
     elif table=='j17+m17+gaia1':
         df = load_table('j17+m17')
@@ -131,6 +124,8 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
         }
         df = df.rename(columns=namemap)
         df = df[namemap.values()]
+
+
 
     elif table=='j17+m17+extinct':
         df = load_table('j17+m17')
@@ -287,11 +282,9 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
         assert False, "table {} not valid table name".format(table)
     return df
 
-def create_xmatch_table():
-    df = load_table('xmatch',cache=2)
-    fn = os.path.join(DATADIR,'cks-xmatch.csv')
-    print "created {}".format(fn)
-    df.to_csv(fn,index=False)
+
+
+
 
 def load_mist():
     model = ebf.read(os.path.join(DATADIR,'mesa.ebf'))
