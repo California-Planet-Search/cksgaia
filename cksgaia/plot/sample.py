@@ -307,8 +307,16 @@ def srad_hist():
 
 
 def srad_err_hist():
-    old = cksgaia.io.load_table('iso-old')
-    new = cksgaia.io.load_table('iso')
+    # old = cksgaia.io.load_table('iso-old')
+    # new = cksgaia.io.load_table('iso')
+
+    old = cksgaia.io.load_table('fulton17-weights')
+    new = cksgaia.io.apply_filters(cksgaia.io.load_table('fakegaia-merged'))
+
+    old['iso_srad_frac_err'] = (old['iso_srad_err1'] - old['iso_srad_err2'])/2. / old['iso_srad']
+    new['iso_srad_frac_err'] = (new['iso_srad_err1'] - new['iso_srad_err2'])/2. / new['iso_srad']
+
+    print len(old), len(new)
 
     fig = pl.figure(figsize=(12, 8))
 
@@ -325,9 +333,9 @@ def srad_err_hist():
     pl.axvline(med_old, color='0.7', linestyle='dashed', lw=4)
     pl.axvline(med_new, color='k', linestyle='dashed', lw=4)
 
-    pl.annotate("median = {:.0f}%".format(np.round(med_old)), xy=(med_old, 125), xycoords='data',
+    pl.annotate("median = {:.0f}%".format(np.round(med_old)), xy=(med_old, 100), xycoords='data',
                 xytext=(-22, 0), textcoords='offset points', rotation=90, verticalalignment='left')
-    pl.annotate("median = {:.0f}%".format(np.round(med_new)), xy=(med_new, 85), xycoords='data',
+    pl.annotate("median = {:.0f}%".format(np.round(med_new)), xy=(med_new, 50), xycoords='data',
                 xytext=(3, 0), textcoords='offset points', rotation=90, verticalalignment='left')
 
 
@@ -348,8 +356,8 @@ def srad_err_hist():
 
 
 def prad_err_hist():
-    old = cksgaia.io.load_table('johnson17')
-    new = cksgaia.io.load_table('fakegaia-merged')
+    old = cksgaia.io.load_table('fulton17-weights')
+    new = cksgaia.io.apply_filters(cksgaia.io.load_table('fakegaia-merged'))
 
     fig = pl.figure(figsize=(12, 8))
 
@@ -358,6 +366,8 @@ def prad_err_hist():
 
     old['iso_prad_frac_err'] *= 100
     new['iso_prad_frac_err'] *= 100
+
+    print len(old), len(new)
 
     med_old = np.nanmedian(old['iso_prad_frac_err'])
     med_new = np.nanmedian(new['iso_prad_frac_err'])
@@ -369,9 +379,9 @@ def prad_err_hist():
     pl.axvline(med_old, color='0.7', linestyle='dashed', lw=4)
     pl.axvline(med_new, color='k', linestyle='dashed', lw=4)
 
-    pl.annotate("median = {:.0f}%".format(np.round(med_old)), xy=(med_old, 160), xycoords='data',
+    pl.annotate("median = {:.0f}%".format(np.round(med_old)), xy=(med_old, 70), xycoords='data',
                 xytext=(-22,0), textcoords='offset points', rotation=90, verticalalignment='left')
-    pl.annotate("median = {:.0f}%".format(np.round(med_new)), xy=(med_new, 160), xycoords='data',
+    pl.annotate("median = {:.0f}%".format(np.round(med_new)), xy=(med_new, 70), xycoords='data',
                 xytext=(-22,0), textcoords='offset points', rotation=90, verticalalignment='left')
 
     pl.xlim(1.5, 40.0)
