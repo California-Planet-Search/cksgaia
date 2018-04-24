@@ -1,4 +1,3 @@
-import os
 
 import pandas as pd
 import numpy as np
@@ -7,7 +6,6 @@ import ebf
 import cksgaia.plot
 import cksgaia.completeness
 from cksgaia.config import *
-import glob
 import cksgaia.extinction
 import cksgaia.xmatch
 from astropy import units as u
@@ -82,7 +80,7 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
         df = df.rename(columns=namemap)
 
     elif table=='j17':
-        fn = os.path.join(DATADIR, 'cks_physical_merged.csv')
+        fn = MERGED_TABLE
         df = pd.read_csv(fn,index_col=0)
 
     elif table=='fulton17':
