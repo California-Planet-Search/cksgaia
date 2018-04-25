@@ -48,11 +48,11 @@ class Pipeline(cksgaia.iso.Pipeline):
         edf['ra'] = [self.ra]
         edf['dec'] = [self.dec]
         edf['gaia2_sparallax'] = [self.parallax]
-        edf = cksgaia.extinction.add_extinction(edf, 'bayestar2017')
+        # edf = cksgaia.extinction.add_extinction(edf, 'bayestar2017')
 
-        self.kmag_ext = self.kmag + edf['ak'].values[0]
-        self.kmag_ext_err = np.sqrt(self.kmag_err**2 +
-                                    edf['ak_err'].values[0]**2)
+        self.kmag_ext = self.kmag# + edf['ak'].values[0]
+        self.kmag_ext_err = np.sqrt(self.kmag_err**2)# +
+                                    #edf['ak_err'].values[0]**2)
         print "Kmag_ext ", self.kmag_ext, self.kmag_ext_err
 
         x.addjhk([-99,-99, self.kmag_ext],[0,0,self.kmag_ext_err])
