@@ -368,7 +368,7 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
         df = df.query('h13_srad > 0.5')
         df['id_kic'] = df.id_kic.astype(int)
 
-    elif table=='furlan-table2':
+    elif table=='furlan17-table2':
         tablefn = os.path.join(DATADIR,'furlan17/Table2.txt')
         df = pd.read_csv(tablefn,sep='\s+')
         namemap = {
@@ -376,9 +376,9 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
         }
         df = df.rename(columns=namemap)[namemap.values()]
         df['id_starname'] = ['K'+str(x).rjust(5, '0') for x in df.id_koi] # LMW convert id_koi to id_starname for merge with cks
-        df = add_prefix(df,'furlan_')
+        df = add_prefix(df,'fur17_')
 
-    elif table=='furlan-table9':
+    elif table=='furlan17-table9':
         tablefn = os.path.join(DATADIR,'furlan17/Table9.txt')
         names = """
         id_koi hst hst_err i i_err 692 692_err lp600 lp600_err jmag jmag_err 
@@ -388,8 +388,13 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
 
         df = pd.read_csv(tablefn,sep='\s+',skiprows=2,names=names)
         df['id_starname'] = ['K'+str(x).rjust(5, '0') for x in df.id_koi] # LMW convert id_koi to id_starname for merge with cks
-        df = add_prefix(df,'furlan_')
+        df = add_prefix(df,'fur17_')
 
+
+    elif table=='fur17':
+        tab2 = load_table('furlan17-table2')
+        tab9 = load_table('furlan17-table9')
+        df = pd.merge(tab2,tab9['id_koi fur17_rcorr_avg fur17_rcorr_avg_err'.split()],how='left',on='id_koi')
 
     elif table=='cks+gaia2+h13':
         df1 = cksgaia.io.load_table('j17+m17+gaia2+iso').groupby('id_kic',as_index=False).first()
@@ -408,8 +413,12 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
         for col in df1.columns:
             if col.startswith('iso_'):
                 del df1[col]
-        df2 = pd.read_csv(os.path.join(DATADIR, 'isochrones_gaia2.csv'))
-        df = pd.merge(df1, df2, on='id_starname', suffixes=['',''])
+        df2 = pd.read_csv(os.path.join(DATADIR, 'isochrones_gaia2.csv'), index_col=0)
+        df = pd.merge(df1, df2, on='id_starname')
+
+    elif table=='j17+m17+gaia2+iso+fur17':
+        df = pd.merge(load_table('j17+m17+gaia2+iso'), load_table('fur17'),how='left')
+
     elif table == "cksgaia-planets":
         df2 = load_table('j17+m17+gaia2+iso')
         df = cksgaia.calc.update_planet_parameters(df2)

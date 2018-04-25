@@ -61,19 +61,19 @@ def comparison(key):
 
     if key=='srad-j17':
         df = cksgaia.io.load_table('j17').groupby('id_kic',as_index=False).nth(0)
-        df = df['id_kic giso_srad giso_srad_err1 giso_srad_err2'.split()]
-        df = cksgaia.io.sub_prefix(df, 'giso', ignore=['id'])
+        df = df['id_kic iso_srad iso_srad_err1 iso_srad_err2'.split()]
+        df = cksgaia.io.sub_prefix(df, 'iso', ignore=['id'])
         df = cksgaia.io.add_prefix(df, 'j17', ignore=['id'])
         df1 = df
 
-        df2 = cksgaia.io.load_table('j17+m17+gaia2+iso',cachefn='load_table_cache.hdf.save2').groupby('id_kic',as_index=False).nth(0)
+        df2 = cksgaia.io.load_table('j17+m17+gaia2+iso+fur17').groupby('id_kic',as_index=False).nth(0)
         df = pd.merge(df1,df2)
-
-        df = df.query('gaia2_gflux_ratio < 1.1 and giso_srad_err1/giso_srad < 0.1')
+        df = df.query('gaia2_gflux_ratio < 1.1 and giso_srad_err1/giso_srad < 0.1 and ~(fur17_rcorr_avg > 1.05)')
 
         x1 = df.giso_srad
         x2 = df.j17_srad
         x3 = x2 / x1 
+        
         x1err = np.vstack([-df.giso_srad_err2,df.giso_srad_err1]) 
         x2err = np.vstack([-df.j17_srad_err2,df.j17_srad_err1])
         x3err = x2err / np.array(df.giso_srad)
@@ -91,6 +91,7 @@ def comparison(key):
         _xlim0 = 0.4,12
         _yt1 = [0.8,0.9,1.0,1.1,1.2]
         _xt0 = [0.5,1,2,3,5,10,20]
+        import pdb;pdb.set_trace()
 
 
     if key=='srad-s15':
