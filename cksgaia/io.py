@@ -11,6 +11,7 @@ import cksgaia.completeness
 from cksgaia.config import *
 import cksgaia.extinction
 import cksgaia.xmatch
+import cksgaia.calc
 from astropy import units as u
 import astropy.io.ascii
 DATADIR = os.path.join(os.path.dirname(__file__), '../data/')
@@ -386,10 +387,12 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
             if col.startswith('iso_'):
                 del df1[col]
         df2 = pd.read_csv(os.path.join(DATADIR, 'isochrones_gaia2.csv'), index_col=0)
-
         df = pd.merge(df1, df2, on='id_starname')
+        df = cksgaia.calc.update_planet_parameters(df)
+    elif table == "cksgaia-planets":
+        df = pd.read_csv(os.path.join(DATADIR, 'cks_iso_gaia2_merged.csv')
     elif table == "cksgaia-filtered":
-        df = load_table('j17+m17+gaia2+iso')
+        df = load_table('cksgaia-planets')
         df = apply_filters(df)
     elif table == 'cksgaia-weights':
         df = load_table('cksgaia-filtered')
