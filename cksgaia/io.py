@@ -368,6 +368,28 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
         df = df.query('h13_srad > 0.5')
         df['id_kic'] = df.id_kic.astype(int)
 
+    elif table=='furlan-table2':
+        tablefn = os.path.join(DATADIR,'furlan17/Table2.txt')
+        df = pd.read_csv(tablefn,sep='\s+')
+        namemap = {
+            'KOI':'id_koi','KICID':'id_kic','Observatories':'ao_obs'
+        }
+        df = df.rename(columns=namemap)[namemap.values()]
+        df['id_starname'] = ['K'+str(x).rjust(5, '0') for x in df.id_koi] # LMW convert id_koi to id_starname for merge with cks
+        df = add_prefix(df,'furlan_')
+
+    elif table=='furlan-table9':
+        tablefn = os.path.join(DATADIR,'furlan17/Table9.txt')
+        names = """
+        id_koi hst hst_err i i_err 692 692_err lp600 lp600_err jmag jmag_err 
+        kmag kmag_err jkdwarf jkdwarf_err jkgiant jkgiant_err rcorr_avg 
+        rcorr_avg_err
+        """.split()
+
+        df = pd.read_csv(tablefn,sep='\s+',skiprows=2,names=names)
+        df['id_starname'] = ['K'+str(x).rjust(5, '0') for x in df.id_koi] # LMW convert id_koi to id_starname for merge with cks
+        df = add_prefix(df,'furlan_')
+
 
     elif table=='cks+gaia2+h13':
         df1 = cksgaia.io.load_table('j17+m17+gaia2+iso').groupby('id_kic',as_index=False).first()
