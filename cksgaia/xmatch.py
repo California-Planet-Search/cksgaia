@@ -165,14 +165,27 @@ def xmatch_gaia2(df, gaia, key, gaiadr):
     )
 
     # count the number of stars within 8 arcsec
-    m.index = m[key]
-    g = m.groupby(key)
-    m[gaiadr+'_nsource'] = g.size()
-    m[gaiadr+'_gflux_sum'] = g[gaiadr+'_gflux'].sum()
+    m.index = m.id_gaia2
+    g = m.groupby('id_kic')
+    m['id_gaia2_best'] = False
+    m['absdiff_gmag_kepmag'] = m['gaia2_gmag'] - m['kic_kepmag']
+    for id_kic, idx in g.groups.iteritems():
+        stars = m.loc[idx]
+        stars.sort_values()
+        if len(stars) > 4:
+            
+            import pdb;pdb.set_trace()
+            
+            
+        print len(stars)
+        
+
+    #m[gaiadr+'_nsource'] = g.size()
+    #m[gaiadr+'_gflux_sum'] = g[gaiadr+'_gflux'].sum()
     #m[gaiadr+'_gflux_nearest'] = g[gaiadr+'_gflux'].first()
     #m[gaiadr+'_gflux_ratio'] = m[gaiadr+'_gflux_sum']/m[gaiadr+'_gflux_nearest']
-    m[gaiadr+'_angdist_n0'] = g[gaiadr+'_angdist'].nth(0) 
-    m[gaiadr+'_angdist_n1'] = g[gaiadr+'_angdist'].nth(1) 
+    #m[gaiadr+'_angdist_n0'] = g[gaiadr+'_angdist'].nth(0) 
+    #m[gaiadr+'_angdist_n1'] = g[gaiadr+'_angdist'].nth(1) 
     #m = m.sort_values(by=[key,gaiadr+'_angdist'])
     #g = m.groupby(key,as_index=False)
     #m = g.nth(0) # first is slow when there is a string in the columns
