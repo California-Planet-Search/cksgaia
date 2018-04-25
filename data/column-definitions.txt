@@ -147,6 +147,11 @@ gaia2_sparallax_err
 gaia2_gflux           Mean flux in Gaia bandpass [e-/s]
 gaia2_gflux_err       
 gaia2_gmag            Mean magnitude in Gaia bandpass [mag]
-
+gaia2_srad            Stellar radius [Solar-radii] 
+gaia2_srad_err1       
+gaia2_srad_err2       
+gaia2_steff           Stellar effective temperature [Kelvin] 
+gaia2_steff_err1       
+gaia2_steff_err2
 
 
