@@ -17,12 +17,12 @@ def comparison(key):
     if key=='smass-h13':
         df = cksgaia.io.load_table('cks+gaia2+h13')
         x1 = df.h13_smass
-        x2 = df.iso_smass
+        x2 = df.giso_smass
         x3 = x2 / x1 
 
         x1err = np.vstack([df.h13_smass_err,df.h13_smass_err])
-        x2err = np.vstack([-df.iso_smass_err2,df.iso_smass_err1])
-        x3err = x2err / np.array(df.iso_smass)
+        x2err = np.vstack([-df.giso_smass_err2,df.giso_smass_err1])
+        x3err = x2err / np.array(df.giso_smass)
         fig, axL = subplots_compare(
             x1,x2,x3, x1err=x1err, x2err=x2err, x3err=x3err, **errorbar_kw
         )
