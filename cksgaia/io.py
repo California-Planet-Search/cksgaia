@@ -1,4 +1,6 @@
 import os
+from collections import OrderedDict
+import re
 
 import pandas as pd
 import numpy as np
@@ -12,7 +14,6 @@ import cksgaia.extinction
 import cksgaia.xmatch
 from astropy import units as u
 import astropy.io.ascii
-
 DATADIR = os.path.join(os.path.dirname(__file__), '../data/')
 
 def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
@@ -124,8 +125,6 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
         }
         df = df.rename(columns=namemap)
         df = df[namemap.values()]
-
-
 
     elif table=='j17+m17+extinct':
         df = load_table('j17+m17')
@@ -278,8 +277,12 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
     elif table == 'fakegaia-merged':
         df = pd.read_csv(MERGED_TABLE, index_col=None, skipinitialspace=True)
 
+    elif table=='cks+gaia2':
+        print "WARNING: using fake Gaia data"
+        df = load_table('fakegaia-merged')
+
     elif table=='silva15':
-        fn = os.path.join(DATADIR,'silva-aguirre15.tex')
+        fn = os.path.join(DATADIR,'silva15/silva-aguirre15.tex')
         with open(fn,'r') as f:
             lines = f.readlines()
         header = lines[7]
@@ -355,6 +358,19 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
         }
         df = df.rename(columns=namemap)[namemap.values()]
         df = df.query('h13_srad > 0.5')
+        df['id_kic'] = df.id_kic.astype(int)
+
+
+    elif table=='cks+gaia2+h13':
+        df1 = cksgaia.io.load_table('cks+gaia2').groupby('id_kic',as_index=False).first()
+        df2 = cksgaia.io.load_table('huber13')
+        df = pd.merge(df1,df2)
+
+    elif table=='cks+gaia2+s15':
+        df1 = cksgaia.io.load_table('cks+gaia2').groupby('id_kic',as_index=False).first()
+        df2 = cksgaia.io.load_table('silva15')
+        df = pd.merge(df1,df2)
+
     else:
         assert False, "table {} not valid table name".format(table)
     return df
