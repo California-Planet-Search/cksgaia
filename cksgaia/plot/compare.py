@@ -70,6 +70,7 @@ def comparison(key):
         df = pd.merge(df1,df2)
 
         df = df.query('gaia2_gflux_ratio < 1.1 and iso_srad_err1/iso_srad < 0.1 and fur17_rcorr_avg < 1.05')
+        import pdb;pdb.set_trace()
 
         x1 = df.iso_srad
         x2 = df.j17_srad
