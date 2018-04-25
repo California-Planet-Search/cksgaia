@@ -75,7 +75,7 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
         df = df.rename(columns=namemap)[namemap.values()]
 
     elif table=='m17':
-        df = cksgaia.io.load_table('stellar17')
+        df = load_table('stellar17')
         namemap = {}
         for col in list(df.columns):
             if col[:3]=='kic':
@@ -107,13 +107,13 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
         temp = cksgaia.xmatch.gaia1(stars,gaia,'id_kic')
         df = pd.merge(df,temp)
 
-    elif table=='j17+m17+gaia2':
-        import cksgaia.xmatch
-        df = load_table('j17+m17')
-        gaia = cksgaia.xmatch.read_xmatch_results('data/xmatch_cks_gaiadr2-result.csv','gaia2-archive')
-        stars = df[['id_kic']].drop_duplicates()
-        temp = cksgaia.xmatch.gaia1(stars,gaia,'id_kic')
-        df = pd.merge(df,temp)
+    # elif table=='j17+m17+gaia2':
+    #     import cksgaia.xmatch
+    #     df = load_table('j17+m17')
+    #     gaia = cksgaia.xmatch.read_xmatch_results('data/xmatch_cks_gaiadr2-result.csv','gaia2-archive')
+    #     stars = df[['id_kic']].drop_duplicates()
+    #     temp = cksgaia.xmatch.gaia1(stars,gaia,'id_kic')
+    #     df = pd.merge(df,temp)
 
     elif table=='xmatch-results':
         fn = os.path.join(DATADIR,'cks-xmatch-results.csv')
@@ -379,7 +379,7 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
         df = pd.merge(df1,df2)
 
     elif table=='j17+m17+gaia2':
-        df = pd.read_csv(os.path.join(DATADIR), 'data/m17+j17+gaiadr2.csv', index_col=0)
+        df = pd.read_csv(os.path.join(DATADIR, 'm17+j17+gaiadr2.csv'), index_col=0)
 
     else:
         assert False, "table {} not valid table name".format(table)

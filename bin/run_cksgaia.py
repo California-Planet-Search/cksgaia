@@ -121,10 +121,11 @@ def create_xmatch_table(args):
 def create_iso_jobs(args):
     if args.sample=='cks':
         df = cksgaia.io.load_table('j17+m17')
+    elif args.sample == 'cks+gaia2':
+        df = cksgaia.io.load_table('j17+m17+gaia2')\
+            .groupby('id_kic').first()
     else:
-        import cksspec.io
-        df = cksspec.io.load_table(args.sample)
-        df['id_starname'] = df['name']
+        print("Invalid sample: {}".format(args.sample))
 
     for i, row in df.iterrows():
         id_starname = row.id_starname
