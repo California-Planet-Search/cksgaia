@@ -74,6 +74,21 @@ def read_xmatch_results(fn, mode):
             'id_kic':'id_kic',
             'angDist':'angdist'
         }
+
+    elif mode=='gaia2-archive':
+        namemap = {
+            'source_id':'id_gaia2',
+            'ra':'ra', 
+            'dec':'dec',
+            'parallax':'sparallax', 
+            'parallax_error':'sparallax_err', 
+            'phot_g_mean_flux':'gflux',
+            'phot_g_mean_flux_error':'gflux_err',
+            'phot_g_mean_mag':'gmag',
+            'parallax_over_error':'sparallax_over_err',
+            'id_kic':'id_kic',
+            'dist':'angdist',
+        }
     elif gaiadr=='gaia2':
         pass
 
@@ -85,7 +100,7 @@ def read_xmatch_results(fn, mode):
     df = cksgaia.io.add_prefix(df, gaiadr+'_')
     return df
 
-def gaia1(df, gaia, key, gaiadr):
+def xmatch_gaia(df, gaia, key, gaiadr):
     """
     Crossmatch the sources in Gaia 1
 
@@ -97,7 +112,7 @@ def gaia1(df, gaia, key, gaiadr):
     """
 
     id_gaia = 'id_{}'.format(gaiadr)
-    assert len(df)==len(df.drop_duplicates()), "No duplicate stars"
+    assert len(df.id_kic)==len(df.id_kic.drop_duplicates()), "No duplicate stars"
     gaia[id_gaia]= gaia[id_gaia].astype(str)  # handle nans
 
     # just want the stars
@@ -105,7 +120,7 @@ def gaia1(df, gaia, key, gaiadr):
     m[id_gaia]= m[id_gaia].fillna('-99')
     m[id_gaia]= m[id_gaia].astype(np.int64)
     ndf = len(df)
-    print "max(gaia1_angdist) = {} (arcsec)".format(m.gaia1_angdist.max())
+    print "max(gaia1_angdist) = {} (arcsec)".format(m[gaiadr+'_angdist'].max())
     print "{} gaia sources within 8 arcsec of {} target sources".format(
         len(m),ndf
     )
@@ -121,4 +136,44 @@ def gaia1(df, gaia, key, gaiadr):
     m = m.sort_values(by=[key,gaiadr+'_angdist'])
     g = m.groupby(key,as_index=False)
     m = g.nth(0) # first is slow when there is a string in the columns
+    return m
+
+
+def xmatch_gaia2(df, gaia, key, gaiadr):
+    """
+    Crossmatch the sources in Gaia 1
+
+    Args:
+        df (pandas.DataFrame): Target catalog 
+        gaia (pandas.DataFrame): Gaia DR1 table
+        key (str): key to join on
+        gaiadr (str): {'gaiadr1','gaiadr2'}
+    """
+
+    id_gaia = 'id_{}'.format(gaiadr)
+    assert len(df.id_kic)==len(df.id_kic.drop_duplicates()), "No duplicate stars"
+    gaia[id_gaia]= gaia[id_gaia].astype(str)  # handle nans
+
+    # just want the stars
+    m = pd.merge(df,gaia,on=key,how='left')
+    m[id_gaia]= m[id_gaia].fillna('-99')
+    m[id_gaia]= m[id_gaia].astype(np.int64)
+    ndf = len(df)
+    print "max(gaia1_angdist) = {} (arcsec)".format(m[gaiadr+'_angdist'].max())
+    print "{} gaia sources within 8 arcsec of {} target sources".format(
+        len(m),ndf
+    )
+
+    # count the number of stars within 8 arcsec
+    m.index = m[key]
+    g = m.groupby(key)
+    m[gaiadr+'_nsource'] = g.size()
+    m[gaiadr+'_gflux_sum'] = g[gaiadr+'_gflux'].sum()
+    #m[gaiadr+'_gflux_nearest'] = g[gaiadr+'_gflux'].first()
+    #m[gaiadr+'_gflux_ratio'] = m[gaiadr+'_gflux_sum']/m[gaiadr+'_gflux_nearest']
+    m[gaiadr+'_angdist_n0'] = g[gaiadr+'_angdist'].nth(0) 
+    m[gaiadr+'_angdist_n1'] = g[gaiadr+'_angdist'].nth(1) 
+    #m = m.sort_values(by=[key,gaiadr+'_angdist'])
+    #g = m.groupby(key,as_index=False)
+    #m = g.nth(0) # first is slow when there is a string in the columns
     return m

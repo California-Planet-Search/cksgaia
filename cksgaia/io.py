@@ -108,6 +108,14 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
         temp = cksgaia.xmatch.gaia1(stars,gaia,'id_kic')
         df = pd.merge(df,temp)
 
+    elif table=='j17+m17+gaia2':
+        import cksgaia.xmatch
+        df = load_table('j17+m17')
+        gaia = cksgaia.xmatch.read_xmatch_results('data/xmatch_cks_gaiadr2-result.csv','gaia2-archive')
+        stars = df[['id_kic']].drop_duplicates()
+        temp = cksgaia.xmatch.gaia1(stars,gaia,'id_kic')
+        df = pd.merge(df,temp)
+
     elif table=='xmatch-results':
         fn = os.path.join(DATADIR,'cks-xmatch-results.csv')
         df = pd.read_csv(fn)
