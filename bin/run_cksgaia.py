@@ -207,6 +207,7 @@ def update_paper(args):
     w.update_paper() 
 
 
+import cksgaia.plot.compare
 class Workflow(object):
     def __init__(self, outputdir='./'):
         self.outputdir = outputdir
@@ -219,6 +220,10 @@ class Workflow(object):
         d['filters'] = cksgaia.plot.sample.filter_plot
         d['mag-hist'] = cksgaia.plot.sample.magcuts
         d['depth-hist'] = cksgaia.plot.sample.depth_hist
+        d['srad-h13'] = lambda : cksgaia.plot.compare.comparison('srad-h13')
+        d['srad-s15'] = lambda : cksgaia.plot.compare.comparison('srad-s15')
+        d['smass-h13'] = lambda : cksgaia.plot.compare.comparison('smass-h13')
+        d['sage-s15'] = lambda : cksgaia.plot.compare.comparison('sage-s15')
         d['srad-hist'] = cksgaia.plot.sample.srad_hist
         d['srad-err-hist'] = cksgaia.plot.sample.srad_err_hist
         d['prad-err-hist'] = cksgaia.plot.sample.prad_err_hist
