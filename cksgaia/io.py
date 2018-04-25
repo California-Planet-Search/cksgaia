@@ -440,7 +440,7 @@ def apply_filters(physmerge, mkplot=False, verbose=False, textable=False):
             left = plti
             right = plti + 1
 
-            letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i']
+            letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k']
             left_letter = letters[left - 1]
             right_letter = letters[right - 1]
 
@@ -474,7 +474,7 @@ def apply_filters(physmerge, mkplot=False, verbose=False, textable=False):
 
             return left + 1
 
-    nrow = 8
+    nrow = 9
     ncol = 1
     plti = 1
 
@@ -501,8 +501,22 @@ def apply_filters(physmerge, mkplot=False, verbose=False, textable=False):
         print "Kp < 14.2 filter removes %d planets." % (pre - post)
     plti = _bipanel(crop, nrow, ncol, plti, eloc=(12.0, 70), atxt='$Kp < 14.2$')
 
+    pre = len(crop)
+    crop = crop[crop['giso_srad'] / crop['giso_srad_err1'] > 10]
+    post = len(crop)
+    if verbose:
+        print "Rp > 10 $\sigma$" % (pre - post)
+    plti = _bipanel(crop, nrow, ncol, plti, eloc=(12.0, 70), atxt='$Rp < 10 \sigma$')
+
+    pre = len(crop)
+    crop = crop[crop['fur17_rcorr_avg'] <= 1.05]
+    post = len(crop)
+    if verbose:
+        print "Rp > 10 $\sigma$" % (pre - post)
+    plti = _bipanel(crop, nrow, ncol, plti, eloc=(12.0, 70), atxt='dilution $\leq$ 5%% (%d)')
+
     # pre = len(crop)
-    # crop = crop[crop['furlan_rcorr_avg'] <= 1.05]
+    # crop = crop[crop['fur17_rcorr_avg'] <= 1.05]
     # if mkplot:
     #     pl.subplot(nrow,ncol,plti)
     #     v = cksrad.plotting.simplehist(crop, annotate='dilution $\leq$ 5%% (%d)' % len(crop), stacked=True, va_anno=True)

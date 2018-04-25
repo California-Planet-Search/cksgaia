@@ -282,7 +282,7 @@ def srad_hist():
 
     x = 2.2
     y = 100.0
-    err1, err2 = cksgaia.misc.frac_err(physmerge, x, 'giso_prad')
+    err1, err2 = cksgaia.misc.frac_err(physmerge, x, 'giso_srad')
 
     xbins = np.logspace(np.log10(0.6), np.log10(3.0), 20)
     physmerge['giso_srad'].hist(bins=xbins, histtype='step', lw=4, color='k')
@@ -307,39 +307,35 @@ def srad_hist():
 
 
 def srad_err_hist():
-    # old = cksgaia.io.load_table('iso-old')
-    # new = cksgaia.io.load_table('iso')
-
     old = cksgaia.io.load_table('j17').groupby('id_starname').nth(0)
     new = cksgaia.io.load_table(full_sample).groupby('id_starname').nth(0)
 
-    old['giso_srad_frac_err'] = (old['giso_srad_err1'] - old['giso_srad_err2'])/2. / old['giso_srad']
+    old['iso_srad_frac_err'] = (old['iso_srad_err1'] - old['iso_srad_err2'])/2. / old['iso_srad']
     new['giso_srad_frac_err'] = (new['giso_srad_err1'] - new['giso_srad_err2'])/2. / new['giso_srad']
 
     print len(old), len(new)
 
     fig = pl.figure(figsize=(12, 8))
 
-    old['giso_srad_frac_err'] *= 100
+    old['iso_srad_frac_err'] *= 100
     new['giso_srad_frac_err'] *= 100
 
-    med_old = np.nanmedian(old['giso_srad_frac_err'])
+    med_old = np.nanmedian(old['iso_srad_frac_err'])
     med_new = np.nanmedian(new['giso_srad_frac_err'])
 
-    xbins = np.logspace(np.log10(0.1), np.log10(30.0), 30)
-    old['giso_srad_frac_err'].hist(bins=xbins, histtype='step', lw=4, color='0.7')
+    xbins = np.logspace(np.log10(0.5), np.log10(30.0), 30)
+    old['iso_srad_frac_err'].hist(bins=xbins, histtype='step', lw=4, color='0.7')
     new['giso_srad_frac_err'].hist(bins=xbins, histtype='step', lw=4, color='k')
 
     pl.axvline(med_old, color='0.7', linestyle='dashed', lw=4)
     pl.axvline(med_new, color='k', linestyle='dashed', lw=4)
 
-    pl.annotate("median = {:.0f}%".format(np.round(med_old)), xy=(med_old, 190), xycoords='data',
+    pl.annotate("median = {:.0f}%".format(np.round(med_old)), xy=(med_old, 160), xycoords='data',
                 xytext=(-22, 0), textcoords='offset points', rotation=90, verticalalignment='left')
-    pl.annotate("median = {:.0f}%".format(np.round(med_new)), xy=(med_new, 190), xycoords='data',
+    pl.annotate("median = {:.0f}%".format(np.round(med_new)), xy=(med_new, 120), xycoords='data',
                 xytext=(-22, 0), textcoords='offset points', rotation=90, verticalalignment='left')
 
-
-    pl.xlim(0.1, 30.0)
+    pl.xlim(0.5, 30.0)
     # pl.ylim(0, 130)
     pl.ylabel('Number of Stars')
     pl.xlabel('Fractional Stellar Radius Uncertainty [%]')
@@ -348,7 +344,7 @@ def srad_err_hist():
     ax = pl.gca()
     ax.xaxis.set_major_formatter(matplotlib.ticker.ScalarFormatter())
     ax.xaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('%0.1f'))
-    pl.xticks([0.1, 0.3, 0.5, 1.0, 2.0, 3.0, 5.0, 10.0, 30.0])
+    pl.xticks([0.5, 1.0, 2.0, 3.0, 5.0, 10.0, 30.0])
 
     pl.grid(False)
 
@@ -402,7 +398,7 @@ def prad_err_hist():
 
 def parallax_err_hist():
     old = cksgaia.io.load_table('iso-old')
-    new = cksgaia.io.load_table('cksgaia-planets').groupby('id_starname').nth(0)
+    new = cksgaia.io.load_table(full_sample)
 
     fig = pl.figure(figsize=(12, 8))
 

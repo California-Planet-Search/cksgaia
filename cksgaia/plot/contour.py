@@ -12,7 +12,7 @@ matplotlib.rcParams['figure.figsize'] = (13, 8)
 
 def contour_plot_kde(physmerge, xcol, ycol, xlim, ylim, ylog=True, pltxlim=None, pltylim=None, epos=[3000, 5],
                      cont=True, nodata=False, weighted=False, nstars=36075., eaoff=(0, -70), clabel=None,
-                     vlims=(0.0, 0.05)):
+                     vlims=(0.0, 0.05), errfloor=None):
     """Plot contour plots
 
     Make the contour plots associated with Figures 8-10 in Fulton et al. (2017)
@@ -35,6 +35,7 @@ def contour_plot_kde(physmerge, xcol, ycol, xlim, ylim, ylog=True, pltxlim=None,
         eaoff (tuple): (optional) text offset for label of the typical uncertainty error bar (default = (0, -70))
         clabel (string): (optional) string to label color bar scale
         vlims (tuple): (optional) colorscale limits (default = (0.0, 0.05))
+        errfloor (tuple): (optional) minumum KDE kernal size in units of (x,y)
 
     Returns:
         tuple: (axes object, 10**(grid x values), 10**(grid y values), grid z values)
@@ -52,6 +53,13 @@ def contour_plot_kde(physmerge, xcol, ycol, xlim, ylim, ylog=True, pltxlim=None,
         weights = crop['weight'].values
     else:
         weights = np.ones_like(crop[xcol].values)
+
+    if errfloor == None:
+        errfloor
+    crop[xcol + '_err1'] = np.sqrt(crop[xcol + '_err1']**2 + errfloor[0]**2)
+    crop[xcol + '_err2'] = -np.sqrt(-crop[xcol + '_err2'] ** 2 + errfloor[0] ** 2)
+    crop[ycol + '_err1'] = np.sqrt(crop[ycol + '_err1'] ** 2 + errfloor[1] ** 2)
+    crop[ycol + '_err2'] = -np.sqrt(crop[ycol + '_err2'] ** 2 + errfloor[1] ** 2)
 
     xi, yi, zi = cksgaia.fitting.wkde2D(crop[xcol].values, crop[ycol].values,
                                        crop[xcol + '_err1'].values, crop[ycol + '_err1'].values,
@@ -161,7 +169,7 @@ def period_contour_cks():
 
     wper, wsens = np.genfromtxt(os.path.join(modpath, 'data/detectability_p1.txt'), unpack=True)
 
-    ax, xi, yi, zi = contour_plot_kde(physmerge, 'koi_period', 'iso_prad', xlim=[0.4, 1000.0],
+    ax, xi, yi, zi = contour_plot_kde(physmerge, 'koi_period', 'giso_prad', xlim=[0.4, 1000.0],
                                                       ylim=[0.5, 20], ylog=True,
                                                       pltxlim=[0.7, 100.0], pltylim=[1.0, 10], epos=[1.2, 8.0],
                                                       weighted=True)
@@ -180,7 +188,7 @@ def period_contour_cks():
 def insol_contour_anno():
     physmerge = cksgaia.io.load_table(cksgaia.plot.config.filtered_sample)
 
-    ax, xi, yi, zi_iso = contour_plot_kde(physmerge, 'iso_insol', 'iso_prad', xlim=[3, 30000],
+    ax, xi, yi, zi_iso = contour_plot_kde(physmerge, 'giso_insol', 'giso_prad', xlim=[3, 30000],
                                                           ylim=[0.5, 10], ylog=True,
                                                           pltxlim=[10, 3000], pltylim=[1, 4], epos=[2000, 1.3],
                                                           nodata=True, weighted=True)
@@ -202,8 +210,8 @@ def insol_contour_anno():
     # cx, cy = np.loadtxt('/Users/bfulton/code/cksrad/data/detectability_p1.txt', unpack=True)
     cx, cy = np.loadtxt(os.path.join(modpath, 'data/sensitivity_p25.txt'), unpack=True)
     # cx, cy = np.loadtxt('/Users/bfulton/code/cksrad/data/sensitivity_p50.txt', unpack=True)
-    a = (physmerge['iso_smass'].max() * (cx / 365.) ** 2) ** (1 / 3.)
-    sx = (physmerge['cks_steff'].max() / 5778) ** 4.0 * (physmerge['iso_srad'].max() / a) ** 2.0
+    a = (physmerge['giso_smass'].max() * (cx / 365.) ** 2) ** (1 / 3.)
+    sx = (physmerge['cks_steff'].max() / 5778) ** 4.0 * (physmerge['giso_srad'].max() / a) ** 2.0
     sx = np.append(sx, 10)
     cy = np.append(cy, 6)
 
@@ -237,8 +245,8 @@ def insol_contour_data(sample=None, vlims=None):
     # cx, cy = np.loadtxt('/Users/bfulton/code/cksrad/data/detectability_p1.txt', unpack=True)
     cx, cy = np.loadtxt(os.path.join(modpath, 'data/sensitivity_p25.txt'), unpack=True)
     # cx, cy = np.loadtxt('/Users/bfulton/code/cksrad/data/sensitivity_p50.txt', unpack=True)
-    a = (physmerge['iso_smass'].max() * (cx / 365.) ** 2) ** (1 / 3.)
-    sx = (physmerge['cks_steff'].max() / 5778) ** 4.0 * (physmerge['iso_srad'].max() / a) ** 2.0
+    a = (physmerge['giso_smass'].max() * (cx / 365.) ** 2) ** (1 / 3.)
+    sx = (physmerge['cks_steff'].max() / 5778) ** 4.0 * (physmerge['giso_srad'].max() / a) ** 2.0
     sx = np.append(sx, 10)
     cy = np.append(cy, 6)
 
@@ -247,7 +255,7 @@ def insol_contour_data(sample=None, vlims=None):
     else:
         vlims = vlims
 
-    ax, xi, yi, zi_iso = contour_plot_kde(physmerge, 'iso_insol', 'iso_prad', xlim=[3, 30000],
+    ax, xi, yi, zi_iso = contour_plot_kde(physmerge, 'giso_insol', 'giso_prad', xlim=[3, 30000],
                                                           ylim=[0.5, 20], ylog=True,
                                                           pltxlim=[10, 3000], pltylim=[1, 4], epos=[1800, 3.0],
                                                           weighted=True, vlims=vlims)
@@ -269,7 +277,7 @@ def insol_contour_data(sample=None, vlims=None):
 def srad_contour():
     physmerge = cksgaia.io.load_table(cksgaia.plot.config.filtered_sample)
 
-    ax, xi, yi, zi = contour_plot_kde(physmerge, 'iso_srad', 'iso_prad', xlim=[0.4, 3.0],
+    ax, xi, yi, zi = contour_plot_kde(physmerge, 'giso_srad', 'giso_prad', xlim=[0.4, 3.0],
                                                       ylim=[0.5, 20], ylog=True,
                                                       pltxlim=[0.6, 2.3], pltylim=[1.0, 5], epos=[0.7, 4.0],# nbins=30,
                                                       weighted=False,
@@ -289,9 +297,9 @@ def contour_masscuts():
 
     highcut, lowcut, _, _, _, annotations = cksgaia.plot.occur.get_mass_samples()
 
-    high = physmerge.query('iso_smass > @highcut')
-    medium = physmerge.query('iso_smass <= @highcut & iso_smass >= @lowcut')
-    low = physmerge.query('iso_smass < @lowcut')
+    high = physmerge.query('giso_smass > @highcut')
+    medium = physmerge.query('giso_smass <= @highcut & giso_smass >= @lowcut')
+    low = physmerge.query('giso_smass < @lowcut')
 
     fig = pl.figure(figsize=(36, 8))
 
