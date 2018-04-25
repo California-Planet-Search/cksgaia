@@ -388,12 +388,6 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
                 del df1[col]
         df2 = pd.read_csv(os.path.join(DATADIR, 'isochrones_gaia2.csv'), index_col=0)
         df = pd.merge(df1, df2, on='id_starname')
-<<<<<<< HEAD
-        df = cksgaia.calc.update_planet_parameters(df)
-    elif table == "cksgaia-planets":
-        df = pd.read_csv(os.path.join(DATADIR, 'cks_iso_gaia2_merged.csv'))
-    elif table == "cksgaia-filtered":
-=======
     elif table == "cksgaia-planets":
         # df1 = load_table('cks+nea')
         # import pdb; pdb.set_trace()
@@ -403,7 +397,6 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
         df = cksgaia.calc.update_planet_parameters(df2)
         # df['iso_srad'] = df['gaia2_srad']
     elif table == "cksgaia-planets-filtered":
->>>>>>> d203c13a1dd7a9a18a32f8d110940d304aeb076d
         df = load_table('cksgaia-planets')
         df = apply_filters(df)
     elif table == 'cksgaia-planets-weights':

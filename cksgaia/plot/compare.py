@@ -58,6 +58,34 @@ def comparison(key):
         _xt0 = [0.5,1,2,3,5,10,20]
 
     if key=='srad-s15':
+        dfold = cksgaia.io.load_table('j17')
+        dfnew = cksgaia.io.load_table('m17+j17+gaia2+iso')
+
+        df = pd.merge(dfold['id_kic iso_srad iso_srad iso_srad'])
+
+
+        x1 = df.s15_srad
+        x2 = df.iso_srad
+        x3 = x2 / x1 
+        x1err = np.vstack([-df.s15_srad_err2,df.s15_srad_err1]) 
+        x2err = np.vstack([-df.iso_srad_err2,df.iso_srad_err1])
+        x3err = x2err / np.array(df.iso_srad)
+        fig, axL = subplots_compare(
+            x1,x2,x3, x1err=x1err, x2err=x2err, x3err=x3err, **errorbar_kw
+        )
+        axL[0].set_xscale('log')
+        axL[0].set_yscale('log')
+        axL[1].set_xscale('log')    
+        axL[1].set_yscale('linear')
+        _ylabel0 = '$R_\star$ [CKS] (Solar-radii)'
+        _xlabel0 = '$R_\star$ [S15] (Solar-radii)'
+        _ylabel1 = 'CKS / S15'
+        _ylim1 = 0.7,1.3
+        _xlim0 = 0.4,12
+        _yt1 = [0.8,0.9,1.0,1.1,1.2]
+        _xt0 = [0.5,1,2,3,5,10,20]
+
+    if key=='srad-j17':
         df = cksgaia.io.load_table('cks+gaia2+s15')
         x1 = df.s15_srad
         x2 = df.iso_srad
@@ -122,6 +150,13 @@ def comparison(key):
     one2one(**one2one_kw)
     sca(axL[1])
     axhline(1, **one2one_kw)
+
+
+class Comparison(object):
+    
+    
+
+
 
 def provision_figure():
     fig = figure(figsize=figsize)
