@@ -271,6 +271,8 @@ def money_plot_fit():
 def money_plot_plain():
     physmerge = cksgaia.io.load_table(cksgaia.plot.config.filtered_sample)
 
+    print len(physmerge)
+
     rmask, rbin_centers, rN, re, result1, result2 = cksgaia.fitting.histfit(physmerge,
                                                                            completeness=False,
                                                                            verbose=False)

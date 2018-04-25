@@ -12,6 +12,8 @@ import cksgaia.extinction
 
 class Pipeline(cksgaia.iso.Pipeline):
     def run(self, dmodel=None):
+        self.logg = -99
+        self.logg_err = 99.0
 
         print "teff ", self.teff, self.teff_err
         print "logg ", self.logg, self.logg_err
@@ -27,6 +29,7 @@ class Pipeline(cksgaia.iso.Pipeline):
         model['fdnu'][:]=1.
         model['avs']=np.zeros(len(model['teff']))
         model['dis']=np.zeros(len(model['teff']))
+
 
         # Instantiate model
         x = grid.classify_grid.obsdata()

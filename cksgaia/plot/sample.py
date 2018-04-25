@@ -310,8 +310,8 @@ def srad_err_hist():
     # old = cksgaia.io.load_table('iso-old')
     # new = cksgaia.io.load_table('iso')
 
-    old = cksgaia.io.load_table('fulton17-weights')
-    new = cksgaia.io.apply_filters(cksgaia.io.load_table('fakegaia-merged'))
+    old = cksgaia.io.load_table('j17').groupby('id_starname').nth(0)
+    new = cksgaia.io.load_table(full_sample).groupby('id_starname').nth(0)
 
     old['iso_srad_frac_err'] = (old['iso_srad_err1'] - old['iso_srad_err2'])/2. / old['iso_srad']
     new['iso_srad_frac_err'] = (new['iso_srad_err1'] - new['iso_srad_err2'])/2. / new['iso_srad']
@@ -326,20 +326,20 @@ def srad_err_hist():
     med_old = np.nanmedian(old['iso_srad_frac_err'])
     med_new = np.nanmedian(new['iso_srad_frac_err'])
 
-    xbins = np.logspace(np.log10(0.2), np.log10(30.0), 30)
+    xbins = np.logspace(np.log10(0.1), np.log10(30.0), 30)
     old['iso_srad_frac_err'].hist(bins=xbins, histtype='step', lw=4, color='0.7')
     new['iso_srad_frac_err'].hist(bins=xbins, histtype='step', lw=4, color='k')
 
     pl.axvline(med_old, color='0.7', linestyle='dashed', lw=4)
     pl.axvline(med_new, color='k', linestyle='dashed', lw=4)
 
-    pl.annotate("median = {:.0f}%".format(np.round(med_old)), xy=(med_old, 150), xycoords='data',
+    pl.annotate("median = {:.0f}%".format(np.round(med_old)), xy=(med_old, 190), xycoords='data',
                 xytext=(-22, 0), textcoords='offset points', rotation=90, verticalalignment='left')
-    pl.annotate("median = {:.0f}%".format(np.round(med_new)), xy=(med_new, 150), xycoords='data',
+    pl.annotate("median = {:.0f}%".format(np.round(med_new)), xy=(med_new, 190), xycoords='data',
                 xytext=(-22, 0), textcoords='offset points', rotation=90, verticalalignment='left')
 
 
-    pl.xlim(0.5, 30.0)
+    pl.xlim(0.1, 30.0)
     # pl.ylim(0, 130)
     pl.ylabel('Number of Stars')
     pl.xlabel('Fractional Stellar Radius Uncertainty [%]')
@@ -348,7 +348,7 @@ def srad_err_hist():
     ax = pl.gca()
     ax.xaxis.set_major_formatter(matplotlib.ticker.ScalarFormatter())
     ax.xaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('%0.1f'))
-    pl.xticks([0.5, 1.0, 2.0, 3.0, 5.0, 10.0, 15.0, 30.0])
+    pl.xticks([0.1, 0.3, 0.5, 1.0, 2.0, 3.0, 5.0, 10.0, 30.0])
 
     pl.grid(False)
 
@@ -356,8 +356,8 @@ def srad_err_hist():
 
 
 def prad_err_hist():
-    old = cksgaia.io.load_table('fulton17-weights')
-    new = cksgaia.io.apply_filters(cksgaia.io.load_table('fakegaia-merged'))
+    old = cksgaia.io.load_table('j17')
+    new = cksgaia.io.load_table(full_sample)
 
     fig = pl.figure(figsize=(12, 8))
 
@@ -372,19 +372,19 @@ def prad_err_hist():
     med_old = np.nanmedian(old['iso_prad_frac_err'])
     med_new = np.nanmedian(new['iso_prad_frac_err'])
 
-    xbins = np.logspace(np.log10(1.5), np.log10(50.0), 50)
+    xbins = np.logspace(np.log10(0.5), np.log10(50.0), 50)
     old['iso_prad_frac_err'].hist(bins=xbins, histtype='step', lw=4, color='0.7')
     new['iso_prad_frac_err'].hist(bins=xbins, histtype='step', lw=4, color='k')
 
     pl.axvline(med_old, color='0.7', linestyle='dashed', lw=4)
     pl.axvline(med_new, color='k', linestyle='dashed', lw=4)
 
-    pl.annotate("median = {:.0f}%".format(np.round(med_old)), xy=(med_old, 70), xycoords='data',
+    pl.annotate("median = {:.0f}%".format(np.round(med_old)), xy=(med_old, 200), xycoords='data',
                 xytext=(-22,0), textcoords='offset points', rotation=90, verticalalignment='left')
-    pl.annotate("median = {:.0f}%".format(np.round(med_new)), xy=(med_new, 70), xycoords='data',
+    pl.annotate("median = {:.0f}%".format(np.round(med_new)), xy=(med_new, 200), xycoords='data',
                 xytext=(-22,0), textcoords='offset points', rotation=90, verticalalignment='left')
 
-    pl.xlim(1.5, 40.0)
+    pl.xlim(0.5, 40.0)
     # pl.ylim(0, 130)
     pl.ylabel('Number of Planets')
     pl.xlabel('Fractional Planet Radius Uncertainty [%]')
