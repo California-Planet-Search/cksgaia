@@ -63,9 +63,9 @@ def simulated_survey(nsim):
 
 
     # Put them around stars with detected planets in my sample
-    kicselect = cksgaia.io.load_table('kic')
+    kicselect = cksgaia.io.load_table('kic', cache=0)
 
-    physmerge = cksgaia.io.load_table('fulton17')
+    physmerge = cksgaia.io.load_table('fulton17', cache=0)
 
     kois = pd.merge(physmerge, kicselect, left_on='id_kic', right_on='KICID')
 
