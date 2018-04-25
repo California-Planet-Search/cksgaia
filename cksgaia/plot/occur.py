@@ -17,14 +17,14 @@ from cksgaia.plot.config import *
 
 
 def get_mass_samples():
-    physmerge = cksgaia.io.load_table(cksgaia.plot.config.filtered_sample).query('iso_prad > 1.75 & iso_prad < 4')
+    physmerge = cksgaia.io.load_table(cksgaia.plot.config.filtered_sample).query('giso_prad > 1.75 & giso_prad < 4')
 
-    highcut = np.percentile(physmerge['iso_smass'], 67)
-    lowcut = np.percentile(physmerge['iso_smass'], 33)
+    highcut = np.percentile(physmerge['giso_smass'], 67)
+    lowcut = np.percentile(physmerge['giso_smass'], 33)
 
-    high = physmerge.query('iso_smass > @highcut')
-    medium = physmerge.query('iso_smass <= @highcut & iso_smass >= @lowcut')
-    low = physmerge.query('iso_smass < @lowcut')
+    high = physmerge.query('giso_smass > @highcut')
+    medium = physmerge.query('giso_smass <= @highcut & giso_smass >= @lowcut')
+    low = physmerge.query('giso_smass < @lowcut')
 
     annotations = ['$M_{\star} > %3.2f M_{\odot}$' % highcut,
                    '$%3.2f M_{\odot} \leq M_{\star} \leq %3.2f M_{\odot}$' % (highcut, lowcut),
@@ -53,7 +53,7 @@ def histfitplot(physmerge, bin_centers, N, e, mask, result, result2, completenes
 
     xpos = eloc[0]
     ypos = eloc[1]
-    err1, err2 = cksgaia.misc.frac_err(physmerge, xpos, 'iso_prad')
+    err1, err2 = cksgaia.misc.frac_err(physmerge, xpos, 'giso_prad')
     print "err+, err- = ", err1, err2
 
     _, caps, _ = pl.errorbar([xpos], [ypos], fmt='k.', xerr=[[err1], [err2]],
@@ -161,8 +161,8 @@ def insol_hist():
     # cx, cy = np.loadtxt('/Users/bfulton/code/cksrad/data/detectability_p1.txt', unpack=True)
     cx, cy = np.loadtxt(os.path.join(modpath, 'data/sensitivity_p25.txt'), unpack=True)
     # cx, cy = np.loadtxt('/Users/bfulton/code/cksrad/data/sensitivity_p50.txt', unpack=True)
-    a = (physmerge['iso_smass'].max() * (cx / 365.) ** 2) ** (1 / 3.)
-    sx = (physmerge['cks_steff'].max() / 5778) ** 4.0 * (physmerge['iso_srad'].max() / a) ** 2.0
+    a = (physmerge['giso_smass'].max() * (cx / 365.) ** 2) ** (1 / 3.)
+    sx = (physmerge['cks_steff'].max() / 5778) ** 4.0 * (physmerge['giso_srad'].max() / a) ** 2.0
     sx = np.append(sx, 10)
     cy = np.append(cy, 6)
 
@@ -176,9 +176,9 @@ def insol_hist():
     pl.subplot(nrow, ncol, plti)
     pl.subplots_adjust(hspace=0, top=0.98, bottom=0.10, left=0.19)
 
-    hot = physmerge.query('iso_insol > 200')
-    medium = physmerge.query('iso_insol <= 200 & iso_insol >= 80')
-    cool = physmerge.query('iso_insol < 50 & iso_insol > 10')
+    hot = physmerge.query('giso_insol > 200')
+    medium = physmerge.query('giso_insol <= 200 & giso_insol >= 80')
+    cool = physmerge.query('giso_insol < 50 & giso_insol > 10')
 
     lim = cy[np.argmin(np.abs(sx - 200))]
     print lim
@@ -271,7 +271,7 @@ def money_plot_fit():
 def money_plot_plain():
     physmerge = cksgaia.io.load_table(cksgaia.plot.config.filtered_sample)
 
-    print len(physmerge), (physmerge.iso_srad_err1 / physmerge.iso_srad).median()
+    print len(physmerge), (physmerge.giso_srad_err1 / physmerge.giso_srad).median()
 
     rmask, rbin_centers, rN, re, result1, result2 = cksgaia.fitting.histfit(physmerge,
                                                                            completeness=False,
@@ -305,8 +305,8 @@ def mass_cuts():
     # cx, cy = np.loadtxt('/Users/bfulton/code/cksrad/data/detectability_p1.txt', unpack=True)
     cx, cy = np.loadtxt(os.path.join(modpath, 'data/sensitivity_p25.txt'), unpack=True)
     # cx, cy = np.loadtxt('/Users/bfulton/code/cksrad/data/sensitivity_p50.txt', unpack=True)
-    a = (physmerge['iso_smass'].max() * (cx / 365.) ** 2) ** (1 / 3.)
-    sx = (physmerge['cks_steff'].max() / 5778) ** 4.0 * (physmerge['iso_srad'].max() / a) ** 2.0
+    a = (physmerge['giso_smass'].max() * (cx / 365.) ** 2) ** (1 / 3.)
+    sx = (physmerge['cks_steff'].max() / 5778) ** 4.0 * (physmerge['giso_srad'].max() / a) ** 2.0
     sx = np.append(sx, 10)
     cy = np.append(cy, 6)
 
@@ -320,12 +320,12 @@ def mass_cuts():
     pl.subplot(nrow, ncol, plti)
     pl.subplots_adjust(hspace=0, top=0.98, bottom=0.10, left=0.19)
 
-    highcut = np.percentile(physmerge['iso_smass'], 67)
-    lowcut = np.percentile(physmerge['iso_smass'], 33)
+    highcut = np.percentile(physmerge['giso_smass'], 67)
+    lowcut = np.percentile(physmerge['giso_smass'], 33)
 
-    high = physmerge.query('iso_smass > @highcut')
-    medium = physmerge.query('iso_smass <= @highcut & iso_smass >= @lowcut')
-    low = physmerge.query('iso_smass < @lowcut')
+    high = physmerge.query('giso_smass > @highcut')
+    medium = physmerge.query('giso_smass <= @highcut & giso_smass >= @lowcut')
+    low = physmerge.query('giso_smass < @lowcut')
 
     # lim = cy[np.argmin(np.abs(sx - 200))]
     lim = 1.14
@@ -394,15 +394,15 @@ def mass_cuts():
     pl.xticks(xticks)
 
 def desert_edge():
-    physmerge = cksgaia.io.load_table(cksgaia.plot.config.filtered_sample).query('iso_prad > 1.75 & iso_prad < 4')
+    physmerge = cksgaia.io.load_table(cksgaia.plot.config.filtered_sample).query('giso_prad > 1.75 & giso_prad < 4')
 
     aloc = (0.1, 0.85)
 
     # cx, cy = np.loadtxt('/Users/bfulton/code/cksrad/data/detectability_p1.txt', unpack=True)
     cx, cy = np.loadtxt(os.path.join(modpath, 'data/sensitivity_p25.txt'), unpack=True)
     # cx, cy = np.loadtxt('/Users/bfulton/code/cksrad/data/sensitivity_p50.txt', unpack=True)
-    a = (physmerge['iso_smass'].max() * (cx / 365.) ** 2) ** (1 / 3.)
-    sx = (physmerge['cks_steff'].max() / 5778) ** 4.0 * (physmerge['iso_srad'].max() / a) ** 2.0
+    a = (physmerge['giso_smass'].max() * (cx / 365.) ** 2) ** (1 / 3.)
+    sx = (physmerge['cks_steff'].max() / 5778) ** 4.0 * (physmerge['giso_srad'].max() / a) ** 2.0
     sx = np.append(sx, 10)
     cy = np.append(cy, 6)
 
@@ -416,12 +416,12 @@ def desert_edge():
     pl.subplot(nrow, ncol, plti)
     pl.subplots_adjust(hspace=0, top=0.98, bottom=0.10, left=0.19)
 
-    highcut = np.percentile(physmerge['iso_smass'], 67)
-    lowcut = np.percentile(physmerge['iso_smass'], 33)
+    highcut = np.percentile(physmerge['giso_smass'], 67)
+    lowcut = np.percentile(physmerge['giso_smass'], 33)
 
-    high = physmerge.query('iso_smass > @highcut')
-    medium = physmerge.query('iso_smass <= @highcut & iso_smass >= @lowcut')
-    low = physmerge.query('iso_smass < @lowcut')
+    high = physmerge.query('giso_smass > @highcut')
+    medium = physmerge.query('giso_smass <= @highcut & giso_smass >= @lowcut')
+    low = physmerge.query('giso_smass < @lowcut')
 
     # lim = cy[np.argmin(np.abs(sx - 200))]
     lim = 1.14
@@ -430,8 +430,8 @@ def desert_edge():
     insolbins = np.logspace(np.log10(10), np.log10(10000), 20)
 
     cut = high
-    N, edges = np.histogram(cut['iso_insol'].dropna().values, bins=insolbins, weights=cut['weight'])
-    Nd, edges = np.histogram(cut['iso_insol'].dropna().values, bins=insolbins)
+    N, edges = np.histogram(cut['giso_insol'].dropna().values, bins=insolbins, weights=cut['weight'])
+    Nd, edges = np.histogram(cut['giso_insol'].dropna().values, bins=insolbins)
     centers = 0.5 * (edges[1:] + edges[:-1])
     pl.step(centers, N / num_stars, lw=3, color='k', where='mid')
     pl.annotate('$M_{\\star} > %3.2f M_{\odot}$' %highcut, xy=aloc, xycoords='axes fraction', fontsize=20,
@@ -472,8 +472,8 @@ def desert_edge():
     pl.subplot(nrow, ncol, plti)
 
     cut = medium
-    N, edges = np.histogram(cut['iso_insol'].dropna().values, bins=insolbins, weights=cut['weight'])
-    Nd, edges = np.histogram(cut['iso_insol'].dropna().values, bins=insolbins)
+    N, edges = np.histogram(cut['giso_insol'].dropna().values, bins=insolbins, weights=cut['weight'])
+    Nd, edges = np.histogram(cut['giso_insol'].dropna().values, bins=insolbins)
     centers = 0.5 * (edges[1:] + edges[:-1])
     pl.step(centers, N / num_stars, lw=3, color='k', where='mid')
     pl.annotate('$%3.2f M_{\odot} \leq M_{\\star} \leq %3.2f M_{\odot}$' % (highcut, lowcut), xy=aloc, xycoords='axes fraction', fontsize=20,
@@ -515,8 +515,8 @@ def desert_edge():
     pl.subplot(nrow, ncol, plti)
 
     cut = low
-    N, edges = np.histogram(cut['iso_insol'].dropna().values, bins=insolbins, weights=cut['weight'])
-    Nd, edges = np.histogram(cut['iso_insol'].dropna().values, bins=insolbins)
+    N, edges = np.histogram(cut['giso_insol'].dropna().values, bins=insolbins, weights=cut['weight'])
+    Nd, edges = np.histogram(cut['giso_insol'].dropna().values, bins=insolbins)
     centers = 0.5 * (edges[1:] + edges[:-1])
     pl.step(centers, N / num_stars, lw=3, color='k', where='mid')
     pl.annotate('$M_{\star} < %3.2f M_{\odot}$' % lowcut, xy=aloc, xycoords='axes fraction', fontsize=20,
@@ -552,10 +552,10 @@ def desert_edge():
 def desert_edge_cum():
 
     def _cumdist(sample, annotation='', color='k'):
-        order = np.argsort(sample['iso_insol'].values)[::-1]
+        order = np.argsort(sample['giso_insol'].values)[::-1]
         w = np.cumsum(sample['weight'].values[order]) / num_stars
         n = np.array(range(len(sample['weight'].values))) / float(len(sample))
-        f = sample['iso_insol'].values[order]
+        f = sample['giso_insol'].values[order]
 
         pl.step(f, n, 'k-', lw=3, linestyle='dashed', alpha=0.25, color=color, label=None)
         pl.step(f, w / np.max(w), 'k-', lw=3, color=color)
@@ -584,7 +584,7 @@ def desert_edge_cum():
     fig = pl.figure(figsize=(12, 8))
     handles = []
     for i, sample in enumerate([high, medium, low]):
-        sample = sample.query('iso_prad > 1.75 & iso_prad < 4')
+        sample = sample.query('giso_prad > 1.75 & giso_prad < 4')
 
         _cumdist(sample, color=colors[i])
         handles.append(mlines.Line2D([], [], color=colors[i], lw=3,

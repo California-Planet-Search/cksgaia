@@ -19,8 +19,8 @@ def hrplot():
     allstars = physmerge.drop_duplicates(subset=['id_starname'])
     stars = crop.drop_duplicates(subset=['id_starname'])
 
-    pl.plot(allstars['cks_steff'], allstars['iso_srad'], 'k.', alpha=0.2, markersize=8)
-    pl.plot(stars['cks_steff'], stars['iso_srad'], 'bo', markersize=6)
+    pl.plot(allstars['cks_steff'], allstars['giso_srad'], 'k.', alpha=0.2, markersize=8)
+    pl.plot(stars['cks_steff'], stars['giso_srad'], 'bo', markersize=6)
     #pl.plot(gap['cks_steff'], gap['iso_srad'], 'ro', markersize=6)
 
     ls, li = 0.00025, 0.20
@@ -57,11 +57,11 @@ def simplehist(physmerge, color='k', annotate='err', nbins=36, fill_valley=True,
     if weighted:
         weights = physmerge['weight'].values
     else:
-        weights = 1 + np.zeros_like(physmerge['iso_prad'].dropna().values)
+        weights = 1 + np.zeros_like(physmerge['giso_prad'].dropna().values)
 
     xbins = np.logspace(np.log10(0.5), np.log10(20), nbins)
-    N, edges = np.histogram(physmerge['iso_prad'].dropna().values, bins=xbins, weights=weights)
-    Nd, edges = np.histogram(physmerge['iso_prad'].dropna().values, bins=xbins)
+    N, edges = np.histogram(physmerge['giso_prad'].dropna().values, bins=xbins, weights=weights)
+    Nd, edges = np.histogram(physmerge['giso_prad'].dropna().values, bins=xbins)
     centers = 0.5 * (edges[1:] + edges[:-1])
     p1loc = edges[(edges > 1.0) & (edges < 1.5)][np.argmax(N[(edges > 1.0) & (edges < 1.5)])]
     p2loc = edges[(edges > 2.0) & (edges < 4.0)][np.argmax(N[(edges > 2.0) & (edges < 4.0)])]
@@ -87,18 +87,18 @@ def simplehist(physmerge, color='k', annotate='err', nbins=36, fill_valley=True,
 
     # radii limits for V_a calc
     v1, v2 = 1.64, 1.97
-    valley = physmerge.query('iso_prad > %4.3f & iso_prad < %4.3f' % (v1, v2))
-    # valley = np.where((physmerge['iso_prad'].values > v1) & (physmerge['iso_prad'].values < v2))[0]
+    valley = physmerge.query('giso_prad > %4.3f & giso_prad < %4.3f' % (v1, v2))
+    # valley = np.where((physmerge['giso_prad'].values > v1) & (physmerge['giso_prad'].values < v2))[0]
     in_valley = len(valley)  # / (v2-v1)
 
     p1l, p1r = 1.2, 1.44
-    peak1 = physmerge.query('iso_prad > %4.3f & iso_prad < %4.3f' % (p1l, p1r))
-    # peak1 = np.where((physmerge['iso_prad'] > p1l).values & (physmerge['iso_prad'].values < p1r))[0]
+    peak1 = physmerge.query('giso_prad > %4.3f & giso_prad < %4.3f' % (p1l, p1r))
+    # peak1 = np.where((physmerge['giso_prad'] > p1l).values & (physmerge['giso_prad'].values < p1r))[0]
     peak1 = len(peak1)  # / (p1r - p1l)
 
     p2l, p2r = 2.19, 2.62
-    peak2 = physmerge.query('iso_prad > %4.3f & iso_prad < %4.3f' % (p2l, p2r))
-    # peak2 = np.where((physmerge['iso_prad'].values > p2l) & (physmerge['iso_prad'].values < p2r))[0]
+    peak2 = physmerge.query('giso_prad > %4.3f & giso_prad < %4.3f' % (p2l, p2r))
+    # peak2 = np.where((physmerge['giso_prad'].values > p2l) & (physmerge['giso_prad'].values < p2r))[0]
     peak2 = len(peak2)  # / (p2r - p2l)
 
     out_valley = np.mean([peak1, peak2])
@@ -125,13 +125,13 @@ def simplehist(physmerge, color='k', annotate='err', nbins=36, fill_valley=True,
         for cap in caps:
             cap.set_markeredgewidth(2)
 
-    # physmerge['iso_prad'].hist(bins=xbins, histtype='step', lw=3, color=color)
+    # physmerge['giso_prad'].hist(bins=xbins, histtype='step', lw=3, color=color)
 
     # pl.fill_between(edges[(edges >= p1loc) & (edges <= p2loc)],top, N[(edges >= p1loc) & (edges <= p2loc)],
     #                where=N[(edges >= p1loc) & (edges <= p2loc)] < top, color='0.5')
 
     x, y = eloc
-    err1, err2 = cksgaia.misc.frac_err(physmerge, x, 'iso_prad')
+    err1, err2 = cksgaia.misc.frac_err(physmerge, x, 'giso_prad')
 
     # if annotate == 'err':
     _, caps, _ = pl.errorbar([x], [y], fmt='.', ms=0.1, xerr=[[err1], [err2]], capsize=6, lw=2, color=color)
@@ -282,10 +282,10 @@ def srad_hist():
 
     x = 2.2
     y = 100.0
-    err1, err2 = cksgaia.misc.frac_err(physmerge, x, 'iso_prad')
+    err1, err2 = cksgaia.misc.frac_err(physmerge, x, 'giso_prad')
 
     xbins = np.logspace(np.log10(0.6), np.log10(3.0), 20)
-    physmerge['iso_srad'].hist(bins=xbins, histtype='step', lw=4, color='k')
+    physmerge['giso_srad'].hist(bins=xbins, histtype='step', lw=4, color='k')
     _, caps, _ = pl.errorbar([x], [y], fmt='k.', xerr=[[err1], [err2]], capsize=6, lw=2, ms=0.1)
     for cap in caps:
         cap.set_markeredgewidth(2)
@@ -313,22 +313,22 @@ def srad_err_hist():
     old = cksgaia.io.load_table('j17').groupby('id_starname').nth(0)
     new = cksgaia.io.load_table(full_sample).groupby('id_starname').nth(0)
 
-    old['iso_srad_frac_err'] = (old['iso_srad_err1'] - old['iso_srad_err2'])/2. / old['iso_srad']
-    new['iso_srad_frac_err'] = (new['iso_srad_err1'] - new['iso_srad_err2'])/2. / new['iso_srad']
+    old['giso_srad_frac_err'] = (old['giso_srad_err1'] - old['giso_srad_err2'])/2. / old['giso_srad']
+    new['giso_srad_frac_err'] = (new['giso_srad_err1'] - new['giso_srad_err2'])/2. / new['giso_srad']
 
     print len(old), len(new)
 
     fig = pl.figure(figsize=(12, 8))
 
-    old['iso_srad_frac_err'] *= 100
-    new['iso_srad_frac_err'] *= 100
+    old['giso_srad_frac_err'] *= 100
+    new['giso_srad_frac_err'] *= 100
 
-    med_old = np.nanmedian(old['iso_srad_frac_err'])
-    med_new = np.nanmedian(new['iso_srad_frac_err'])
+    med_old = np.nanmedian(old['giso_srad_frac_err'])
+    med_new = np.nanmedian(new['giso_srad_frac_err'])
 
     xbins = np.logspace(np.log10(0.1), np.log10(30.0), 30)
-    old['iso_srad_frac_err'].hist(bins=xbins, histtype='step', lw=4, color='0.7')
-    new['iso_srad_frac_err'].hist(bins=xbins, histtype='step', lw=4, color='k')
+    old['giso_srad_frac_err'].hist(bins=xbins, histtype='step', lw=4, color='0.7')
+    new['giso_srad_frac_err'].hist(bins=xbins, histtype='step', lw=4, color='k')
 
     pl.axvline(med_old, color='0.7', linestyle='dashed', lw=4)
     pl.axvline(med_new, color='k', linestyle='dashed', lw=4)
@@ -362,19 +362,19 @@ def prad_err_hist():
     fig = pl.figure(figsize=(12, 8))
 
     old['iso_prad_frac_err'] = cksgaia.errors.frac_err(old['iso_prad'], old['iso_prad_err1'], old['iso_prad_err2'])
-    new['iso_prad_frac_err'] = cksgaia.errors.frac_err(new['iso_prad'], new['iso_prad_err1'], new['iso_prad_err2'])
+    new['giso_prad_frac_err'] = cksgaia.errors.frac_err(new['giso_prad'], new['giso_prad_err1'], new['giso_prad_err2'])
 
     old['iso_prad_frac_err'] *= 100
-    new['iso_prad_frac_err'] *= 100
+    new['giso_prad_frac_err'] *= 100
 
     print len(old), len(new)
 
     med_old = np.nanmedian(old['iso_prad_frac_err'])
-    med_new = np.nanmedian(new['iso_prad_frac_err'])
+    med_new = np.nanmedian(new['giso_prad_frac_err'])
 
     xbins = np.logspace(np.log10(0.5), np.log10(50.0), 50)
     old['iso_prad_frac_err'].hist(bins=xbins, histtype='step', lw=4, color='0.7')
-    new['iso_prad_frac_err'].hist(bins=xbins, histtype='step', lw=4, color='k')
+    new['giso_prad_frac_err'].hist(bins=xbins, histtype='step', lw=4, color='k')
 
     pl.axvline(med_old, color='0.7', linestyle='dashed', lw=4)
     pl.axvline(med_new, color='k', linestyle='dashed', lw=4)

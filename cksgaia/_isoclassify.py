@@ -107,11 +107,19 @@ def _csv_reader(f):
     ifile = open(f, 'r')
     dirname = os.path.dirname(f)
     id_starname = dirname.split('/')[-1]
+    logfile = open(f.replace('isochrones.csv', 'run-iso.log'), 'r')
+    for line in logfile.readlines():
+        if line.startswith("number of models after phot constraints"):
+            num_mods = line.split()[-1]
+            break
     row = {'id_starname': id_starname}
     for line in ifile.readlines():
         key, val = line.strip().split(',')
+        key = key.replace('iso_', 'giso_')
         row[key] = float(val)
+    row['giso_nmodels'] = int(num_mods)
     ifile.close()
     row = pd.DataFrame.from_dict(row, orient='index')
     row = row.T
+
     return row

@@ -174,7 +174,7 @@ def create_iso_table(args):
             
         try:
             df.append(_csv_reader(f))
-        except:
+        except ValueError:
             print "{} failed".format(f)
 
     df = pd.concat(df)
