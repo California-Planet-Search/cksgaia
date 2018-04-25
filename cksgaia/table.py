@@ -60,3 +60,34 @@ def filters_table():
     lines = [l.replace('\n', '') for l in lines]
 
     return lines
+
+def planet_params_table(lines='all'):
+    physmerge = cksgaia.io.load_table('j17')
+
+    cols = ['id_koicand', 'koi_period', 'koi_ror', 'iso_prad', 'iso_insol', 'iso_teq']#, 'tr_prob', 'weight']
+
+    if lines == 'all':
+        outstr = physmerge.to_latex(columns=cols, escape=False, header=False,
+                                    index=False, float_format='%4.2f')
+    else:
+        outstr = physmerge.iloc[0:int(lines)].to_latex(columns=cols, escape=False, header=False,
+                                                       index=False, float_format='%4.2f')
+
+    return outstr.split('\n')
+
+
+def stellar_params_table(lines='all'):
+    physmerge = cksgaia.io.load_table('j17')
+
+    cols = ['id_koicand', 'id_tycho2', 'kic_kmag', 'cks_teff', 'iso_insol', 'iso_teq', 'iso_logg',
+            'iso_feh', 'iso_smass', 'iso_srad', 'iso_slogage', 'gaia2_sparallax']
+
+    if lines == 'all':
+        outstr = physmerge.to_latex(columns=cols, escape=False, header=False,
+                                    index=False, float_format='%4.2f')
+    else:
+        outstr = physmerge.iloc[0:int(lines)].to_latex(columns=cols, escape=False, header=False,
+                                                       index=False, float_format='%4.2f')
+
+    return outstr.split('\n')
+

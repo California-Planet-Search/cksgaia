@@ -41,7 +41,13 @@ $ run_cksgaia.py create-iso-table isoclassify isocla-j17-fakegaia isocla-j17-fak
 $ run_cksgaia.py create-iso-table isochrones isocla+isochr-dsep data/isochrones.csv
 ```
 
+Run a suite of simulated surveys to determine occurance error scaling
+
 ```
+$ run_cksgaia.py simulate-surveys
+
+```
+
 $ run_cksgaia.py tex-tables # LaTeX tables
 $ run_cksgaia.py tex-stats # Summary statistics
 $ run_cksgaia.py create-plots # Make figures
