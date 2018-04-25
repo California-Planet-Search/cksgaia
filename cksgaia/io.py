@@ -82,9 +82,9 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
                 namemap[col] = col.replace('kic','m17')
         df = df.rename(columns=namemap)
 
-    # elif table=='j17':
-    #     fn = MERGED_TABLE
-    #     df = pd.read_csv(fn,index_col=0)
+    elif table=='j17':
+         fn = MERGED_TABLE
+         df = pd.read_csv(fn,index_col=0)
 
     elif table=='fulton17':
         df = load_table('j17')
@@ -369,12 +369,12 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
 
 
     elif table=='cks+gaia2+h13':
-        df1 = cksgaia.io.load_table('cks+gaia2').groupby('id_kic',as_index=False).first()
+        df1 = cksgaia.io.load_table('j17+m17+gaia2+iso').groupby('id_kic',as_index=False).first()
         df2 = cksgaia.io.load_table('huber13')
         df = pd.merge(df1,df2)
 
     elif table=='cks+gaia2+s15':
-        df1 = cksgaia.io.load_table('cks+gaia2').groupby('id_kic',as_index=False).first()
+        df1 = cksgaia.io.load_table('j17+m17+gaia2+iso').groupby('id_kic',as_index=False).first()
         df2 = cksgaia.io.load_table('silva15')
         df = pd.merge(df1,df2)
 
