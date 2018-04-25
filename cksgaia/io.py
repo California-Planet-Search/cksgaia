@@ -386,16 +386,11 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
         for col in df1.columns:
             if col.startswith('iso_'):
                 del df1[col]
-        df2 = pd.read_csv(os.path.join(DATADIR, 'isochrones_gaia2.csv'), index_col=0)
-        df = pd.merge(df1, df2, on='id_starname')
+        df2 = pd.read_csv(os.path.join(DATADIR, 'isochrones_gaia2.csv'))
+        df = pd.merge(df1, df2, on='id_starname', suffixes=['',''])
     elif table == "cksgaia-planets":
-        # df1 = load_table('cks+nea')
-        # import pdb; pdb.set_trace()
         df2 = load_table('j17+m17+gaia2+iso')
-        # df = pd.merge(df1, df2, on='id_koicand')
-
         df = cksgaia.calc.update_planet_parameters(df2)
-        # df['iso_srad'] = df['gaia2_srad']
     elif table == "cksgaia-planets-filtered":
         df = load_table('cksgaia-planets')
         df = apply_filters(df)
@@ -518,7 +513,7 @@ def apply_filters(physmerge, mkplot=False, verbose=False, textable=False):
     # print "v-shaped >= 0.3 filter removes %d planets." % (pre-post)
 
     # pre = len(crop)
-    # crop = crop[crop['iso_prad_err1']/crop['iso_prad'] <= 0.12]
+    # crop = crop[crop['giso_prad_err1']/crop['giso_prad'] <= 0.12]
     # if mkplot:
     #     pl.subplot(nrow,ncol,plti)
     #     v = cksrad.plotting.simplehist(crop, annotate='$\sigma(R_p)/R_p \leq 12$%% (%d)' % len(crop), stacked=True, va_anno=True)
@@ -535,7 +530,7 @@ def apply_filters(physmerge, mkplot=False, verbose=False, textable=False):
     plti = _bipanel(crop, nrow, ncol, plti, eloc=(12.0, 60), atxt='$P < 100$ d')
 
     pre = len(crop)
-    crop = crop[crop['iso_srad'] <= 10 ** (ls * (crop['cks_steff'] - 5500) + li)]
+    crop = crop[crop['giso_srad'] <= 10 ** (ls * (crop['cks_steff'] - 5500) + li)]
     post = len(crop)
     if verbose:
         print "Subgiant filter removes %d planets." % (pre - post)
