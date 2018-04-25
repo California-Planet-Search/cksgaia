@@ -390,7 +390,7 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
         df = pd.merge(df1, df2, on='id_starname')
         df = cksgaia.calc.update_planet_parameters(df)
     elif table == "cksgaia-planets":
-        df = pd.read_csv(os.path.join(DATADIR, 'cks_iso_gaia2_merged.csv')
+        df = pd.read_csv(os.path.join(DATADIR, 'cks_iso_gaia2_merged.csv'))
     elif table == "cksgaia-filtered":
         df = load_table('cksgaia-planets')
         df = apply_filters(df)
