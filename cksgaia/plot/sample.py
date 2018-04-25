@@ -402,20 +402,20 @@ def prad_err_hist():
 
 def parallax_err_hist():
     old = cksgaia.io.load_table('iso-old')
-    new = cksgaia.io.load_table('iso')
+    new = cksgaia.io.load_table('cksgaia-planets').groupby('id_starname').nth(0)
 
     fig = pl.figure(figsize=(12, 8))
 
-    new['gaia2_sparallax_err1'] *= 1e6
+    new['gaia2_sparallax_err'] *= 1e3
 
-    med_new = np.nanmedian(new['gaia2_sparallax_err1'])
+    med_new = np.nanmedian(new['gaia2_sparallax_err'])
 
-    #xbins = np.logspace(np.log10(1.0), np.log10(30.0), 30)
-    new['gaia2_sparallax_err1'].hist(bins=60, histtype='step', lw=4, color='k')
+    xbins = np.logspace(np.log10(1.0), np.log10(300.0), 80)
+    new['gaia2_sparallax_err'].hist(bins=xbins, histtype='step', lw=4, color='k')
 
     pl.axvline(med_new, color='k', linestyle='dashed', lw=4)
 
-    pl.annotate("median = {:.0f}$\mu$\"".format(np.round(med_new)), xy=(med_new, 125), xycoords='data',
+    pl.annotate("median = {:.0f}$\mu$\"".format(np.round(med_new)), xy=(med_new, 40), xycoords='data',
                 xytext=(-22, 0), textcoords='offset points', rotation=90, verticalalignment='left')
 
     pl.xlim(10.0, 300.0)

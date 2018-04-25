@@ -17,7 +17,7 @@ from cksgaia.plot.config import *
 
 
 def get_mass_samples():
-    physmerge = cksgaia.io.load_table('fulton17-weights').query('iso_prad > 1.75 & iso_prad < 4')
+    physmerge = cksgaia.io.load_table(cksgaia.plot.config.filtered_sample).query('iso_prad > 1.75 & iso_prad < 4')
 
     highcut = np.percentile(physmerge['iso_smass'], 67)
     lowcut = np.percentile(physmerge['iso_smass'], 33)
@@ -156,7 +156,7 @@ def histfitplot(physmerge, bin_centers, N, e, mask, result, result2, completenes
 
 
 def insol_hist():
-    physmerge = cksgaia.io.load_table('cksgaia-weights')
+    physmerge = cksgaia.io.load_table(cksgaia.plot.config.filtered_sample)
 
     # cx, cy = np.loadtxt('/Users/bfulton/code/cksrad/data/detectability_p1.txt', unpack=True)
     cx, cy = np.loadtxt(os.path.join(modpath, 'data/sensitivity_p25.txt'), unpack=True)
@@ -271,7 +271,7 @@ def money_plot_fit():
 def money_plot_plain():
     physmerge = cksgaia.io.load_table(cksgaia.plot.config.filtered_sample)
 
-    print len(physmerge)
+    print len(physmerge), (physmerge.iso_srad_err1 / physmerge.iso_srad).median()
 
     rmask, rbin_centers, rN, re, result1, result2 = cksgaia.fitting.histfit(physmerge,
                                                                            completeness=False,
@@ -300,7 +300,7 @@ def money_plot_plain():
 
 
 def mass_cuts():
-    physmerge = cksgaia.io.load_table('cksgaia-weights')
+    physmerge = cksgaia.io.load_table(cksgaia.plot.config.filtered_sample)
 
     # cx, cy = np.loadtxt('/Users/bfulton/code/cksrad/data/detectability_p1.txt', unpack=True)
     cx, cy = np.loadtxt(os.path.join(modpath, 'data/sensitivity_p25.txt'), unpack=True)
@@ -394,7 +394,7 @@ def mass_cuts():
     pl.xticks(xticks)
 
 def desert_edge():
-    physmerge = cksgaia.io.load_table('cksgaia-weights').query('iso_prad > 1.75 & iso_prad < 4')
+    physmerge = cksgaia.io.load_table(cksgaia.plot.config.filtered_sample).query('iso_prad > 1.75 & iso_prad < 4')
 
     aloc = (0.1, 0.85)
 
@@ -415,6 +415,9 @@ def desert_edge():
 
     pl.subplot(nrow, ncol, plti)
     pl.subplots_adjust(hspace=0, top=0.98, bottom=0.10, left=0.19)
+
+    highcut = np.percentile(physmerge['iso_smass'], 67)
+    lowcut = np.percentile(physmerge['iso_smass'], 33)
 
     high = physmerge.query('iso_smass > @highcut')
     medium = physmerge.query('iso_smass <= @highcut & iso_smass >= @lowcut')
