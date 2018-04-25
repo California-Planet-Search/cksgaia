@@ -168,17 +168,19 @@ def xmatch_gaia2(df, gaia, key, gaiadr):
     m.index = m.id_gaia2
     g = m.groupby('id_kic')
     m['id_gaia2_best'] = False
+    m[gaiadr+'_gflux_sum'] = g[gaiadr+'_gflux'].sum()
     m['absdiff_gmag_kepmag'] = m['gaia2_gmag'] - m['kic_kepmag']
+
     for id_kic, idx in g.groups.iteritems():
         stars = m.loc[idx]
-        stars.sort_values()
-        if len(stars) > 4:
-            
-            import pdb;pdb.set_trace()
-            
-            
-        print len(stars)
-        
+
+        matchcand = stars.sort_values(by='absdiff_gmag_kepmag').query('gaia2_angdist < 1')
+        if len(matchcand)>0:
+            match = matchcand.iloc[0]
+            m.loc[match.id_gaia2,'id_gaia2_best'] = True
+            flux_sum = stars.gaia2_gflux.sum()
+            flux_ratio = flux_sum / match.gaia2_gflux
+            m.loc[match.id_gaia2,gaiadr+'_gflux_ratio'] = flux_ratio
 
     #m[gaiadr+'_nsource'] = g.size()
     #m[gaiadr+'_gflux_sum'] = g[gaiadr+'_gflux'].sum()
