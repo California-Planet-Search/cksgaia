@@ -17,12 +17,12 @@ def comparison(key):
     if key=='smass-h13':
         df = cksgaia.io.load_table('cks+gaia2+h13')
         x1 = df.h13_smass
-        x2 = df.iso_smass
+        x2 = df.giso_smass
         x3 = x2 / x1 
 
         x1err = np.vstack([df.h13_smass_err,df.h13_smass_err])
-        x2err = np.vstack([-df.iso_smass_err2,df.iso_smass_err1])
-        x3err = x2err / np.array(df.iso_smass)
+        x2err = np.vstack([-df.giso_smass_err2,df.giso_smass_err1])
+        x3err = x2err / np.array(df.giso_smass)
         fig, axL = subplots_compare(
             x1,x2,x3, x1err=x1err, x2err=x2err, x3err=x3err, **errorbar_kw
         )
@@ -36,14 +36,14 @@ def comparison(key):
 
     if key=='srad-h13':
         df = cksgaia.io.load_table('cks+gaia2+h13')
-        df = df.query('gaia2_gflux_ratio < 1.1 and iso_srad_err1/iso_srad < 0.1')
+        df = df.query('gaia2_gflux_ratio < 1.1 and giso_srad_err1/giso_srad < 0.1')
 
         x1 = df.h13_srad
-        x2 = df.iso_srad
+        x2 = df.giso_srad
         x3 = x2 / x1 
         x1err = np.vstack([df.h13_srad_err,df.h13_srad_err]) 
-        x2err = np.vstack([-df.iso_srad_err2,df.iso_srad_err1])
-        x3err = x2err / np.array(df.iso_srad)
+        x2err = np.vstack([-df.giso_srad_err2,df.giso_srad_err1])
+        x3err = x2err / np.array(df.giso_srad)
         fig, axL = subplots_compare(
             x1,x2,x3, x1err=x1err, x2err=x2err, x3err=x3err, **errorbar_kw
         )
@@ -61,22 +61,22 @@ def comparison(key):
 
     if key=='srad-j17':
         df = cksgaia.io.load_table('j17').groupby('id_kic',as_index=False).nth(0)
-        df = df['id_kic iso_srad iso_srad_err1 iso_srad_err2'.split()]
-        df = cksgaia.io.sub_prefix(df, 'iso', ignore=['id'])
+        df = df['id_kic giso_srad giso_srad_err1 giso_srad_err2'.split()]
+        df = cksgaia.io.sub_prefix(df, 'giso', ignore=['id'])
         df = cksgaia.io.add_prefix(df, 'j17', ignore=['id'])
         df1 = df
 
         df2 = cksgaia.io.load_table('j17+m17+gaia2+iso',cachefn='load_table_cache.hdf.save2').groupby('id_kic',as_index=False).nth(0)
         df = pd.merge(df1,df2)
 
-        df = df.query('gaia2_gflux_ratio < 1.1 and iso_srad_err1/iso_srad < 0.1')
+        df = df.query('gaia2_gflux_ratio < 1.1 and giso_srad_err1/giso_srad < 0.1')
 
-        x1 = df.iso_srad
+        x1 = df.giso_srad
         x2 = df.j17_srad
         x3 = x2 / x1 
-        x1err = np.vstack([-df.iso_srad_err2,df.iso_srad_err1]) 
+        x1err = np.vstack([-df.giso_srad_err2,df.giso_srad_err1]) 
         x2err = np.vstack([-df.j17_srad_err2,df.j17_srad_err1])
-        x3err = x2err / np.array(df.iso_srad)
+        x3err = x2err / np.array(df.giso_srad)
         fig, axL = subplots_compare(
             x1,x2,x3, x1err=x1err, x2err=x2err, x3err=x3err, **errorbar_kw
         )
@@ -95,13 +95,13 @@ def comparison(key):
 
     if key=='srad-s15':
         df = cksgaia.io.load_table('cks+gaia2+s15')
-        df = df.query('gaia2_gflux_ratio < 1.1 and iso_srad_err1/iso_srad < 0.1')
+        df = df.query('gaia2_gflux_ratio < 1.1 and giso_srad_err1/giso_srad < 0.1')
         x1 = df.s15_srad
-        x2 = df.iso_srad
+        x2 = df.giso_srad
         x3 = x2 / x1 
         x1err = np.vstack([-df.s15_srad_err2,df.s15_srad_err1]) 
-        x2err = np.vstack([-df.iso_srad_err2,df.iso_srad_err1])
-        x3err = x2err / np.array(df.iso_srad)
+        x2err = np.vstack([-df.giso_srad_err2,df.giso_srad_err1])
+        x3err = x2err / np.array(df.giso_srad)
         fig, axL = subplots_compare(
             x1,x2,x3, x1err=x1err, x2err=x2err, x3err=x3err, **errorbar_kw
         )
@@ -120,11 +120,11 @@ def comparison(key):
     if key=='sage-s15':
         df = cksgaia.io.load_table('cks+gaia2+s15')
         x1 = df.s15_sage
-        x2 = df.iso_sage
+        x2 = df.giso_sage
         x3 = x2 / x1 
         x1err = np.vstack([-df.s15_sage_err2,df.s15_sage_err1])
-        x2err = np.vstack([-df.iso_sage_err2,df.iso_sage_err1])
-        x3err = x2err / np.array(df.iso_sage)
+        x2err = np.vstack([-df.giso_sage_err2,df.giso_sage_err1])
+        x3err = x2err / np.array(df.giso_sage)
         fig, axL = subplots_compare(
             x1,x2,x3, x1err=x1err, x2err=x2err, x3err=x3err, **errorbar_kw
         )
