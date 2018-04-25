@@ -12,10 +12,9 @@ class Pipeline(object):
         self.id_starname = id_starname
         self.outdir = outdir
 
-        df = cksgaia.io.load_table(cksgaia.config.MERGED_TABLE_NAME,
-                                   cache=0)
+        df = cksgaia.io.load_table('j17+m17+gaia2', cache=0)
         g = df.groupby('id_starname',as_index=True)
-        df = g.first()
+        df = g.nth(0)
         star = df.ix[id_starname]
         self.teff = star.cks_steff
         self.teff_err = star.cks_steff_err1
