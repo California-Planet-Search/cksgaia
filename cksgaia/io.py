@@ -82,9 +82,9 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
                 namemap[col] = col.replace('kic','m17')
         df = df.rename(columns=namemap)
 
-    elif table=='j17':
-        fn = MERGED_TABLE
-        df = pd.read_csv(fn,index_col=0)
+    # elif table=='j17':
+    #     fn = MERGED_TABLE
+    #     df = pd.read_csv(fn,index_col=0)
 
     elif table=='fulton17':
         df = load_table('j17')
@@ -380,6 +380,20 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
 
     elif table=='j17+m17+gaia2':
         df = pd.read_csv(os.path.join(DATADIR, 'm17+j17+gaiadr2.csv'), index_col=0)
+    elif table=='j17+m17+gaia2+iso':
+        df1 = load_table('j17+m17+gaia2')
+        for col in df1.columns:
+            if col.startswith('iso_'):
+                del df1[col]
+        df2 = pd.read_csv(os.path.join(DATADIR, 'isochrones_gaia2.csv'), index_col=0)
+
+        df = pd.merge(df1, df2, on='id_starname')
+    elif table == "cksgaia-filtered":
+        df = load_table('j17+m17+gaia2+iso')
+        df = apply_filters(df)
+    elif table == 'cksgaia-weights':
+        df = load_table('cksgaia-filtered')
+        df = cksgaia.completeness.weight_merge(df)
 
     else:
         assert False, "table {} not valid table name".format(table)

@@ -156,7 +156,7 @@ def histfitplot(physmerge, bin_centers, N, e, mask, result, result2, completenes
 
 
 def insol_hist():
-    physmerge = cksgaia.io.load_table('fulton17-weights')
+    physmerge = cksgaia.io.load_table('cksgaia-weights')
 
     # cx, cy = np.loadtxt('/Users/bfulton/code/cksrad/data/detectability_p1.txt', unpack=True)
     cx, cy = np.loadtxt(os.path.join(modpath, 'data/sensitivity_p25.txt'), unpack=True)
@@ -244,7 +244,7 @@ def insol_hist():
 
 
 def money_plot_fit():
-    physmerge = cksgaia.io.load_table('fulton17-weights')
+    physmerge = cksgaia.io.load_table(cksgaia.plot.config.filtered_sample)
 
     rmask, rbin_centers, rN, re, result1, result2 = cksgaia.fitting.histfit(physmerge,
                                                                            completeness=False,
@@ -269,7 +269,7 @@ def money_plot_fit():
 
 
 def money_plot_plain():
-    physmerge = cksgaia.io.load_table('fulton17-weights')
+    physmerge = cksgaia.io.load_table(cksgaia.plot.config.filtered_sample)
 
     rmask, rbin_centers, rN, re, result1, result2 = cksgaia.fitting.histfit(physmerge,
                                                                            completeness=False,
@@ -298,7 +298,7 @@ def money_plot_plain():
 
 
 def mass_cuts():
-    physmerge = cksgaia.io.load_table('fulton17-weights')
+    physmerge = cksgaia.io.load_table('cksgaia-weights')
 
     # cx, cy = np.loadtxt('/Users/bfulton/code/cksrad/data/detectability_p1.txt', unpack=True)
     cx, cy = np.loadtxt(os.path.join(modpath, 'data/sensitivity_p25.txt'), unpack=True)
@@ -392,7 +392,7 @@ def mass_cuts():
     pl.xticks(xticks)
 
 def desert_edge():
-    physmerge = cksgaia.io.load_table('fulton17-weights').query('iso_prad > 1.75 & iso_prad < 4')
+    physmerge = cksgaia.io.load_table('cksgaia-weights').query('iso_prad > 1.75 & iso_prad < 4')
 
     aloc = (0.1, 0.85)
 

@@ -91,9 +91,9 @@ class Pipeline(cksgaia.iso.Pipeline):
         # outdf['iso_sparallax'] = par
         # outdf['iso_sparallax_err1'] = par_upper
         # outdf['iso_sparallax_err2'] = par_lower
-        outdf['gaia2_sparallax'] = self.parallax
-        outdf['gaia2_sparallax_err1'] = self.parallax_err
-        outdf['gaia2_sparallax_err2'] = -self.parallax_err
+        outdf['iso_sparallax'] = self.parallax
+        outdf['iso_sparallax_err1'] = self.parallax_err
+        outdf['iso_sparallax_err2'] = -self.parallax_err
 
 
         outdf = pd.Series(outdf)

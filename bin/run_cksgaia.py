@@ -183,9 +183,9 @@ def create_iso_table(args):
 
 
 def create_merged_table(args):
-    df = cksgaia.io.load_table('cks+nea+iso', verbose=True, cache=0)
+    df = cksgaia.io.load_table('j17+m17+gaia2+iso', verbose=True, cache=0)
 
-    csvfn = os.path.join(cksgaia.io.DATADIR, 'cks_fakegaia_merged.csv')
+    csvfn = os.path.join(cksgaia.io.DATADIR, 'cks_iso_gaia2_merged.csv')
     df.to_csv(csvfn)
 
 

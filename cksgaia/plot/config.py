@@ -11,7 +11,7 @@ matplotlib.rcParams['figure.figsize'] = (12, 10)
 afs = 24  # font size for annotations
 
 full_sample = 'j17+m17+gaia2'
-filtered_sample = 'fulton17-weights'
+filtered_sample = 'cksgaia-weights'
 
 modpath = '/'.join(os.path.dirname(cksgaia.__file__).split('/')[:-1])
 
