@@ -17,6 +17,8 @@ import cksgaia.errors
 import cksgaia.calc
 import cksgaia.plot.extinction
 import cksgaia.extinction
+import cksgaia.config
+import cksgaia.sim.simulations
 
 def main():
     psr = ArgumentParser()
@@ -71,6 +73,9 @@ def main():
     psr2.add_argument('table', help='name of star')
     psr2.add_argument('key')
     psr2.set_defaults(func=compute_extinction)
+
+    psr2 = subpsr.add_parser('simulate-surveys', parents=[psr_parent])
+    psr2.set_defaults(func=sim_surveys)
 
     psr_merge = subpsr.add_parser(
         'create-merged-table', parents=[psr_parent],
@@ -128,6 +133,9 @@ def create_iso_jobs(args):
                                                                                       args.driver,
                                                                                       id_starname,
                                                                                       outdir, outdir)
+
+def sim_surveys(args):
+    cksgaia.sim.simulations.run(args)
 
 def create_extinction_jobs(args):
     for table in cksgaia.extinction.TABLES:
