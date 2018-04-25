@@ -60,6 +60,7 @@ def read_xmatch_results(fn, mode):
             'id_kic':'id_kic',
             'dist':'angdist',
         }
+        df = df.rename(columns=namemap)
 
     elif mode=='gaia1-xmatch':
         namemap = {
@@ -74,8 +75,10 @@ def read_xmatch_results(fn, mode):
             'id_kic':'id_kic',
             'angDist':'angdist'
         }
+        df = df.rename(columns=namemap)
 
     elif mode=='gaia2-archive':
+
         namemap = {
             'source_id':'id_gaia2',
             'ra':'ra', 
@@ -89,15 +92,43 @@ def read_xmatch_results(fn, mode):
             'id_kic':'id_kic',
             'dist':'angdist',
         }
-    elif gaiadr=='gaia2':
-        pass
+        df = df.rename(columns=namemap)
 
-    df = df.rename(columns=namemap)
+
     if mode.count('archive')==1:
         df['angdist'] *= 60*60
 
     df = df[namemap.values()]
     df = cksgaia.io.add_prefix(df, gaiadr+'_')
+    return df
+
+
+def read_xmatch_gaia2(fn):
+    df = pd.read_csv(fn)
+    namemap = {
+        'source_id':'id_gaia2',
+        'ra':'ra', 
+        'dec':'dec',
+        'parallax':'sparallax', 
+        'parallax_error':'sparallax_err', 
+        'phot_g_mean_flux':'gflux',
+        'phot_g_mean_flux_error':'gflux_err',
+        'phot_g_mean_mag':'gmag',
+        'parallax_over_error':'sparallax_over_err',
+        'id_kic':'id_kic',
+        'dist':'angdist',
+    }
+    df['steff'] = df['teff_val']
+    df['steff_err1'] = df.eval('teff_percentile_upper - teff_val')
+    df['steff_err2'] = df.eval('teff_percentile_lower - teff_val')
+    df['srad'] = df['radius_val']
+    df['srad_err1'] = df.eval('radius_percentile_upper - radius_val')
+    df['srad_err2'] = df.eval('radius_percentile_lower - radius_val')
+    df = df.rename(columns=namemap)
+    df['angdist'] *= 60*60
+    cols = namemap.values() + 'steff steff_err1 steff_err2 srad srad_err1 srad_err2 '.split()
+    df = df[cols]
+    df = cksgaia.io.add_prefix(df, 'gaia2_')
     return df
 
 def xmatch_gaia(df, gaia, key, gaiadr):
@@ -173,7 +204,6 @@ def xmatch_gaia2(df, gaia, key, gaiadr):
 
     for id_kic, idx in g.groups.iteritems():
         stars = m.loc[idx]
-
         matchcand = stars.sort_values(by='absdiff_gmag_kepmag').query('gaia2_angdist < 1')
         if len(matchcand)>0:
             match = matchcand.iloc[0]
@@ -182,13 +212,4 @@ def xmatch_gaia2(df, gaia, key, gaiadr):
             flux_ratio = flux_sum / match.gaia2_gflux
             m.loc[match.id_gaia2,gaiadr+'_gflux_ratio'] = flux_ratio
 
-    #m[gaiadr+'_nsource'] = g.size()
-    #m[gaiadr+'_gflux_sum'] = g[gaiadr+'_gflux'].sum()
-    #m[gaiadr+'_gflux_nearest'] = g[gaiadr+'_gflux'].first()
-    #m[gaiadr+'_gflux_ratio'] = m[gaiadr+'_gflux_sum']/m[gaiadr+'_gflux_nearest']
-    #m[gaiadr+'_angdist_n0'] = g[gaiadr+'_angdist'].nth(0) 
-    #m[gaiadr+'_angdist_n1'] = g[gaiadr+'_angdist'].nth(1) 
-    #m = m.sort_values(by=[key,gaiadr+'_angdist'])
-    #g = m.groupby(key,as_index=False)
-    #m = g.nth(0) # first is slow when there is a string in the columns
     return m
