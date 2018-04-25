@@ -135,7 +135,7 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
 
     elif table=='j17+m17+extinct':
         df = load_table('j17+m17')
-        df['distance'] = np.array(1 / df.iso_sparallax * 1000) * u.pc
+        df['distance'] = np.array(1 / df.gaia2_sparallax * 1000) * u.pc
         df['ra'] = df['m17_ra']
         df['dec'] = df['m17_dec']
         df = cksgaia.extinction.add_extinction(df,'bayestar2017')
@@ -144,10 +144,10 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
 
     elif table == 'j17+m17-fakegaia':
         df = load_table('j17+m17')
-        iso_err = df.iso_sparallax_err1 / 5 
+        iso_err = df.gaia2_sparallax_err1 / 5
         gaia_err = np.sqrt(iso_err**2 + 0.02**2) # 20uas error floor
-        df['iso_sparallax_err1'] = gaia_err
-        df['iso_sparallax_err2'] = -1.0 * gaia_err
+        df['gaia2_sparallax_err1'] = gaia_err
+        df['gaia2_sparallax_err2'] = -1.0 * gaia_err
 
     elif table == 'kic':
         fname = os.path.join(DATADIR, 'kic_q0_q17.hdf')
