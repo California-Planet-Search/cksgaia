@@ -4,6 +4,7 @@ import os
 import numpy as np    
 import pandas as pd
 import cksgaia.io
+import cksgaia.config
 np.random.seed(0) 
 
 class Pipeline(object):
@@ -11,7 +12,8 @@ class Pipeline(object):
         self.id_starname = id_starname
         self.outdir = outdir
 
-        df = cksgaia.io.load_table('j17+m17-fakegaia', cache=0)
+        df = cksgaia.io.load_table(cksgaia.config.MERGED_TABLE_NAME,
+                                   cache=0)
         g = df.groupby('id_starname',as_index=True)
         df = g.first()
         star = df.ix[id_starname]
@@ -25,8 +27,8 @@ class Pipeline(object):
         self.kmag_err = 0.02
         self.jmag = star.kic_jmag
         self.jmag_err = 0.02
-        self.parallax = star['iso_sparallax'] / 1e3
-        self.parallax_err = star['iso_sparallax_err1'] / 1e3
+        self.parallax = star['gaia2_sparallax'] / 1e3
+        self.parallax_err = star['gaia2_sparallax_err'] / 1e3
         self.ra = star.m17_ra
         self.dec = star.m17_dec
 
@@ -80,8 +82,8 @@ def run(driver, id_starname, outdir,debug=False):
         # d0 (some r^2 prior from 1--30,000 pc) 
         # AV0 (1-0) 
         row = pd.read_csv(pipe.csvfn,squeeze=True,header=None, index_col=0)
-        dist = 1e3 / row.iso_sparallax # mas -> pc
-        dist_err = dist * row.iso_sparallax_err1 / row.iso_sparallax
+        dist = 1e3 / row.gaia2_sparallax # mas -> pc
+        dist_err = dist * row.gaia2_sparallax_err1 / row.gaia2_sparallax
         slogage = np.log10(row.iso_sage * 1e9) # Gyr -> logage
         slogage = np.log10(row.iso_sage * 1e9) # Gyr -> logage
 

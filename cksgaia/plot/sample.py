@@ -406,12 +406,12 @@ def parallax_err_hist():
 
     fig = pl.figure(figsize=(12, 8))
 
-    new['iso_sparallax_err1'] *= 1e6
+    new['gaia2_sparallax_err1'] *= 1e6
 
-    med_new = np.nanmedian(new['iso_sparallax_err1'])
+    med_new = np.nanmedian(new['gaia2_sparallax_err1'])
 
     #xbins = np.logspace(np.log10(1.0), np.log10(30.0), 30)
-    new['iso_sparallax_err1'].hist(bins=60, histtype='step', lw=4, color='k')
+    new['gaia2_sparallax_err1'].hist(bins=60, histtype='step', lw=4, color='k')
 
     pl.axvline(med_new, color='k', linestyle='dashed', lw=4)
 
