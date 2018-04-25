@@ -378,6 +378,9 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
         df2 = cksgaia.io.load_table('silva15')
         df = pd.merge(df1,df2)
 
+    elif table=='j17+m17+gaia2':
+        df = pd.read_csv(os.path.join(DATADIR), 'data/m17+j17+gaiadr2.csv', index_col=0)
+
     else:
         assert False, "table {} not valid table name".format(table)
     return df
