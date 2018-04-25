@@ -55,14 +55,15 @@ def contour_plot_kde(physmerge, xcol, ycol, xlim, ylim, ylog=True, pltxlim=None,
         weights = np.ones_like(crop[xcol].values)
 
     if errfloor == None:
-        errfloor
-    crop[xcol + '_err1'] = np.sqrt(crop[xcol + '_err1']**2 + errfloor[0]**2)
-    crop[xcol + '_err2'] = -np.sqrt(-crop[xcol + '_err2'] ** 2 + errfloor[0] ** 2)
-    crop[ycol + '_err1'] = np.sqrt(crop[ycol + '_err1'] ** 2 + errfloor[1] ** 2)
-    crop[ycol + '_err2'] = -np.sqrt(crop[ycol + '_err2'] ** 2 + errfloor[1] ** 2)
+        errfloor = (0, 0)
+
+    xerr1 = np.sqrt(crop[xcol + '_err1']**2 + errfloor[0]**2)
+    xerr2 = -np.sqrt(-crop[xcol + '_err2'] ** 2 + errfloor[0] ** 2)
+    yerr1 = np.sqrt(crop[ycol + '_err1'] ** 2 + errfloor[1] ** 2)
+    yerr2 = -np.sqrt(crop[ycol + '_err2'] ** 2 + errfloor[1] ** 2)
 
     xi, yi, zi = cksgaia.fitting.wkde2D(crop[xcol].values, crop[ycol].values,
-                                       crop[xcol + '_err1'].values, crop[ycol + '_err1'].values,
+                                       xerr1, yerr1,
                                        weights, xlim=xlim, ylim=ylim, nstars=nstars)
 
     # cmap = plt.cm.inferno_r

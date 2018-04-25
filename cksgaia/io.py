@@ -413,14 +413,14 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
         for col in df1.columns:
             if col.startswith('iso_'):
                 del df1[col]
-        df2 = pd.read_csv(os.path.join(DATADIR, 'isochrones_gaia2.csv'), index_col=0)
+        df2 = pd.read_csv(os.path.join(DATADIR, 'isochrones_gaia2.csv'))
         df = pd.merge(df1, df2, on='id_starname')
 
     elif table=='j17+m17+gaia2+iso+fur17':
         df = pd.merge(load_table('j17+m17+gaia2+iso'), load_table('fur17'),how='left')
 
     elif table == "cksgaia-planets":
-        df2 = load_table('j17+m17+gaia2+iso')
+        df2 = load_table('j17+m17+gaia2+iso+fur17')
         df = cksgaia.calc.update_planet_parameters(df2)
     elif table == "cksgaia-planets-filtered":
         df = load_table('cksgaia-planets')
@@ -449,7 +449,7 @@ def apply_filters(physmerge, mkplot=False, verbose=False, textable=False):
             left = plti
             right = plti + 1
 
-            letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k']
+            letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l']
             left_letter = letters[left - 1]
             right_letter = letters[right - 1]
 
@@ -483,7 +483,7 @@ def apply_filters(physmerge, mkplot=False, verbose=False, textable=False):
 
             return left + 1
 
-    nrow = 9
+    nrow = 10
     ncol = 1
     plti = 1
 
@@ -518,10 +518,10 @@ def apply_filters(physmerge, mkplot=False, verbose=False, textable=False):
     plti = _bipanel(crop, nrow, ncol, plti, eloc=(12.0, 70), atxt='$Rp < 10 \sigma$')
 
     pre = len(crop)
-    crop = crop[crop['fur17_rcorr_avg'] <= 1.05]
+    crop = crop[~(crop['fur17_rcorr_avg'] > 1.05)]
     post = len(crop)
     if verbose:
-        print "Rp > 10 $\sigma$" % (pre - post)
+        print "Furlan+17 Rp correction < 5%% filter removes %d planets." % (pre - post)
     plti = _bipanel(crop, nrow, ncol, plti, eloc=(12.0, 70), atxt='dilution $\leq$ 5%% (%d)')
 
     # pre = len(crop)
