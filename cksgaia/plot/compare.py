@@ -66,10 +66,10 @@ def comparison(key):
         df = cksgaia.io.add_prefix(df, 'j17', ignore=['id'])
         df1 = df
 
-        df2 = cksgaia.io.load_table('j17+m17+gaia2+iso',cachefn='load_table_cache.hdf.save2').groupby('id_kic',as_index=False).nth(0)
+        df2 = cksgaia.io.load_table('j17+m17+gaia2+iso+fur17',cachefn='load_table_cache.hdf.save2').groupby('id_kic',as_index=False).nth(0)
         df = pd.merge(df1,df2)
 
-        df = df.query('gaia2_gflux_ratio < 1.1 and iso_srad_err1/iso_srad < 0.1')
+        df = df.query('gaia2_gflux_ratio < 1.1 and iso_srad_err1/iso_srad < 0.1 and fur17_rcorr_avg < 1.05')
 
         x1 = df.iso_srad
         x2 = df.j17_srad
