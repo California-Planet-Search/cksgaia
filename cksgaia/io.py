@@ -84,8 +84,8 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
         df = df.rename(columns=namemap)
 
     elif table=='j17':
-         fn = MERGED_TABLE
-         df = pd.read_csv(fn,index_col=0)
+        fn = MERGED_TABLE_OLD
+        df = pd.read_csv(fn, index_col=0)
 
     elif table=='fulton17':
         df = load_table('j17')
@@ -413,14 +413,26 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
                 del df1[col]
         df2 = pd.read_csv(os.path.join(DATADIR, 'isochrones_gaia2.csv'), index_col=0)
         df = pd.merge(df1, df2, on='id_starname')
+<<<<<<< HEAD
         df = cksgaia.calc.update_planet_parameters(df)
     elif table == "cksgaia-planets":
         df = pd.read_csv(os.path.join(DATADIR, 'cks_iso_gaia2_merged.csv'))
     elif table == "cksgaia-filtered":
+=======
+    elif table == "cksgaia-planets":
+        # df1 = load_table('cks+nea')
+        # import pdb; pdb.set_trace()
+        df2 = load_table('j17+m17+gaia2+iso')
+        # df = pd.merge(df1, df2, on='id_koicand')
+
+        df = cksgaia.calc.update_planet_parameters(df2)
+        # df['iso_srad'] = df['gaia2_srad']
+    elif table == "cksgaia-planets-filtered":
+>>>>>>> d203c13a1dd7a9a18a32f8d110940d304aeb076d
         df = load_table('cksgaia-planets')
         df = apply_filters(df)
-    elif table == 'cksgaia-weights':
-        df = load_table('cksgaia-filtered')
+    elif table == 'cksgaia-planets-weights':
+        df = load_table('cksgaia-planets-filtered')
         df = cksgaia.completeness.weight_merge(df)
 
     else:
@@ -443,7 +455,7 @@ def apply_filters(physmerge, mkplot=False, verbose=False, textable=False):
             left = plti
             right = plti + 1
 
-            letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
+            letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i']
             left_letter = letters[left - 1]
             right_letter = letters[right - 1]
 
@@ -477,7 +489,7 @@ def apply_filters(physmerge, mkplot=False, verbose=False, textable=False):
 
             return left + 1
 
-    nrow = 7
+    nrow = 8
     ncol = 1
     plti = 1
 
@@ -513,6 +525,14 @@ def apply_filters(physmerge, mkplot=False, verbose=False, textable=False):
     # post = len(crop)
     # if verbose:
     #     print "Furlan+17 Rp correction < 5%% filter removes %d planets." % (pre-post)
+
+    pre = len(crop)
+    crop = crop[crop['gaia2_gflux_ratio'] < 1.1]
+    post = len(crop)
+    if verbose:
+        print "GAIA dilution < 1.1 filter removes %d planets." % (pre - post)
+    plti = _bipanel(crop, nrow, ncol, plti, eloc=(12.0, 60), atxt='$G_{\\rm blend} < 1.1$')
+
 
     pre = len(crop)
     crop = crop[crop['koi_impact'] <= 0.7]

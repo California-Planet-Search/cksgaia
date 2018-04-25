@@ -138,7 +138,7 @@ def contour_plot_kde(physmerge, xcol, ycol, xlim, ylim, ylog=True, pltxlim=None,
 
 
 def period_contour_q16():
-    physmerge = cksgaia.io.load_table('fulton17-weights')
+    physmerge = cksgaia.io.load_table(cksgaia.plot.config.filtered_sample)
 
     ax, xi, yi, zi = contour_plot_kde(physmerge, 'koi_period', 'koi_prad', xlim=[0.4, 1000.0],
                                                       ylim=[0.5, 20], ylog=True,
@@ -157,7 +157,7 @@ def period_contour_q16():
 
 
 def period_contour_cks():
-    physmerge = cksgaia.io.load_table('fulton17-weights')
+    physmerge = cksgaia.io.load_table(cksgaia.plot.config.filtered_sample)
 
     wper, wsens = np.genfromtxt(os.path.join(modpath, 'data/detectability_p1.txt'), unpack=True)
 
@@ -178,7 +178,7 @@ def period_contour_cks():
 
 
 def insol_contour_anno():
-    physmerge = cksgaia.io.load_table('fulton17-weights')
+    physmerge = cksgaia.io.load_table(cksgaia.plot.config.filtered_sample)
 
     ax, xi, yi, zi_iso = contour_plot_kde(physmerge, 'iso_insol', 'iso_prad', xlim=[3, 30000],
                                                           ylim=[0.5, 10], ylog=True,
@@ -230,7 +230,7 @@ def insol_contour_anno():
 
 def insol_contour_data(sample=None, vlims=None):
     if sample is None:
-        physmerge = cksgaia.io.load_table('fulton17-weights')
+        physmerge = cksgaia.io.load_table(cksgaia.plot.config.filtered_sample)
     else:
         physmerge = sample
 
@@ -243,7 +243,7 @@ def insol_contour_data(sample=None, vlims=None):
     cy = np.append(cy, 6)
 
     if vlims is None:
-        vlims = (0.0, 0.05)
+        vlims = (0.0, 0.025)
     else:
         vlims = vlims
 
@@ -253,7 +253,7 @@ def insol_contour_data(sample=None, vlims=None):
                                                           weighted=True, vlims=vlims)
 
     pl.fill_between(sx, cy, y2=0.1, color='0.5', zorder=10, alpha=0.5, hatch='\\\\')
-    pl.annotate('      low\ncompleteness', xy=(30, 1.03), xycoords='data', color='0.2', fontsize=afs - 2)
+    pl.annotate('      low\ncompleteness', xy=(50, 1.03), xycoords='data', color='0.2', fontsize=afs - 2)
 
     pl.xlabel('Stellar light intensity relative to Earth')
     pl.ylabel('Planet Size [Earth radii]')
@@ -267,7 +267,7 @@ def insol_contour_data(sample=None, vlims=None):
 
 
 def srad_contour():
-    physmerge = cksgaia.io.load_table('fulton17-weights')
+    physmerge = cksgaia.io.load_table(cksgaia.plot.config.filtered_sample)
 
     ax, xi, yi, zi = contour_plot_kde(physmerge, 'iso_srad', 'iso_prad', xlim=[0.4, 3.0],
                                                       ylim=[0.5, 20], ylog=True,
@@ -285,7 +285,7 @@ def srad_contour():
 
 
 def contour_masscuts():
-    physmerge = cksgaia.io.load_table('fulton17-weights')
+    physmerge = cksgaia.io.load_table(cksgaia.plot.config.filtered_sample)
 
     highcut, lowcut, _, _, _, annotations = cksgaia.plot.occur.get_mass_samples()
 
