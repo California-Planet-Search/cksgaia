@@ -1,6 +1,7 @@
 import numpy as np
 import astropysics.constants as C
 import pandas as pd
+import pylab as pl
 
 import cksgaia.io
 import cksgaia.fitting
@@ -54,8 +55,9 @@ def detection_prob(prad, per, kicselect, nkic=None, step=False):
     rors = (prad * (C.Re / C.Rs)) / kicselect['kic_srad'].values
 
     x = 1 / np.sqrt(durations)
-    cdpp_durs = kicselect['kic_cdpp_fit0'].values + kicselect['kic_cdpp_fit1'].values * x + kicselect[
-                                                                                                'kic_cdpp_fit2'].values * x ** 2
+    cdpp_durs = kicselect['kic_cdpp_fit0'].values + \
+                kicselect['kic_cdpp_fit1'].values * x + \
+                kicselect['kic_cdpp_fit2'].values * x ** 2
 
     # Calculate SNR for other stars
     other_snr = rors ** 2 * (per / kicselect['kic_tobs'].values) ** -0.5 * (1 / (cdpp_durs * 1e-6))
@@ -137,3 +139,58 @@ def weight_merge(physmerge):
     physmerge = get_weights(physmerge, kicselect)
 
     return physmerge
+
+
+def get_sensitivity_contour(kicselect, percentile):
+    pgrid = np.logspace(np.log10(1.0), np.log10(300), 40)
+    rgrid = np.logspace(np.log10(0.3), np.log10(20.0), 40)
+    prob_grid = np.zeros((len(pgrid), len(rgrid)))
+    sens_grid = np.zeros((len(pgrid), len(rgrid)))
+    tr_grid = np.zeros((len(pgrid), len(rgrid)))
+
+    nkic = kicselect['id_kic'].count()
+
+    for i, p in enumerate(pgrid):
+        smas = (kicselect['kic_smass'] * (p / 365.) ** 2) ** (1 / 3.)
+        a = (C.G * kicselect['kic_srad'] * C.Ms * ((p * (24 * 3600.)) / (2 * np.pi)) ** 2) ** (1 / 3.) * C.aupercm
+        R = kicselect['kic_srad'] * C.Rs * C.aupercm
+        durations = (p * 24. / np.pi) * np.arcsin(R / a)
+        aors = (smas / 0.00465047) / kicselect['kic_srad']
+
+        x = 1 / np.sqrt(durations)
+        cdpp_dur = kicselect['kic_cdpp_fit0'] + kicselect['kic_cdpp_fit1'] * x + kicselect['kic_cdpp_fit2'] * x ** 2
+
+        for j, r in enumerate(rgrid):
+            rors = (r * (C.Re / C.Rs)) / kicselect['kic_srad']
+
+            snr = (r * (C.Re / C.Rs) / kicselect['kic_smass']) ** 2 * (p / kicselect['kic_tobs']) ** -0.5 * (
+                        1 / (cdpp_dur * 1e-6))
+
+            tr = np.nanmedian((0.7 / aors))
+            sens = cksgaia.completeness.detection_prob(r, p, kicselect, nkic=nkic, step=True)
+            prob = sens * tr
+
+            prob_grid[i, j] = prob
+            sens_grid[i, j] = sens
+            tr_grid[i, j] = tr
+
+
+    prob_flat = prob_grid.transpose()
+    sens_flat = sens_grid.transpose()
+    tr_flat = tr_grid.transpose()
+
+    colors = ['0.25', '0.25', '0.25', '0.25', '0.25', '0.25']
+
+    CS = pl.contour(pgrid, rgrid, sens_flat, 10, levels=[0.0, percentile], colors=colors)
+    v = CS.collections[1].get_paths()[0].vertices
+    cx = v[:, 0]
+    cy = v[:, 1]
+
+    # level = 1.0/num_stars
+    # CS = pl.contour(pgrid, rgrid, prob_flat, 10, levels=[0.0, level], colors=colors)
+    # v = CS.collections[1].get_paths()[0].vertices
+    # cx = v[:, 0]
+    # cy = v[:, 1]
+
+    return cx, cy
+

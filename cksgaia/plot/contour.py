@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 
 import cksgaia.io
 import cksgaia.calc
+import cksgaia.completeness
 
 from cksgaia.config import *
 from cksgaia.plot.config import *
@@ -165,7 +166,8 @@ def period_contour_q16():
     pl.title('Q16')
 
 
-def period_contour_cks(sample=None, kwidth=(0.40, 0.05), vlims=(0.0, 0.05), ylimits=(1.0, 10.0)):
+def period_contour_cks(sample=None, kwidth=(0.40, 0.05), vlims=(0.0, 0.05),
+                       ylimits=(1.0, 10.0), clim=None):
     if sample is None:
         physmerge = cksgaia.io.load_table(cksgaia.plot.config.filtered_sample)
     else:
@@ -181,8 +183,19 @@ def period_contour_cks(sample=None, kwidth=(0.40, 0.05), vlims=(0.0, 0.05), ylim
     # pl.plot(wper, wsens, 'k-', color='0.6', linestyle='dashed', lw=3)
 
     # pl.xticks([0.6,0.8,1.0,1.2,1.5])
+    pl.yticks([1.0, 1.5, 2.4, 3.5])
     ax.xaxis.set_major_formatter(matplotlib.ticker.ScalarFormatter())
     ax.xaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('%.0f'))
+    ax.yaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('%.1f'))
+
+    if clim is not None:
+        cx, cy = clim
+    else:
+        cx, cy = np.loadtxt(os.path.join(DATADIR, 'sensitivity_p25.txt'), unpack=True)
+
+    pl.fill_between(cx, cy, y2=0.1, color='0.2', zorder=10, alpha=0.8, hatch='\\\\')
+    # pl.annotate('      low\ncompleteness', xy=(30, 1.03),
+    #             xycoords='data', color='0.2', fontsize=afs - 2)
 
     # for v in [1000, 300, 100, 30, 10]:
     #     xs = xi[:,0].flatten()
@@ -249,14 +262,17 @@ def insol_contour_anno():
     pl.xlim(pl.xlim()[::-1])
 
 
-def insol_contour_data(sample=None, vlims=None, kwidth=(0.4, 0.05)):
+def insol_contour_data(sample=None, vlims=None, kwidth=(0.4, 0.05), clims=None):
     if sample is None:
         physmerge = cksgaia.io.load_table(cksgaia.plot.config.filtered_sample)
     else:
         physmerge = sample
 
     # cx, cy = np.loadtxt('/Users/bfulton/code/cksrad/data/detectability_p1.txt', unpack=True)
-    cx, cy = np.loadtxt(os.path.join(modpath, 'data/sensitivity_p25.txt'), unpack=True)
+    if clims is None:
+        cx, cy = np.loadtxt(os.path.join(modpath, 'data/sensitivity_p25.txt'), unpack=True)
+    else:
+        cx, cy = clims
     # cx, cy = np.loadtxt('/Users/bfulton/code/cksrad/data/sensitivity_p50.txt', unpack=True)
     a = (physmerge['giso_smass'].max() * (cx / 365.) ** 2) ** (1 / 3.)
     sx = (physmerge['cks_steff'].max() / 5778) ** 4.0 * (physmerge['giso_srad'].max() / a) ** 2.0
@@ -264,7 +280,7 @@ def insol_contour_data(sample=None, vlims=None, kwidth=(0.4, 0.05)):
     cy = np.append(cy, 6)
 
     if vlims is None:
-        vlims = (0.0, 0.05)
+        vlims = (0.0, 0.035)
     else:
         vlims = vlims
 
@@ -273,8 +289,8 @@ def insol_contour_data(sample=None, vlims=None, kwidth=(0.4, 0.05)):
                                                           pltxlim=[10, 3000], pltylim=[1, 4], epos=[1800, 3.0],
                                                           weighted=True, vlims=vlims, kwidth=kwidth)
 
-    pl.fill_between(sx, cy, y2=0.1, color='0.5', zorder=10, alpha=0.5, hatch='\\\\')
-    pl.annotate('      low\ncompleteness', xy=(50, 1.03), xycoords='data', color='0.2', fontsize=afs - 2)
+    pl.fill_between(sx, cy, y2=0.1, color='0.2', zorder=10, alpha=0.8, hatch='\\\\')
+    # pl.annotate('      low\ncompleteness', xy=(50, 1.03), xycoords='data', color='0.2', fontsize=afs - 2)
 
     pl.xlabel('Stellar light intensity relative to Earth')
     pl.ylabel('Planet Size [Earth radii]')
@@ -307,6 +323,8 @@ def srad_contour():
 
 def contour_masscuts():
     physmerge = cksgaia.io.load_table(cksgaia.plot.config.filtered_sample)
+    kicselect = cksgaia.io.load_table('kic-filtered')
+    kicselect = cksgaia.completeness.fit_cdpp(kicselect)
 
     highcut, lowcut, _, _, _, annotations = cksgaia.plot.occur.get_mass_samples()
 
@@ -314,16 +332,32 @@ def contour_masscuts():
     medium = physmerge.query('giso_smass <= @highcut & giso_smass >= @lowcut')
     low = physmerge.query('giso_smass < @lowcut')
 
-    fig = pl.figure(figsize=(36, 8))
+    fig = pl.figure(1, figsize=(36, 8))
 
     pl.subplot(1, 3, 1)
 
     pl.subplots_adjust(left=0.05, right=0.95)
 
-    vlimits = [(0.0, 0.02), (0.0, 0.02), (0.0, 0.03)]
+    vlimits = [(0.0, 0.03), (0.0, 0.02), (0.0, 0.03)]
 
     for i, sample in enumerate([high, medium, low]):
+
         pl.subplot(1, 3, i+1)
+
+        if sample is high:
+            kicsample = kicselect.query('kic_smass > @highcut')
+        elif sample is medium:
+            kicsample = kicselect.query('kic_smass <= @highcut & kic_smass >= @lowcut')
+        elif sample is low:
+            kicsample = kicselect.query('kic_smass < @lowcut')
+
+        sample = cksgaia.completeness.get_weights(sample, kicsample)
+
+        # get 25% completeness limits
+        pl.figure(2)
+        cx, cy = cksgaia.completeness.get_sensitivity_contour(kicsample, 0.25)
+
+        pl.figure(1)
         insol_contour_data(sample=sample, vlims=vlimits[i], kwidth=(0.75, 0.05))
         pl.title(annotations[i], fontsize=afs + 6)
         pl.grid(lw=2, alpha=0.5)
@@ -331,6 +365,8 @@ def contour_masscuts():
 
 def period_contour_masscuts():
     physmerge = cksgaia.io.load_table(cksgaia.plot.config.filtered_sample)
+    kicselect = cksgaia.io.load_table('kic-filtered')
+    kicselect = cksgaia.completeness.fit_cdpp(kicselect)
 
     highcut, lowcut, _, _, _, annotations = cksgaia.plot.occur.get_mass_samples()
 
@@ -338,16 +374,33 @@ def period_contour_masscuts():
     medium = physmerge.query('giso_smass <= @highcut & giso_smass >= @lowcut')
     low = physmerge.query('giso_smass < @lowcut')
 
-    fig = pl.figure(figsize=(36, 8))
+    fig = pl.figure(1, figsize=(36, 8))
 
     pl.subplot(1, 3, 1)
-
     pl.subplots_adjust(left=0.05, right=0.95)
 
-    vlimits = [(0.0, 0.025), (0.0, 0.025), (0.0, 0.04)]
+    fig2 = pl.figure(2)
+
+    vlimits = [(0.0, 0.04), (0.0, 0.023), (0.0, 0.04)]
 
     for i, sample in enumerate([high, medium, low]):
+
+        if sample is high:
+            kicsample = kicselect.query('kic_smass > @highcut')
+        elif sample is medium:
+            kicsample = kicselect.query('kic_smass <= @highcut & kic_smass >= @lowcut')
+        elif sample is low:
+            kicsample = kicselect.query('kic_smass < @lowcut')
+
+        sample = cksgaia.completeness.get_weights(sample, kicsample)
+
+        # get 25% completeness limits
+        pl.figure(2)
+        cx, cy = cksgaia.completeness.get_sensitivity_contour(kicsample, 0.25)
+
+        pl.figure(1)
         pl.subplot(1, 3, i+1)
-        period_contour_cks(sample=sample, vlims=vlimits[i], kwidth=(0.75, 0.05), ylimits=(1.0, 4.0))
+        period_contour_cks(sample=sample, vlims=vlimits[i],
+                           kwidth=(0.75, 0.05), ylimits=(1.0, 4.0), clim=(cx, cy))
         pl.title(annotations[i], fontsize=afs + 6)
         pl.grid(lw=2, alpha=0.5)

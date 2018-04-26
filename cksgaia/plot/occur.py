@@ -596,3 +596,147 @@ def desert_edge_cum():
                 xycoords='axes fraction', fontsize=16)
 
 
+def rocky_cores():
+    physmerge = cksgaia.io.load_table(cksgaia.plot.config.filtered_sample).query('giso_prad > 1.0 & koi_period <= 10')
+
+    aloc = (0.1, 0.85)
+
+    figure = pl.figure(figsize=(10.1, 12))
+    nrow = 3
+    ncol = 1
+    plti = 1
+
+    xticks = [10000, 3000, 1000, 300, 100, 30, 10]
+
+    pl.subplot(nrow, ncol, plti)
+    pl.subplots_adjust(hspace=0, top=0.98, bottom=0.10, left=0.19)
+
+    highcut = np.percentile(physmerge['giso_smass'], 67)
+    lowcut = np.percentile(physmerge['giso_smass'], 33)
+
+    high = physmerge.query('giso_smass > @highcut')
+    medium = physmerge.query('giso_smass <= @highcut & giso_smass >= @lowcut')
+    low = physmerge.query('giso_smass < @lowcut')
+
+    # # lim = cy[np.argmin(np.abs(sx - 200))]
+    # lim = 1.14
+    # print lim
+
+    cut = high
+    N, edges = np.histogram(cut['giso_prad'].dropna().values, bins=insolbins, weights=cut['weight'])
+    Nd, edges = np.histogram(cut['giso_prad'].dropna().values, bins=insolbins)
+    centers = 0.5 * (edges[1:] + edges[:-1])
+    pl.step(centers, N / num_stars, lw=3, color='k', where='mid')
+    pl.annotate('$M_{\\star} > %3.2f M_{\odot}$' %highcut, xy=aloc, xycoords='axes fraction', fontsize=20,
+                horizontalalignment='left')
+
+    err = (np.sqrt(Nd) * (N / Nd)) / num_stars
+    err[np.isnan(err)] = 0
+    _, caps, _ = pl.errorbar(centers, N / num_stars, fmt='.', yerr=err, lw=2, capsize=6, color='k')
+    for cap in caps:
+        cap.set_markeredgewidth(2)
+
+    cksgaia.plot.config.logscale_rad()
+
+
+    ax = pl.gca()
+    ax.xaxis.set_major_formatter(matplotlib.ticker.ScalarFormatter())
+    ax.xaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('%0.0f'))
+    ax.xaxis.set_ticks(np.logspace(1, 4, 8))
+
+    yticks = ax.yaxis.get_major_ticks()
+    yticks[0].label1.set_visible(False)
+    for label in ax.yaxis.get_ticklabels()[1::2]:
+        label.set_visible(False)
+    for label in ax.xaxis.get_ticklabels():
+        label.set_visible(False)
+    pl.xticks(xticks)
+
+
+    pl.ylabel('')
+    #pl.ylim(0, 0.06)
+    pl.xlim(1.0, 4.0)
+    #pl.xticks([])
+    plti += 1
+
+    # lim = cy[np.argmin(np.abs(sx - 80))]
+    lim = 1.14
+    print lim
+    pl.subplot(nrow, ncol, plti)
+
+    cut = medium
+    N, edges = np.histogram(cut['giso_prad'].dropna().values, bins=insolbins, weights=cut['weight'])
+    Nd, edges = np.histogram(cut['giso_prad'].dropna().values, bins=insolbins)
+    centers = 0.5 * (edges[1:] + edges[:-1])
+    pl.step(centers, N / num_stars, lw=3, color='k', where='mid')
+    pl.annotate('$%3.2f M_{\odot} \leq M_{\\star} \leq %3.2f M_{\odot}$' % (highcut, lowcut), xy=aloc, xycoords='axes fraction', fontsize=20,
+                horizontalalignment='left')
+
+    err = (np.sqrt(Nd) * (N / Nd)) / num_stars
+    err[np.isnan(err)] = 0
+    _, caps, _ = pl.errorbar(centers, N / num_stars, fmt='.', yerr=err, lw=2, capsize=6, color='k')
+    for cap in caps:
+        cap.set_markeredgewidth(2)
+
+    pl.semilogx()
+
+    ax = pl.gca()
+    ax.xaxis.set_major_formatter(matplotlib.ticker.ScalarFormatter())
+    ax.xaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('%0.0f'))
+    ax.xaxis.set_ticks(np.logspace(1, 4, 8))
+
+    # yticks = ax.yaxis.get_major_ticks()
+    # yticks[0].label1.set_visible(False)
+    for label in ax.yaxis.get_ticklabels()[1::2]:
+        label.set_visible(False)
+    for label in ax.xaxis.get_ticklabels():
+        label.set_visible(False)
+    ax.yaxis.get_ticklabels()[0].set_visible(False)
+    ax.yaxis.get_ticklabels()[-1].set_visible(False)
+    pl.xticks(xticks)
+    pl.ylabel('')
+    #pl.ylim(0, 0.06)
+    pl.xlim(1.0, 4.0)
+    pl.xticks(xticks)
+    plti += 1
+
+    pl.ylabel('Number of Planets per Star')
+
+    lim = cy[-2]
+    lim = 1.14
+    # print lim
+    pl.subplot(nrow, ncol, plti)
+
+    cut = low
+    N, edges = np.histogram(cut['giso_prad'].dropna().values, bins=insolbins, weights=cut['weight'])
+    Nd, edges = np.histogram(cut['giso_prad'].dropna().values, bins=insolbins)
+    centers = 0.5 * (edges[1:] + edges[:-1])
+    pl.step(centers, N / num_stars, lw=3, color='k', where='mid')
+    pl.annotate('$M_{\star} < %3.2f M_{\odot}$' % lowcut, xy=aloc, xycoords='axes fraction', fontsize=20,
+                horizontalalignment='left')
+
+    err = (np.sqrt(Nd) * (N / Nd)) / num_stars
+    err[np.isnan(err)] = 0
+    _, caps, _ = pl.errorbar(centers, N / num_stars, fmt='.', yerr=err, lw=2, capsize=6, color='k')
+    for cap in caps:
+        cap.set_markeredgewidth(2)
+
+    pl.semilogx()
+
+    ax = pl.gca()
+    ax.xaxis.set_major_formatter(matplotlib.ticker.ScalarFormatter())
+    ax.xaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('%0.0f'))
+    ax.xaxis.set_ticks(np.logspace(1, 4, 8))
+
+    # yticks = ax.yaxis.get_major_ticks()
+    # yticks[0].label1.set_visible(False)
+    for label in ax.yaxis.get_ticklabels()[1::2]:
+        label.set_visible(False)
+    pl.xticks([])
+
+    pl.ylabel('')
+    #pl.ylim(0, 0.06)
+    pl.xlim(1.0, 4.0)
+    pl.xticks(xticks)
+
+    pl.xlabel('Planet Radius [R$_{\oplus}$')
