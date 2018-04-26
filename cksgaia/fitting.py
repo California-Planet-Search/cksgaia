@@ -484,8 +484,11 @@ def wkde2D(xvalues, yvalues, xerrors, yerrors, weights, xlim=None, ylim=None, ns
     for i, val in enumerate(xvalues):
         x = xvalues[i]
         y = yvalues[i]
-        xe = np.clip((0.434*xerrors[i]/x)**2, 2.5e-3, np.inf)
-        ye = np.clip((0.434*yerrors[i]/y)**2, 2.5e-3, np.inf)
+        # xe = np.clip((0.434*xerrors[i]/x)**2, 2.5e-5, np.inf)
+        # ye = np.clip((0.434*yerrors[i]/y)**2, 2.5e-5, np.inf)
+        xe = (0.434*xerrors[i]/x)**2
+        ye = (0.434*yerrors[i]/y)**2
+
         w = weights[i]
 
         #print x, xe, y, ye, w

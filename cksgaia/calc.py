@@ -136,3 +136,20 @@ def table_statistics():
 
     for k, v in d.iteritems():
         print r"{{{}}}{{{}}}".format(k, v)
+
+
+def kdeslice(x, xvalue, kde):
+    """
+    Return a slice through a KDE at the specificed x value.
+    :param x: array of x values corresponding to the columns in the KDE array
+    :param xvalue: x location to slice
+    :param kde: 2D KDE to be sliced
+    :return: 1d array of KDE values
+
+    """
+
+    pos = np.argmin(np.abs(x - xvalue))
+    print pos
+    sl = kde[pos,:].flatten()
+
+    return sl

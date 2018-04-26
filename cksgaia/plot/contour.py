@@ -4,6 +4,7 @@ import pylab as pl
 import matplotlib.pyplot as plt
 
 import cksgaia.io
+import cksgaia.calc
 
 from cksgaia.config import *
 from cksgaia.plot.config import *
@@ -12,7 +13,7 @@ matplotlib.rcParams['figure.figsize'] = (13, 8)
 
 def contour_plot_kde(physmerge, xcol, ycol, xlim, ylim, ylog=True, pltxlim=None, pltylim=None, epos=[3000, 5],
                      cont=True, nodata=False, weighted=False, nstars=36075., eaoff=(0, -70), clabel=None,
-                     vlims=(0.0, 0.05), errfloor=None):
+                     vlims=(0.0, 0.05), kwidth=None):
     """Plot contour plots
 
     Make the contour plots associated with Figures 8-10 in Fulton et al. (2017)
@@ -35,7 +36,7 @@ def contour_plot_kde(physmerge, xcol, ycol, xlim, ylim, ylog=True, pltxlim=None,
         eaoff (tuple): (optional) text offset for label of the typical uncertainty error bar (default = (0, -70))
         clabel (string): (optional) string to label color bar scale
         vlims (tuple): (optional) colorscale limits (default = (0.0, 0.05))
-        errfloor (tuple): (optional) minumum KDE kernal size in units of (x,y)
+        kwidth (tuple): (optional) kernel width in units of (x,y)
 
     Returns:
         tuple: (axes object, 10**(grid x values), 10**(grid y values), grid z values)
@@ -54,13 +55,12 @@ def contour_plot_kde(physmerge, xcol, ycol, xlim, ylim, ylog=True, pltxlim=None,
     else:
         weights = np.ones_like(crop[xcol].values)
 
-    if errfloor == None:
-        errfloor = (0, 0)
-
-    xerr1 = np.sqrt(crop[xcol + '_err1']**2 + errfloor[0]**2)
-    xerr2 = -np.sqrt(-crop[xcol + '_err2'] ** 2 + errfloor[0] ** 2)
-    yerr1 = np.sqrt(crop[ycol + '_err1'] ** 2 + errfloor[1] ** 2)
-    yerr2 = -np.sqrt(crop[ycol + '_err2'] ** 2 + errfloor[1] ** 2)
+    xerr1 = crop[xcol + '_err1'].values
+    yerr1 = crop[ycol + '_err1'].values
+    if kwidth != None:
+        print kwidth
+        xerr1 = np.zeros_like(xerr1) + kwidth[0] * crop[xcol].values
+        yerr1 = np.zeros_like(yerr1) + kwidth[1] * crop[ycol].values
 
     xi, yi, zi = cksgaia.fitting.wkde2D(crop[xcol].values, crop[ycol].values,
                                        xerr1, yerr1,
@@ -76,7 +76,7 @@ def contour_plot_kde(physmerge, xcol, ycol, xlim, ylim, ylog=True, pltxlim=None,
 
     vmin, vmax = vlims
     levels = np.arange(vmin, vmax + 0.0001, 0.005)
-    if len(levels) < 4:
+    if len(levels) <= 7:
         levels = np.linspace(vmin, vmax + 1e-4, 11)
 
     if cont:
@@ -165,15 +165,18 @@ def period_contour_q16():
     pl.title('Q16')
 
 
-def period_contour_cks():
-    physmerge = cksgaia.io.load_table(cksgaia.plot.config.filtered_sample)
+def period_contour_cks(sample=None, kwidth=(0.40, 0.05), vlims=(0.0, 0.05), ylimits=(1.0, 10.0)):
+    if sample is None:
+        physmerge = cksgaia.io.load_table(cksgaia.plot.config.filtered_sample)
+    else:
+        physmerge = sample
 
     wper, wsens = np.genfromtxt(os.path.join(modpath, 'data/detectability_p1.txt'), unpack=True)
 
     ax, xi, yi, zi = contour_plot_kde(physmerge, 'koi_period', 'giso_prad', xlim=[0.4, 1000.0],
                                                       ylim=[0.5, 20], ylog=True,
-                                                      pltxlim=[0.7, 100.0], pltylim=[1.0, 10], epos=[1.2, 8.0],
-                                                      weighted=True)
+                                                      pltxlim=[0.7, 100.0], pltylim=ylimits, epos=[1.2, 8.0],
+                                                      weighted=True, kwidth=kwidth, vlims=vlims)
 
     # pl.plot(wper, wsens, 'k-', color='0.6', linestyle='dashed', lw=3)
 
@@ -181,9 +184,18 @@ def period_contour_cks():
     ax.xaxis.set_major_formatter(matplotlib.ticker.ScalarFormatter())
     ax.xaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('%.0f'))
 
+    # for v in [1000, 300, 100, 30, 10]:
+    #     xs = xi[:,0].flatten()
+    #     print xs.shape
+    #     k = cksgaia.calc.kdeslice(xs, v, zi)
+    #
+    #     print k.shape
+    #     np.savetxt(os.path.join(DATADIR, 'kde_slices_{}.txt'.format(v)),
+    #                np.transpose((xi, k)))
+
     pl.xlabel('Orbital period [days]')
     pl.ylabel('Planet Size [Earth radii]')
-    pl.title('CKS')
+    # pl.title('CKS')
 
 
 def insol_contour_anno():
@@ -237,7 +249,7 @@ def insol_contour_anno():
     pl.xlim(pl.xlim()[::-1])
 
 
-def insol_contour_data(sample=None, vlims=None):
+def insol_contour_data(sample=None, vlims=None, kwidth=(0.4, 0.05)):
     if sample is None:
         physmerge = cksgaia.io.load_table(cksgaia.plot.config.filtered_sample)
     else:
@@ -252,14 +264,14 @@ def insol_contour_data(sample=None, vlims=None):
     cy = np.append(cy, 6)
 
     if vlims is None:
-        vlims = (0.0, 0.025)
+        vlims = (0.0, 0.05)
     else:
         vlims = vlims
 
     ax, xi, yi, zi_iso = contour_plot_kde(physmerge, 'giso_insol', 'giso_prad', xlim=[3, 30000],
                                                           ylim=[0.5, 20], ylog=True,
                                                           pltxlim=[10, 3000], pltylim=[1, 4], epos=[1800, 3.0],
-                                                          weighted=True, vlims=vlims)
+                                                          weighted=True, vlims=vlims, kwidth=kwidth)
 
     pl.fill_between(sx, cy, y2=0.1, color='0.5', zorder=10, alpha=0.5, hatch='\\\\')
     pl.annotate('      low\ncompleteness', xy=(50, 1.03), xycoords='data', color='0.2', fontsize=afs - 2)
@@ -308,7 +320,34 @@ def contour_masscuts():
 
     pl.subplots_adjust(left=0.05, right=0.95)
 
+    vlimits = [(0.0, 0.02), (0.0, 0.02), (0.0, 0.03)]
+
     for i, sample in enumerate([high, medium, low]):
         pl.subplot(1, 3, i+1)
-        insol_contour_data(sample=sample, vlims=(0, 0.025))
+        insol_contour_data(sample=sample, vlims=vlimits[i], kwidth=(0.75, 0.05))
         pl.title(annotations[i], fontsize=afs + 6)
+        pl.grid(lw=2, alpha=0.5)
+
+
+def period_contour_masscuts():
+    physmerge = cksgaia.io.load_table(cksgaia.plot.config.filtered_sample)
+
+    highcut, lowcut, _, _, _, annotations = cksgaia.plot.occur.get_mass_samples()
+
+    high = physmerge.query('giso_smass > @highcut')
+    medium = physmerge.query('giso_smass <= @highcut & giso_smass >= @lowcut')
+    low = physmerge.query('giso_smass < @lowcut')
+
+    fig = pl.figure(figsize=(36, 8))
+
+    pl.subplot(1, 3, 1)
+
+    pl.subplots_adjust(left=0.05, right=0.95)
+
+    vlimits = [(0.0, 0.025), (0.0, 0.025), (0.0, 0.04)]
+
+    for i, sample in enumerate([high, medium, low]):
+        pl.subplot(1, 3, i+1)
+        period_contour_cks(sample=sample, vlims=vlimits[i], kwidth=(0.75, 0.05), ylimits=(1.0, 4.0))
+        pl.title(annotations[i], fontsize=afs + 6)
+        pl.grid(lw=2, alpha=0.5)

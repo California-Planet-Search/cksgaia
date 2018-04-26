@@ -514,8 +514,8 @@ def apply_filters(physmerge, mkplot=False, verbose=False, textable=False):
     crop = crop[crop['giso_srad'] / crop['giso_srad_err1'] > 10]
     post = len(crop)
     if verbose:
-        print "Rp > 10 $\sigma$" % (pre - post)
-    plti = _bipanel(crop, nrow, ncol, plti, eloc=(12.0, 70), atxt='$Rp < 10 \sigma$')
+        print "R$_{\star}$ > 10 $\sigma$" % (pre - post)
+    plti = _bipanel(crop, nrow, ncol, plti, eloc=(12.0, 70), atxt='$R_{\star} < 10 \sigma$')
 
     pre = len(crop)
     crop = crop[~(crop['fur17_rcorr_avg'] > 1.05)]
@@ -543,11 +543,11 @@ def apply_filters(physmerge, mkplot=False, verbose=False, textable=False):
 
 
     pre = len(crop)
-    crop = crop[crop['koi_impact'] <= 0.7]
+    crop = crop[crop['koi_impact'] <= 0.9]
     post = len(crop)
     if verbose:
-        print "b < 0.7 filter removes %d planets." % (pre - post)
-    plti = _bipanel(crop, nrow, ncol, plti, eloc=(12.0, 60), atxt='$b < 0.7$')
+        print "b < 0.9 filter removes %d planets." % (pre - post)
+    plti = _bipanel(crop, nrow, ncol, plti, eloc=(12.0, 60), atxt='$b < 0.9$')
 
     # pre = len(crop)
     # crop = crop[crop['vshaped'] >= 0.3]
@@ -567,12 +567,12 @@ def apply_filters(physmerge, mkplot=False, verbose=False, textable=False):
     # if verbose:
     #     print "Rp_err < 12%% filter removes %d planets." % (pre-post)
 
-    pre = len(crop)
-    crop = crop[(crop['koi_period'] < 100)]  # & (crop['koi_period'] > 1)]
-    post = len(crop)
-    if verbose:
-        print "Period filter removes %d planets." % (pre - post)
-    plti = _bipanel(crop, nrow, ncol, plti, eloc=(12.0, 60), atxt='$P < 100$ d')
+    # pre = len(crop)
+    # crop = crop[(crop['koi_period'] < 100)]  # & (crop['koi_period'] > 1)]
+    # post = len(crop)
+    # if verbose:
+    #     print "Period filter removes %d planets." % (pre - post)
+    # plti = _bipanel(crop, nrow, ncol, plti, eloc=(12.0, 60), atxt='$P < 100$ d')
 
     pre = len(crop)
     crop = crop[crop['giso_srad'] <= 10 ** (ls * (crop['cks_steff'] - 5500) + li)]
