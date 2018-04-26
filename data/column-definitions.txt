@@ -138,7 +138,7 @@ gaia1_sparallax_err
 gaia1_gflux           Mean flux in Gaia bandpass [e-/s]
 gaia1_gflux_err       
 gaia1_gmag            Mean magnitude in Gaia bandpass [mag]
-# Gaia DR1 columns
+# Gaia DR2 columns
 gaia2_angdist         Distance between KIC position and Gaia position [arcsec]
 gaia2_ra              Right ascension [deg]
 gaia2_dec             Declination [deg]
