@@ -59,64 +59,6 @@ def comparison(key):
         _yt1 = [0.8,0.9,1.0,1.1,1.2]
         _xt0 = [0.5,1,2,3,5,10,20]
 
-    if key=='srad-j17':
-        df = cksgaia.io.load_table('j17').groupby('id_kic',as_index=False).nth(0)
-        df = df['id_kic iso_srad iso_srad_err1 iso_srad_err2'.split()]
-        df = cksgaia.io.sub_prefix(df, 'iso', ignore=['id'])
-        df = cksgaia.io.add_prefix(df, 'j17', ignore=['id'])
-        df1 = df
-
-        df2 = cksgaia.io.load_table('j17+m17+gaia2+iso+fur17').groupby('id_kic',as_index=False).nth(0)
-        df = pd.merge(df1,df2)
-        df = df.query('gaia2_gflux_ratio < 1.1 and giso_srad_err1/giso_srad < 0.1 and ~(fur17_rcorr_avg > 1.05)')
-
-        x1 = df.giso_srad
-        x2 = df.j17_srad
-        x3 = x2 / x1 
-        
-        x1err = np.vstack([-df.giso_srad_err2,df.giso_srad_err1]) 
-        x2err = np.vstack([-df.j17_srad_err2,df.j17_srad_err1])
-        x3err = x2err / np.array(df.giso_srad)
-        fig, axL = subplots_compare(
-            x1,x2,x3, x1err=x1err, x2err=x2err, x3err=x3err, **errorbar_kw
-        )
-        axL[0].set_xscale('log')
-        axL[0].set_yscale('log')
-        axL[1].set_xscale('log')    
-        axL[1].set_yscale('linear')
-        _ylabel0 = '$R_\star$ [CKS-II] (Solar-radii)'
-        _xlabel0 = '$R_\star$ [CKS+Gaia] (Solar-radii)'
-        _ylabel1 = 'CKS / S15'
-        _ylim1 = 0.7,1.3
-        _xlim0 = 0.4,12
-        _yt1 = [0.8,0.9,1.0,1.1,1.2]
-        _xt0 = [0.5,1,2,3,5,10,20]
-        import pdb;pdb.set_trace()
-
-
-    if key=='srad-s15':
-        df = cksgaia.io.load_table('cks+gaia2+s15')
-        df = df.query('gaia2_gflux_ratio < 1.1 and giso_srad_err1/giso_srad < 0.1')
-        x1 = df.s15_srad
-        x2 = df.giso_srad
-        x3 = x2 / x1 
-        x1err = np.vstack([-df.s15_srad_err2,df.s15_srad_err1]) 
-        x2err = np.vstack([-df.giso_srad_err2,df.giso_srad_err1])
-        x3err = x2err / np.array(df.giso_srad)
-        fig, axL = subplots_compare(
-            x1,x2,x3, x1err=x1err, x2err=x2err, x3err=x3err, **errorbar_kw
-        )
-        axL[0].set_xscale('log')
-        axL[0].set_yscale('log')
-        axL[1].set_xscale('log')    
-        axL[1].set_yscale('linear')
-        _ylabel0 = '$R_\star$ [CKS] (Solar-radii)'
-        _xlabel0 = '$R_\star$ [S15] (Solar-radii)'
-        _ylabel1 = 'CKS / S15'
-        _ylim1 = 0.7,1.3
-        _xlim0 = 0.4,12
-        _yt1 = [0.8,0.9,1.0,1.1,1.2]
-        _xt0 = [0.5,1,2,3,5,10,20]
 
     if key=='sage-s15':
         df = cksgaia.io.load_table('cks+gaia2+s15')
@@ -143,88 +85,157 @@ def comparison(key):
         axL[0].minorticks_off()
         axL[1].minorticks_off()
 
-    sca(axL[0])
-    setp(axL[0],ylabel=_ylabel0,xlim=_xlim0,ylim=_xlim0)
-    xticks(_xt0,_xt0)
-    yticks(_xt0,_xt0)
-    sca(axL[1])
-    setp(axL[1],ylabel=_ylabel1,xlabel=_xlabel0,ylim=_ylim1)
-    xticks(_xt0,_xt0)
-    yticks(_yt1,_yt1)
-   
-    one2one_kw = dict(linestyle='--',lw=1,color='g')
-    sca(axL[0])
-    xt = gca().get_xticklabels()
-    setp(xt,visible=False)
-    
-    one2one(**one2one_kw)
-    sca(axL[1])
-    axhline(1, **one2one_kw)
+
+class Comparison(object):
+    """ 
+    Code for generic comparisons (all parameters)
+    """
+    sns.set(style='ticks',rc={
+        'ytick.major.size':3.0,'xtick.major.size':3.0,
+        'xtick.direction': u'in','ytick.direction': u'in',}
+    )
+
+    def __init__(self):
+        pass
+
+    def _provision_figure(self):
+        self.fig = figure(figsize=figsize)
+        ax1 = subplot2grid((4,1), (0,0), rowspan=3)
+        ax2 = subplot2grid((4,1), (3,0), rowspan=1, sharex=ax1)
+        self.axL = [ax1,ax2]
+
+    def _label_figure(self):
+        sca(self.axL[0])
+        setp(self.axL[0],ylabel=self.ylabel0,xlim=self.xlim0,ylim=self.xlim0)
+        xticks(self.xt0,self.xt0)
+        yticks(self.xt0,self.xt0)
+        sca(self.axL[1])
+        setp(self.axL[1],ylabel=self.ylabel1,xlabel=self.xlabel0,ylim=self.ylim1)
+        xticks(self.xt0,self.xt0)
+        yticks(self.yt1,self.yt1)
+
+        one2one_kw = dict(linestyle='--',lw=1,color='g')
+        sca(self.axL[0])
+        xt = gca().get_xticklabels()
+        setp(xt,visible=False)
+
+        one2one(**one2one_kw)
+        sca(self.axL[1])
+        axhline(1, **one2one_kw)
+
+    def _subplots_compare(self, **errorbar_kw):
+        subplots_compare(
+            self.x1,self.x2,self.x3, self.fig, self.axL, 
+            x1err=self.x1err, x2err=self.x2err, x3err=self.x3err, 
+            **errorbar_kw
+        )
 
 
-def provision_figure():
-    fig = figure(figsize=figsize)
-    ax1 = subplot2grid((4,1), (0,0), rowspan=3)
-    ax2 = subplot2grid((4,1), (3,0), rowspan=1, sharex=ax1)
-    axL = [ax1,ax2]
-    return fig,axL 
+class ComparisonRadius(Comparison):
+    def __init__(self, key):
+        if key=='srad-h13':
+            df = cksgaia.io.load_table('cks+gaia2+h13')
+            df = df.query('gaia2_gflux_ratio < 1.1 and giso_srad_err1/giso_srad < 0.1')
+            x1 = df.h13_srad
+            x2 = df.giso_srad
+            x3 = x2 / x1 
+            x1err = np.vstack([df.h13_srad_err,df.h13_srad_err]) 
+            x2err = np.vstack([-df.giso_srad_err2,df.giso_srad_err1])
+            x3err = x2err / np.array(df.giso_srad)
+            xlabel0 = '$R_\star$ [H13] (Solar-radii)'
+            ylabel0 = '$R_\star$ [CKS+Gaia] (Solar-radii)'
 
-def subplots_compare(x1, x2, x3, xerr3=None, fig0=None, axL0=None, **kwargs):
-    if fig0 is None:
-        fig, axL = provision_figure()
-    else:
-        fig = fig0
-        axL = axL0
+        if key=='srad-s15':
+            df = cksgaia.io.load_table('cks+gaia2+s15')
+            df = df.query('gaia2_gflux_ratio < 1.1 and giso_srad_err1/giso_srad < 0.1')
+            x1 = df.s15_srad
+            x2 = df.giso_srad
+            x3 = x2 / x1 
+            x1err = np.vstack([-df.s15_srad_err2,df.s15_srad_err1]) 
+            x2err = np.vstack([-df.giso_srad_err2,df.giso_srad_err1])
+            x3err = x2err / np.array(df.giso_srad)
+            xlabel0 = '$R_\star$ [S15] (Solar-radii)'
+            ylabel0 = '$R_\star$ [CKS+Gaia] (Solar-radii)'
 
+        if key=='srad-j17':
+            df = cksgaia.io.load_table('j17').groupby('id_kic',as_index=False).nth(0)
+            df = df['id_kic iso_srad iso_srad_err1 iso_srad_err2'.split()]
+            df = cksgaia.io.sub_prefix(df, 'iso', ignore=['id'])
+            df = cksgaia.io.add_prefix(df, 'j17', ignore=['id'])
+            df1 = df
+
+            df2 = cksgaia.io.load_table('j17+m17+gaia2+iso+fur17')
+            df2 = df2.groupby('id_kic',as_index=False).nth(0)
+            df = pd.merge(df1,df2)
+            df = df.query('gaia2_gflux_ratio < 1.1 and giso_srad_err1/giso_srad < 0.1 and ~(fur17_rcorr_avg > 1.05)')
+            x1 = df.giso_srad
+            x2 = df.j17_srad
+            x3 = x2 / x1 
+            x1err = np.vstack([-df.giso_srad_err2,df.giso_srad_err1]) 
+            x2err = np.vstack([-df.j17_srad_err2,df.j17_srad_err1])
+            x3err = x2err / np.array(df.giso_srad)
+            xlabel0 = '$R_\star$ [CKS+Gaia] (Solar-radii)'
+            ylabel0 = '$R_\star$ [CKS-II] (Solar-radii)'
+
+        if key=='srad-gaia2':
+            df = cksgaia.io.load_table('j17+m17+gaia2+iso+fur17')
+            df = df.query('gaia2_gflux_ratio < 1.1 and giso_srad_err1/giso_srad < 0.1 and ~(fur17_rcorr_avg > 1.05)')
+            df = df.groupby('id_kic',as_index=False).nth(0)
+
+
+            x1 = df.giso_srad
+            x2 = df.gaia2_srad
+            x3 = x2 / x1 
+            x1err = np.vstack([-df.giso_srad_err2,df.giso_srad_err1]) 
+            x2err = np.vstack([-df.gaia2_srad_err2,df.gaia2_srad_err1])
+            x3err = x2err / np.array(df.giso_srad)
+            xlabel0 = '$R_\star$ [CKS+Gaia] (Solar-radii)'
+            ylabel0 = '$R_\star$ [GaiaDR2] (Solar-radii)'
+
+        self.ylim1 = 0.7,1.3
+        self.xlim0 = 0.4,12
+        self.yt1 = [0.8,0.9,1.0,1.1,1.2]
+        self.xt0 = [0.5,1,2,3,5,10,20]
+
+        if (key.count('h13') + key.count('s15')) > 0:
+            self.ylim1 = 0.85,1.15
+            self.xlim0 = 0.4,12
+            self.yt1 = [0.9,0.95,1.0,1.05,1.1]
+            self.xt0 = [0.5,1,2,3,5,10,20] 
+
+        self.x1 = x1
+        self.x2 = x2
+        self.x3 = x3 
+        self.x1err = x1err
+        self.x2err = x2err
+        self.x3err = x3err
+        self.ylabel0 = ylabel0
+        self.xlabel0 = xlabel0
+        self.ylabel1 = "Ratio $(y/x)$"
+
+    def plot_comparison(self):
+        self._provision_figure()
+        self._subplots_compare()
+        self.axL[0].set_xscale('log')
+        self.axL[0].set_yscale('log')
+        self.axL[1].set_xscale('log')    
+        self.axL[1].set_yscale('linear')
+        self._label_figure()
+       
+    def mean_string(self):
+        _mean  = self.x3.mean() 
+        if _mean > 1:
+            s = r"{:.1f}\% larger".format(100*(_mean-1.0))
+        else:
+            s = r"{:.1f}\% smaller".format(abs(100*(_mean-1.0)))
+        return s
+
+    def std_string(self):
+        s = r"{:.1f}\%".format(100*self.x3.std())
+        return s
+
+def subplots_compare(x1, x2, x3, fig, axL, x1err=None, x2err=None, x3err=None, **kwargs):
     fig.set_tight_layout(False)
-    fig.subplots_adjust(hspace=0.4,left=0.17,top=0.95,right=0.90)
-    sca(axL[0])
-    grid()
-    errorbar(x1,x2,**kwargs)
-    xl = xlim()
-    yl = ylim()
-    x12 = np.hstack([x1,x2])
-    x = np.linspace(min(x12)/100,max(x12)*100)
-    plot(x,x,zorder=1)
-    xlim(*xl)
-    ylim(*xl)
-
-    sca(axL[1])
-    grid() 
-    errorbar(x1,x3,**kwargs)
-    print "mean(x3) {}".format(np.mean(x3))
-    print "std(x3) {}".format(np.std(x3))
-    return fig,axL
-
-def add_anchored(*args,**kwargs):
-    ax = gca()
-    at = AnchoredText(*args,**kwargs)
-    ax.add_artist(at)
-
-def provision_figure():
-    fig = figure(figsize=figsize)
-    ax1 = subplot2grid((4,1), (0,0), rowspan=3)
-    ax2 = subplot2grid((4,1), (3,0), rowspan=1, sharex=ax1)
-    axL = [ax1,ax2]
-    return fig, axL 
-
-def one2one(**kwargs):
-    xl = xlim()
-    plot(xl,xl,**kwargs)
-
-figsize = (4,4.5)
-
-
-def subplots_compare(x1, x2, x3, x1err=None, x2err=None, x3err=None, fig0=None, axL0=None, **kwargs):
-    if fig0 is None:
-        fig, axL = provision_figure()
-    else:
-        fig = fig0
-        axL = axL0
-
-    fig.set_tight_layout(False)
-
-    #fig.subplots_adjust(hspace=0.4,left=0.17,top=0.95,right=0.90)
     fig.subplots_adjust(hspace=0.001,left=0.17,top=0.95,right=0.90,bottom=0.12)
     sca(axL[0])
     plot(x1, x2, 'o',markersize=5,color='k')
@@ -241,37 +252,14 @@ def subplots_compare(x1, x2, x3, x1err=None, x2err=None, x3err=None, fig0=None, 
     )
     return fig,axL
 
-def radius():
-    df = cksphys.io.load_table('cks+iso+huber')
-    x1 = df.huber_srad
-    x2 = df.iso_srad
-    x3 = x2 / x1 
+def add_anchored(*args,**kwargs):
+    ax = gca()
+    at = AnchoredText(*args,**kwargs)
+    ax.add_artist(at)
 
-    xerr = np.vstack([df.huber_srad_err,df.huber_srad_err])
-    yerr = np.vstack([df.iso_srad_err1,-df.iso_srad_err2])
-
-    fig, axL = provision_figure()
-    axL[0].set_xscale('log')
-    axL[0].set_yscale('log')
-    axL[1].set_xscale('log')    
-    axL[1].set_yscale('linear')
-
-
-    sca(axL[0])
-    grid()
-    errorbar(x1,x2)
+def one2one(**kwargs):
     xl = xlim()
-    yl = ylim()
-    x12 = np.hstack([x1,x2])
-    x = np.linspace(min(x12)/100,max(x12)*100)
-    plot(x,x,zorder=1)
-    xlim(*xl)
-    ylim(*xl)
+    plot(xl,xl,**kwargs)
 
-    sca(axL[1])
-    grid() 
-    errorbar(x1,x3,fmt='.')
-    print "mean(x3) {}".format(np.mean(x3))
-    print "std(x3) {}".format(np.std(x3))
-
+figsize = (4,4.5)
 

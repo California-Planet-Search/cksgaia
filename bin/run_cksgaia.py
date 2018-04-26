@@ -216,7 +216,8 @@ def update_paper(args):
     w.update_paper() 
 
 
-import cksgaia.plot.compare
+from cksgaia.plot.compare import ComparisonRadius as CR 
+
 class Workflow(object):
     def __init__(self, outputdir='./'):
         self.outputdir = outputdir
@@ -229,10 +230,12 @@ class Workflow(object):
         d['filters'] = cksgaia.plot.sample.filter_plot
         d['mag-hist'] = cksgaia.plot.sample.magcuts
         d['depth-hist'] = cksgaia.plot.sample.depth_hist
-        d['srad-h13'] = lambda : cksgaia.plot.compare.comparison('srad-h13')
-        d['srad-s15'] = lambda : cksgaia.plot.compare.comparison('srad-s15')
-        d['smass-h13'] = lambda : cksgaia.plot.compare.comparison('smass-h13')
-        d['sage-s15'] = lambda : cksgaia.plot.compare.comparison('sage-s15')
+        d['srad-h13'] = lambda : CR('srad-h13').plot_comparison()
+        d['srad-s15'] = lambda : CR('srad-s15').plot_comparison()
+        d['srad-j17'] = lambda : CR('srad-j17').plot_comparison()
+        d['srad-gaia2'] = lambda : CR('srad-gaia2').plot_comparison()
+        #d['smass-h13'] = lambda : CR('smass-h13').plot_comparison()
+        #d['sage-s15'] = lambda : CR('sage-s15').plot_comparison()
         d['srad-hist'] = cksgaia.plot.sample.srad_hist
         d['srad-err-hist'] = cksgaia.plot.sample.srad_err_hist
         d['prad-err-hist'] = cksgaia.plot.sample.prad_err_hist
@@ -327,17 +330,17 @@ class Workflow(object):
 
                 lines1 = [
                     "\\newcommand{\%s}[1]{%%" % key,
-                    "\IfEqCase{#1}{%",
+                    "\IfEqCase{#1}{",
                 ]
 
                 lines2 = [
-                    "}[\PackageError{tree}{Undefined option to tree: #1}{}]%",
-                    "}%"
+                    "}[XX]",
+                    "}"
                 ]
                 lines = lines1 + lines + lines2
 
                 with open(fn,'w') as f:
-                    f.writelines("\n".join(lines))
+                    f.writelines("%\n".join(lines))
 
             i+=1
 
