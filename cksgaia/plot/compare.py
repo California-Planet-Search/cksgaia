@@ -136,6 +136,7 @@ class ComparisonRadius(Comparison):
         if key=='srad-h13':
             df = cksgaia.io.load_table('cks+gaia2+h13')
             df = df.query('gaia2_gflux_ratio < 1.1 and giso_srad_err1/giso_srad < 0.1')
+            
             x1 = df.h13_srad
             x2 = df.giso_srad
             x3 = x2 / x1 
@@ -167,7 +168,9 @@ class ComparisonRadius(Comparison):
             df2 = cksgaia.io.load_table('j17+m17+gaia2+iso+fur17')
             df2 = df2.groupby('id_kic',as_index=False).nth(0)
             df = pd.merge(df1,df2)
-            df = df.query('gaia2_gflux_ratio < 1.1 and giso_srad_err1/giso_srad < 0.1 and ~(fur17_rcorr_avg > 1.05)')
+            df = df.query('gaia2_gflux_ratio < 1.1 and giso_srad_err1/giso_srad < 0.1 and ~(fur17_rcorr_avg > 1.05) and abs(gaia2_gmag - kic_kepmag) < 0.2')
+#            df = df.query('gaia2_gflux_ratio < 1.1 and giso_srad_err1/giso_srad < 0.1 and ~(fur17_rcorr_avg > 1.05)')
+
             x1 = df.giso_srad
             x2 = df.j17_srad
             x3 = x2 / x1 
@@ -192,6 +195,7 @@ class ComparisonRadius(Comparison):
             xlabel0 = '$R_\star$ [CKS+Gaia] (Solar-radii)'
             ylabel0 = '$R_\star$ [GaiaDR2] (Solar-radii)'
 
+        self.df = df
         self.ylim1 = 0.7,1.3
         self.xlim0 = 0.4,12
         self.yt1 = [0.8,0.9,1.0,1.1,1.2]

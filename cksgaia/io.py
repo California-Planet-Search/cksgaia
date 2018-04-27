@@ -100,54 +100,6 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
         m17 = load_table('m17')
         df = pd.merge(df, m17, on='id_kic')
 
-    elif table=='j17+m17+gaia1':
-        df = load_table('j17+m17')
-        gaia = cksgaia.io.load_table('xmatch-results')
-        stars = df[['id_kic']].drop_duplicates()
-        temp = cksgaia.xmatch.gaia1(stars,gaia,'id_kic')
-        df = pd.merge(df,temp)
-
-    # elif table=='j17+m17+gaia2':
-    #     import cksgaia.xmatch
-    #     df = load_table('j17+m17')
-    #     gaia = cksgaia.xmatch.read_xmatch_results('data/xmatch_cks_gaiadr2-result.csv','gaia2-archive')
-    #     stars = df[['id_kic']].drop_duplicates()
-    #     temp = cksgaia.xmatch.gaia1(stars,gaia,'id_kic')
-    #     df = pd.merge(df,temp)
-
-    elif table=='xmatch-results':
-        fn = os.path.join(DATADIR,'cks-xmatch-results.csv')
-        df = pd.read_csv(fn)
-        namemap = {
-            'angDist':'gaia1_angdist',
-            'ra_ep2000':'gaia1_ra', 
-            'dec_ep2000':'gaia1_dec',
-            'parallax':'gaia1_sparallax', 
-            'parallax_error':'gaia1_sparallax_err', 
-            'phot_g_mean_flux':'gaia1_gflux',
-            'phot_g_mean_flux_error':'gaia1_gflux_err',
-            'phot_g_mean_mag':'gaia1_gmag',
-            'source_id':'id_gaia',
-            'id_kic':'id_kic'
-        }
-        df = df.rename(columns=namemap)
-        df = df[namemap.values()]
-
-    elif table=='j17+m17+extinct':
-        df = load_table('j17+m17')
-        df['distance'] = np.array(1 / df.gaia2_sparallax * 1000) * u.pc
-        df['ra'] = df['m17_ra']
-        df['dec'] = df['m17_dec']
-        df = cksgaia.extinction.add_extinction(df,'bayestar2017')
-        df = df.drop('distance ra dec'.split(),axis=1)
-        
-
-    elif table == 'j17+m17-fakegaia':
-        df = load_table('j17+m17')
-        iso_err = df.gaia2_sparallax_err1 / 5
-        gaia_err = np.sqrt(iso_err**2 + 0.02**2) # 20uas error floor
-        df['gaia2_sparallax_err1'] = gaia_err
-        df['gaia2_sparallax_err2'] = -1.0 * gaia_err
 
     elif table == 'kic':
         fname = os.path.join(DATADIR, 'kic_q0_q17.hdf')
@@ -164,125 +116,6 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
         kicselect = kicselect.dropna(subset=['kic_smass']).reset_index()
 
         df = kicselect
-
-    elif table=='cks':
-        # Adding in the specmatch uncerts
-        df = pd.read_csv(CKS_CSVFN)
-        namemap = {
-            'name':'id_starname',
-            'id_koi':'id_koi',
-            'cks_steff_err':'cks_steff_err1',
-            'cks_slogg_err':'cks_slogg_err1',
-            'cks_smet_err':'cks_smet_err1',
-            'cks_svsini_err':'cks_svsini_err1',
-        }
-
-        df = df.rename(columns=namemap)
-        for k in 'steff slogg smet svsini'.split():
-            df['cks_'+k+'_err2'] = -1.0 * df['cks_'+k+'_err1']
-        df = order_columns(df)
-
-    elif table=='cks+kmag':
-        # Load up CKS sample and merge in kmag
-        cks = load_table('cks')
-        df = load_table('stellar17')
-        df = df['id_kic kic_kepmag kic_jmag kic_hmag kic_kmag'.split()]
-        df = pd.merge(cks, df, how='left', on='id_kic')
-        df = order_columns(df,verbose=False)
-
-    elif table=='cks+nea':
-        cks = load_table('cks+kmag')
-        nea = load_table('nea')
-        # Drop mags from nea table to prevent naming collisions
-        df = pd.merge(cks, nea, on='id_kic',)
-        df = order_columns(df,verbose=False)
-
-    elif table=='cks+nea+iso-floor':
-        if verbose:
-            print "Merging CKS and NEA tables"
-        cksnea = load_table('cks+nea')
-
-        if verbose:
-            print "Merging with ISO table"
-        iso = load_table('iso-floor')
-        df = pd.merge(cksnea,iso,on='id_starname')
-
-        if verbose:
-            print "Updating planet parameters"
-        df = cksgaia.calc.update_planet_parameters(df)
-        df = order_columns(df,verbose=False)
-
-    elif table=='cks+nea+iso':
-        if verbose:
-            print "Merging CKS and NEA tables"
-        cksnea = load_table('cks+nea')
-
-        if verbose:
-            print "Merging with ISO table"
-        iso = load_table('iso')
-        df = pd.merge(cksnea, iso, on='id_starname')
-
-        if verbose:
-            print "Updating planet parameters"
-        df = cksgaia.calc.update_planet_parameters(df)
-        df = order_columns(df,verbose=False)
-
-
-    elif table == 'nea':
-        csvfn = os.path.join(DATADIR, 'q1_q16_koi.csv')
-        df = pd.read_csv(csvfn, comment='#', skipinitialspace=True)
-        namemap = {
-            'kepid': 'id_kic',
-            'kepoi_name': 'id_koicand',
-            'kepler_name': 'id_kepler_name',
-        }
-
-        df = df.rename(columns=namemap)
-
-        # Get MES from cummulative table
-        cum = load_table('nea-cum')
-        cum = cum.rename(columns=namemap)
-        m = pd.merge(df, cum, on='id_koicand', suffixes=['', '_cum'])
-        df['koi_max_mult_ev'] = m['koi_max_mult_ev_cum']
-
-        # Get CKS dispositions
-        fn = os.path.join(DATADIR, 'tab_dispositions.csv')
-        disp = pd.read_csv(fn, index_col=None)
-        disp['cks_fp'] = disp['cks_disp'] == 'FP'
-        df = pd.merge(df, disp, on='id_koicand')
-        df['id_koi'] = df.id_koicand.str.slice(start=1, stop=6).astype(int)
-        df = order_columns(df, verbose=False)
-
-    elif table == 'nea-cum':
-        csvfn = os.path.join(DATADIR, 'cumulative_koi_20170215.csv')
-        df = pd.read_csv(csvfn, comment='#', skipinitialspace=True)
-        namemap = {
-            'kepid': 'id_kic',
-            'kepoi_name': 'id_koicand',
-            'kepler_name': 'id_kepler_name',
-        }
-        df = df.rename(columns=namemap)
-        df['id_koi'] = df.id_koicand.str.slice(start=1, stop=6).astype(int)
-        df = order_columns(df, verbose=False)
-
-    elif table == 'iso':
-        df = pd.read_csv(ISO_CSVFN, index_col=None, skipinitialspace=True)
-        df.index = df.id_starname
-        df = cksgaia.errors.add_frac_err(df)
-
-    elif table == 'iso-old':
-        df = pd.read_csv(os.path.join(DATADIR,'isochrones_old.csv'), index_col=None, skipinitialspace=True)
-        df.index = df.id_starname
-        df = cksgaia.errors.add_equad(df)
-        df = cksgaia.errors.add_frac_err(df)
-
-    elif table == 'iso-floor':
-        df = load_table('iso')
-        df = cksgaia.errors.add_equad(df)
-        df = cksgaia.errors.add_frac_err(df)
-
-    elif table == 'fakegaia-merged':
-        df = pd.read_csv(MERGED_TABLE, index_col=None, skipinitialspace=True)
 
     elif table=='cks+gaia2':
         print "WARNING: using fake Gaia data"
@@ -314,7 +147,6 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
             d['id_kic'] = line[1]
             d['teff'] = line[2].split('$\\pm$')[0]
             d['teff_err1'] = line[2].split('$\\pm$')[1]
-
 
             d['fe'] = line[3].split('$\\pm$')[0]
             d['fe_err1'] = line[3].split('$\\pm$')[1]
@@ -370,11 +202,9 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
     elif table=='furlan17-table2':
         tablefn = os.path.join(DATADIR,'furlan17/Table2.txt')
         df = pd.read_csv(tablefn,sep='\s+')
-        namemap = {
-            'KOI':'id_koi','KICID':'id_kic','Observatories':'ao_obs'
-        }
+        namemap = {'KOI':'id_koi','KICID':'id_kic','Observatories':'ao_obs'}
         df = df.rename(columns=namemap)[namemap.values()]
-        df['id_starname'] = ['K'+str(x).rjust(5, '0') for x in df.id_koi] # LMW convert id_koi to id_starname for merge with cks
+        df['id_starname'] = ['K'+str(x).rjust(5, '0') for x in df.id_koi] 
         df = add_prefix(df,'fur17_')
 
     elif table=='furlan17-table9':
@@ -386,9 +216,8 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
         """.split()
 
         df = pd.read_csv(tablefn,sep='\s+',skiprows=2,names=names)
-        df['id_starname'] = ['K'+str(x).rjust(5, '0') for x in df.id_koi] # LMW convert id_koi to id_starname for merge with cks
+        df['id_starname'] = ['K'+str(x).rjust(5, '0') for x in df.id_koi] 
         df = add_prefix(df,'fur17_')
-
 
     elif table=='fur17':
         tab2 = load_table('furlan17-table2')
@@ -406,7 +235,34 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
         df = pd.merge(df1,df2)
 
     elif table=='j17+m17+gaia2':
-        df = pd.read_csv(os.path.join(DATADIR, 'm17+j17+gaiadr2.csv'), index_col=0)
+        print "performing crossmatch on gaia2"
+        df = cksgaia.io.load_table('j17+m17')
+        fn = os.path.join(DATADIR, 'xmatch_cks_gaiadr2-result.csv')
+        gaia = cksgaia.xmatch.read_xmatch_gaia2(fn)
+        stars = df['id_kic kic_kepmag'.split()].drop_duplicates()
+        mbest,mfull = cksgaia.xmatch.xmatch_gaia2(stars,gaia,'id_kic','gaia2')
+        df = pd.merge(df,mbest.drop(['kic_kepmag'],axis=1),on='id_kic')
+
+
+    elif table=='m17+gaia2':
+        print "performing crossmatch on gaia2"
+        df = cksgaia.io.load_table('m17')
+        df = df.rename(columns={'m17_kepmag':'kic_kepmag'})
+        fn = os.path.join(DATADIR, 'xmatch_m17_gaiadr2-result.csv')
+        gaia = cksgaia.xmatch.read_xmatch_gaia2(fn)
+        stars = df['id_kic kic_kepmag'.split()].drop_duplicates()
+        mbest,mfull = cksgaia.xmatch.xmatch_gaia2(stars,gaia,'id_kic','gaia2')
+        df = pd.merge(df,mbest.drop(['kic_kepmag'],axis=1),on='id_kic')
+
+
+    elif table=='j17+m17+extinct':
+        df = load_table('j17+m17+gaia2')
+        df['distance'] = np.array(1 / df.gaia2_sparallax * 1000) * u.pc
+        df['ra'] = df['m17_ra']
+        df['dec'] = df['m17_dec']
+        df = cksgaia.extinction.add_extinction(df,'bayestar2017')
+        df = df.drop('distance ra dec'.split(),axis=1)
+
     elif table=='j17+m17+gaia2+iso':
         df1 = load_table('j17+m17+gaia2')
         for col in df1.columns:
@@ -416,7 +272,9 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
         df = pd.merge(df1, df2, on='id_starname')
 
     elif table=='j17+m17+gaia2+iso+fur17':
-        df = pd.merge(load_table('j17+m17+gaia2+iso'), load_table('fur17'),how='left')
+        df1 = load_table('j17+m17+gaia2+iso')
+        df2 = load_table('fur17')
+        df = pd.merge(df1,df2 ,how='left')
 
     elif table == "cksgaia-planets":
         df2 = load_table('j17+m17+gaia2+iso+fur17')
@@ -432,12 +290,7 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
         assert False, "table {} not valid table name".format(table)
     return df
 
-
-def load_mist():
-    model = ebf.read(os.path.join(DATADIR,'mesa.ebf'))
-    return model
-
-# General table manipulation helper functions
+# Table manipulation
 
 def add_prefix(df,prefix,ignore=['id']):
     namemap = {}
