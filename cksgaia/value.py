@@ -11,7 +11,7 @@ def val_stat(return_dict=False):
     cut = stars.query('kic_kepmag < 14.2')
     d['cks-mag-star-count'] = len(cut)
 
-    df = cksgaia.io.load_table('j17+m17+gaia2',cache=1)
+    df = cksgaia.io.load_table('m17+gaia2+j17',cache=1)
     stars = df.groupby('id_kic',as_index=False).nth(0)
     cut = stars.query('kic_kepmag < 14.2')
     d['cks-gaia-star-count'] = len(cut)
@@ -19,7 +19,7 @@ def val_stat(return_dict=False):
 
     d['cks-gaia-distmod-err-median'] = "{:.2f}".format(cut.eval('gaia2_sparallax_err / gaia2_sparallax').median())
 
-    df = cksgaia.io.load_table('j17+m17+extinct',cache=0)
+    df = cksgaia.io.load_table('m17+gaia2+j17+extinct',cache=0)
     df = df.query('kic_kepmag < 14.2')
     d['ak-median'] = "{:.03f}".format(df.ak.median())
     d['ak-median-err'] = "{:.03f}".format(df.ak_err.median())

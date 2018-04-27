@@ -1,5 +1,5 @@
 import pylab as pl
-
+import cksgaia.plot.sample
 
 def apply_filters(physmerge, mkplot=False, verbose=False, textable=False):
     # slope and intercept for subgiant filter
@@ -117,7 +117,7 @@ def apply_filters(physmerge, mkplot=False, verbose=False, textable=False):
     post = len(crop)
     if verbose:
         print "R$_{p}$ precision < 10%" % (pre - post)
-    plti = _bipanel(crop, nrow, ncol, plti, eloc=(12.0, 60), atxt='$Rp_{\rm err} < 10%$')
+    plti = _bipanel(crop, nrow, ncol, plti, eloc=(12.0, 60), atxt=r'$Rp_{\rm err} < 10%$')
 
 
     # pre = len(crop)
