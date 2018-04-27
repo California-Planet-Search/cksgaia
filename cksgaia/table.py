@@ -4,25 +4,32 @@ import cksgaia.io
 import cksgaia.fitting
 
 def weight_table(lines='all'):
-    physmerge = cksgaia.io.load_table('fulton17-weights')
-
-    cols = ['id_koicand', 'koi_period', 'iso_prad', 'koi_snr', 'det_prob', 'tr_prob', 'weight']
-
+    physmerge = cksgaia.io.load_table('cksgaia-planets-weights')
+    cols = [
+        'id_koicand', 'koi_period', 'iso_prad', 'koi_snr', 'det_prob', 
+        'tr_prob', 'weight'
+    ]
     if lines == 'all':
-        outstr = physmerge.to_latex(columns=cols, escape=False, header=False,
-                                    index=False, float_format='%4.2f')
+        outstr = physmerge.to_latex(
+            columns=cols, escape=False, header=False, index=False, 
+            float_format='%4.2f'
+        )
     else:
-        outstr = physmerge.iloc[0:int(lines)].to_latex(columns=cols, escape=False, header=False,
-                                                       index=False, float_format='%4.2f')
+        outstr = physmerge.iloc[0:int(lines)].to_latex(
+            columns=cols, escape=False, header=False, index=False, 
+            float_format='%4.2f'
+        )
 
     return outstr.split('\n')
 
 def weight_table_machine():
     physmerge = cksgaia.io.load_table('fulton17-weights')
 
-    full_cols = ['id_koicand', 'koi_period', 'koi_period_err1', 'koi_period_err2',
-                 'iso_prad', 'iso_prad_err1', 'iso_prad_err2',
-                 'koi_snr', 'det_prob', 'tr_prob', 'weight']
+    full_cols = [
+        'id_koicand', 'koi_period', 'koi_period_err1', 'koi_period_err2',
+        'iso_prad', 'iso_prad_err1', 'iso_prad_err2'
+        'koi_snr', 'det_prob', 'tr_prob', 'weight'
+    ]
 
     lines = []
     lines.append(", ".join(full_cols))
@@ -48,24 +55,20 @@ def bins_table():
 
 def filters_table():
     physmerge = cksgaia.io.load_table('fulton17')
-
     crop = cksgaia.io.apply_filters(physmerge, mkplot=True, textable=True)
-
     f = open('tmp.tex', 'r')
     lines = f.readlines()
     f.close()
-
     os.system('rm tmp.tex')
-
     lines = [l.replace('\n', '') for l in lines]
-
     return lines
 
 def planet_params_table(lines='all'):
     physmerge = cksgaia.io.load_table('j17')
-
-    cols = ['id_koicand', 'koi_period', 'koi_ror', 'iso_prad', 'iso_insol', 'iso_teq']#, 'tr_prob', 'weight']
-
+    cols = [
+        'id_koicand', 'koi_period', 'koi_ror', 'iso_prad', 'iso_insol', 
+        'iso_teq'
+    ]
     if lines == 'all':
         outstr = physmerge.to_latex(columns=cols, escape=False, header=False,
                                     index=False, float_format='%4.2f')
@@ -78,9 +81,11 @@ def planet_params_table(lines='all'):
 
 def stellar_params_table(lines='all'):
     physmerge = cksgaia.io.load_table('j17')
-
-    cols = ['id_koicand', 'id_tycho2', 'kic_kmag', 'cks_teff', 'iso_insol', 'iso_teq', 'iso_logg',
-            'iso_feh', 'iso_smass', 'iso_srad', 'iso_slogage', 'gaia2_sparallax']
+    cols = [
+        'id_koicand', 'id_tycho2', 'kic_kmag', 'cks_teff', 'iso_insol', 
+        'iso_teq', 'iso_logg','iso_feh', 'iso_smass', 'iso_srad', 
+        'iso_slogage', 'gaia2_sparallax'
+    ]
 
     if lines == 'all':
         outstr = physmerge.to_latex(columns=cols, escape=False, header=False,
@@ -88,6 +93,5 @@ def stellar_params_table(lines='all'):
     else:
         outstr = physmerge.iloc[0:int(lines)].to_latex(columns=cols, escape=False, header=False,
                                                        index=False, float_format='%4.2f')
-
     return outstr.split('\n')
 

@@ -1,4 +1,7 @@
 data/
+*.pdf
+*.ipynb
+*/*.hdf
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
