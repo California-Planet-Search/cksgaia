@@ -131,23 +131,6 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
 
         df = kicselect
 
-    elif table=='cks':
-        # Adding in the specmatch uncerts
-        df = pd.read_csv(CKS_CSVFN)
-        namemap = {
-            'name':'id_starname',
-            'id_koi':'id_koi',
-            'cks_steff_err':'cks_steff_err1',
-            'cks_slogg_err':'cks_slogg_err1',
-            'cks_smet_err':'cks_smet_err1',
-            'cks_svsini_err':'cks_svsini_err1',
-        }
-
-        df = df.rename(columns=namemap)
-        for k in 'steff slogg smet svsini'.split():
-            df['cks_'+k+'_err2'] = -1.0 * df['cks_'+k+'_err1']
-        df = order_columns(df)
-
     elif table=='cks+kmag':
         # Load up CKS sample and merge in kmag
         cks = load_table('cks')
