@@ -195,17 +195,6 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
         df['id_koi'] = df.id_koicand.str.slice(start=1, stop=6).astype(int)
         df = order_columns(df, verbose=False)
 
-    elif table == 'nea-cum':
-        csvfn = os.path.join(DATADIR, 'cumulative_koi_20170215.csv')
-        df = pd.read_csv(csvfn, comment='#', skipinitialspace=True)
-        namemap = {
-            'kepid': 'id_kic',
-            'kepoi_name': 'id_koicand',
-            'kepler_name': 'id_kepler_name',
-        }
-        df = df.rename(columns=namemap)
-        df['id_koi'] = df.id_koicand.str.slice(start=1, stop=6).astype(int)
-        df = order_columns(df, verbose=False)
 
     elif table == 'iso':
         df = pd.read_csv(ISO_CSVFN, index_col=None, skipinitialspace=True)
