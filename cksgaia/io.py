@@ -100,31 +100,6 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
         m17 = load_table('m17')
         df = pd.merge(df, m17, on='id_kic')
 
-    elif table=='j17+m17+gaia1':
-        df = load_table('j17+m17')
-        gaia = cksgaia.io.load_table('xmatch-results')
-        stars = df[['id_kic']].drop_duplicates()
-        temp = cksgaia.xmatch.gaia1(stars,gaia,'id_kic')
-        df = pd.merge(df,temp)
-
-    elif table=='xmatch-results':
-        fn = os.path.join(DATADIR,'cks-xmatch-results.csv')
-        df = pd.read_csv(fn)
-        namemap = {
-            'angDist':'gaia1_angdist',
-            'ra_ep2000':'gaia1_ra', 
-            'dec_ep2000':'gaia1_dec',
-            'parallax':'gaia1_sparallax', 
-            'parallax_error':'gaia1_sparallax_err', 
-            'phot_g_mean_flux':'gaia1_gflux',
-            'phot_g_mean_flux_error':'gaia1_gflux_err',
-            'phot_g_mean_mag':'gaia1_gmag',
-            'source_id':'id_gaia',
-            'id_kic':'id_kic'
-        }
-        df = df.rename(columns=namemap)
-        df = df[namemap.values()]
-
     elif table=='j17+m17+extinct':
         df = load_table('j17+m17')
         df['distance'] = np.array(1 / df.gaia2_sparallax * 1000) * u.pc
@@ -133,7 +108,6 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
         df = cksgaia.extinction.add_extinction(df,'bayestar2017')
         df = df.drop('distance ra dec'.split(),axis=1)
         
-
     elif table == 'j17+m17-fakegaia':
         df = load_table('j17+m17')
         iso_err = df.gaia2_sparallax_err1 / 5
