@@ -14,7 +14,7 @@ matplotlib.rcParams['figure.figsize'] = (13, 8)
 
 def contour_plot_kde(physmerge, xcol, ycol, xlim, ylim, ylog=True, pltxlim=None, pltylim=None, epos=[3000, 5],
                      cont=True, nodata=False, weighted=False, nstars=36075., eaoff=(0, -70), clabel=None,
-                     vlims=(0.0, 0.05), kwidth=None):
+                     vlims=(0.0, 0.05), kwidth=None, single=False):
     """Plot contour plots
 
     Make the contour plots associated with Figures 8-10 in Fulton et al. (2017)
@@ -67,6 +67,8 @@ def contour_plot_kde(physmerge, xcol, ycol, xlim, ylim, ylog=True, pltxlim=None,
                                        xerr1, yerr1,
                                        weights, xlim=xlim, ylim=ylim, nstars=nstars)
 
+    print nplanets, (crop['giso_prad_err1'] / crop['giso_prad']).median()
+
     # cmap = plt.cm.inferno_r
     # cmap = plt.cm.gray_r
     # cmap = plt.cm.bone_r
@@ -80,14 +82,21 @@ def contour_plot_kde(physmerge, xcol, ycol, xlim, ylim, ylog=True, pltxlim=None,
     if len(levels) <= 7:
         levels = np.linspace(vmin, vmax + 1e-4, 11)
 
-    if cont:
+    if single:
+        levels = [0, np.mean([vmin, vmax])]
+
+    if cont and not single:
         CS = plt.contourf(10 ** xi, 10 ** yi, zi, levels=levels, cmap=cmap, vmin=vmin, vmax=vmax)
+        for c in CS.collections:
+            c.set_edgecolor("face")
+    if single:
+        CS = plt.contour(10 ** xi, 10 ** yi, zi, levels=levels, cmap=cmap, vmin=vmin, vmax=vmax, lw=3)
         for c in CS.collections:
             c.set_edgecolor("face")
 
     # pl.plot(big_sdist, big_pdist, 'k.', color='0.3', ms=1.0)
     if not nodata:
-        pl.plot(crop[xcol], crop[ycol], 'ko', ms=6, markeredgewidth=1, markeredgecolor='w')
+        pl.plot(crop[xcol], crop[ycol], 'ko', ms=3, markeredgewidth=1, markeredgecolor='w')
 
     xe, ye = epos
     xerr1, xerr2 = cksgaia.misc.frac_err(physmerge, xe, xcol)
@@ -166,8 +175,8 @@ def period_contour_q16():
     pl.title('Q16')
 
 
-def period_contour_cks(sample=None, kwidth=(0.40, 0.05), vlims=(0.0, 0.05),
-                       ylimits=(1.0, 10.0), clim=None):
+def period_contour_cks(sample=None, kwidth=(0.20, 0.05), vlims=(0.0, 0.05),
+                       ylimits=(1.0, 10.0), clim=None, single=False, nodata=False):
     if sample is None:
         physmerge = cksgaia.io.load_table(cksgaia.plot.config.filtered_sample)
     else:
@@ -176,9 +185,10 @@ def period_contour_cks(sample=None, kwidth=(0.40, 0.05), vlims=(0.0, 0.05),
     wper, wsens = np.genfromtxt(os.path.join(modpath, 'data/detectability_p1.txt'), unpack=True)
 
     ax, xi, yi, zi = contour_plot_kde(physmerge, 'koi_period', 'giso_prad', xlim=[0.4, 1000.0],
-                                                      ylim=[0.5, 20], ylog=True,
-                                                      pltxlim=[0.7, 100.0], pltylim=ylimits, epos=[1.2, 8.0],
-                                                      weighted=True, kwidth=kwidth, vlims=vlims)
+                                      ylim=[0.5, 20], ylog=True,
+                                      pltxlim=[0.7, 100.0], pltylim=ylimits, epos=[1.2, 8.0],
+                                      weighted=True, kwidth=kwidth, vlims=vlims, single=single,
+                                      nodata=nodata)
 
     # pl.plot(wper, wsens, 'k-', color='0.6', linestyle='dashed', lw=3)
 
@@ -374,14 +384,15 @@ def period_contour_masscuts():
     medium = physmerge.query('giso_smass <= @highcut & giso_smass >= @lowcut')
     low = physmerge.query('giso_smass < @lowcut')
 
-    fig = pl.figure(1, figsize=(36, 8))
+    fig = pl.figure(1, figsize=(18, 4))
 
     pl.subplot(1, 3, 1)
     pl.subplots_adjust(left=0.05, right=0.95)
 
     fig2 = pl.figure(2)
 
-    vlimits = [(0.0, 0.04), (0.0, 0.023), (0.0, 0.04)]
+    vlimits = [(0.0, 0.025), (0.0, 0.015), (0.0, 0.025)]
+    hlines = [2.63, 2.46, 2.33]
 
     for i, sample in enumerate([high, medium, low]):
 
@@ -401,6 +412,7 @@ def period_contour_masscuts():
         pl.figure(1)
         pl.subplot(1, 3, i+1)
         period_contour_cks(sample=sample, vlims=vlimits[i],
-                           kwidth=(0.75, 0.05), ylimits=(1.0, 4.0), clim=(cx, cy))
-        pl.title(annotations[i], fontsize=afs + 6)
+                           kwidth=(0.40, 0.05), ylimits=(1.0, 4.0), clim=(cx, cy))
+        # pl.axhline(hlines[i], lw=3, color='r')
+        pl.title(annotations[i], fontsize=afs + 2)
         pl.grid(lw=2, alpha=0.5)
