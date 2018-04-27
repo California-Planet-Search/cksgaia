@@ -102,7 +102,6 @@ def read_xmatch_results(fn, mode):
     df = cksgaia.io.add_prefix(df, gaiadr+'_')
     return df
 
-
 def read_xmatch_gaia2(fn):
     df = pd.read_csv(fn)
     namemap = {
@@ -172,11 +171,11 @@ def xmatch_gaia(df, gaia, key, gaiadr):
 
 def xmatch_gaia2(df, gaia, key, gaiadr):
     """
-    Crossmatch the sources in Gaia 1
+    Crossmatch the sources in Gaia 2
 
     Args:
         df (pandas.DataFrame): Target catalog 
-        gaia (pandas.DataFrame): Gaia DR1 table
+        gaia (pandas.DataFrame): Gaia DR2 table
         key (str): key to join on
         gaiadr (str): {'gaiadr1','gaiadr2'}
     """
@@ -190,26 +189,29 @@ def xmatch_gaia2(df, gaia, key, gaiadr):
     m[id_gaia]= m[id_gaia].fillna('-99')
     m[id_gaia]= m[id_gaia].astype(np.int64)
     ndf = len(df)
-    print "max(gaia1_angdist) = {} (arcsec)".format(m[gaiadr+'_angdist'].max())
+    print "max(gaia_angdist) = {} (arcsec)".format(m[gaiadr+'_angdist'].max())
     print "{} gaia sources within 8 arcsec of {} target sources".format(
         len(m),ndf
     )
 
     # count the number of stars within 8 arcsec
-    m.index = m.id_gaia2
+    m.index = m.id_kic
     g = m.groupby('id_kic')
-    m['id_gaia2_best'] = False
     m[gaiadr+'_gflux_sum'] = g[gaiadr+'_gflux'].sum()
-    m['absdiff_gmag_kepmag'] = m['gaia2_gmag'] - m['kic_kepmag']
+    m['absdiff_gmag_kepmag'] = np.abs(m['gaia2_gmag'] - m['kic_kepmag'])
+    m['gaia2_n_8arcsec'] = g.size()
 
-    for id_kic, idx in g.groups.iteritems():
-        stars = m.loc[idx]
-        matchcand = stars.sort_values(by='absdiff_gmag_kepmag').query('gaia2_angdist < 1')
-        if len(matchcand)>0:
-            match = matchcand.iloc[0]
-            m.loc[match.id_gaia2,'id_gaia2_best'] = True
-            flux_sum = stars.gaia2_gflux.sum()
-            flux_ratio = flux_sum / match.gaia2_gflux
-            m.loc[match.id_gaia2,gaiadr+'_gflux_ratio'] = flux_ratio
+    # Match candidate
+    mbest = m.query('gaia2_angdist < 1 and abs(kic_kepmag - gaia2_gmag) < 0.5') # within 1 arcsec
+    mbest['gaia2_n_1arcsec'] = mbest.groupby('id_kic').size()
 
-    return m
+    print "{} gaia sources within 1 arcsec of {} target sources".format(
+        len(mbest),mbest.id_kic.drop_duplicates().count()
+    )
+
+    mbest = mbest.sort_values(by=['id_kic','absdiff_gmag_kepmag'])
+    g = mbest.groupby('id_kic',as_index=False)
+    mbest['gaia2_n_1arcsec'] = g.size()
+    mbest = g.nth(0) 
+    mbest['gaia2_gflux_ratio'] = mbest.eval('gaia2_gflux_sum / gaia2_gflux')
+    return mbest, m 
