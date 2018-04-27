@@ -131,13 +131,6 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
 
         df = kicselect
 
-    elif table=='cks+kmag':
-        # Load up CKS sample and merge in kmag
-        cks = load_table('cks')
-        df = load_table('stellar17')
-        df = df['id_kic kic_kepmag kic_jmag kic_hmag kic_kmag'.split()]
-        df = pd.merge(cks, df, how='left', on='id_kic')
-        df = order_columns(df,verbose=False)
 
     elif table=='cks+nea':
         cks = load_table('cks+kmag')
