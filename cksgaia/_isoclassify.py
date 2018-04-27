@@ -3,10 +3,13 @@ import numpy as np
 import pylab as pl
 import pandas as pd
 from matplotlib.pylab import * 
+import time
+
+import ebf
 
 import grid.classify_grid 
 
-import cksgaia.io import DATADIR
+from cksgaia.io import DATADIR
 import cksgaia.iso
 import cksgaia.extinction
 
@@ -52,11 +55,17 @@ class Pipeline(cksgaia.iso.Pipeline):
         edf['ra'] = [self.ra]
         edf['dec'] = [self.dec]
         edf['gaia2_sparallax'] = [self.parallax]
-        # edf = cksgaia.extinction.add_extinction(edf, 'bayestar2017')
+        for i in range(10):
+            try:
+                edf = cksgaia.extinction.add_extinction(edf, 'bayestar2017')
+                break
+            except:
+                time.sleep(2)
+            if i == 10:
+                print "WARNING: Extinction correction failed"
 
-        self.kmag_ext = self.kmag# + edf['ak'].values[0]
-        self.kmag_ext_err = np.sqrt(self.kmag_err**2)# +
-                                    #edf['ak_err'].values[0]**2)
+        self.kmag_ext = self.kmag + edf['ak'].values[0]
+        self.kmag_ext_err = np.sqrt(self.kmag_err**2 + edf['ak_err'].values[0]**2)
         print "Kmag_ext ", self.kmag_ext, self.kmag_ext_err
 
         x.addjhk([-99,-99, self.kmag_ext],[0,0,self.kmag_ext_err])
