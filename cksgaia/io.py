@@ -107,14 +107,6 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
         temp = cksgaia.xmatch.gaia1(stars,gaia,'id_kic')
         df = pd.merge(df,temp)
 
-    # elif table=='j17+m17+gaia2':
-    #     import cksgaia.xmatch
-    #     df = load_table('j17+m17')
-    #     gaia = cksgaia.xmatch.read_xmatch_results('data/xmatch_cks_gaiadr2-result.csv','gaia2-archive')
-    #     stars = df[['id_kic']].drop_duplicates()
-    #     temp = cksgaia.xmatch.gaia1(stars,gaia,'id_kic')
-    #     df = pd.merge(df,temp)
-
     elif table=='xmatch-results':
         fn = os.path.join(DATADIR,'cks-xmatch-results.csv')
         df = pd.read_csv(fn)
@@ -406,7 +398,24 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
         df = pd.merge(df1,df2)
 
     elif table=='j17+m17+gaia2':
-        df = pd.read_csv(os.path.join(DATADIR, 'm17+j17+gaiadr2.csv'), index_col=0)
+        print "performing crossmatch on gaia2"
+        df = cksgaia.io.load_table('j17+m17')
+        fn = os.path.join(DATADIR, 'xmatch_cks_gaiadr2-result.csv')
+        gaia = cksgaia.xmatch.read_xmatch_gaia2(fn)
+        stars = df['id_kic kic_kepmag'.split()].drop_duplicates()
+        mbest,mfull = cksgaia.xmatch.xmatch_gaia2(stars,gaia,'id_kic','gaia2')
+        df = pd.merge(df,mbest.drop(['kic_kepmag'],axis=1),on='id_kic')
+
+    elif table=='m17+gaia2':
+        print "performing crossmatch on gaia2"
+        df = cksgaia.io.load_table('m17')
+        df = df.rename(columns={'m17_kepmag':'kic_kepmag'})
+        fn = os.path.join(DATADIR, 'xmatch_m17_gaiadr2-result.csv')
+        gaia = cksgaia.xmatch.read_xmatch_gaia2(fn)
+        stars = df['id_kic kic_kepmag'.split()].drop_duplicates()
+        mbest,mfull = cksgaia.xmatch.xmatch_gaia2(stars,gaia,'id_kic','gaia2')
+        df = pd.merge(df,mbest.drop(['kic_kepmag'],axis=1),on='id_kic')
+
     elif table=='j17+m17+gaia2+iso':
         df1 = load_table('j17+m17+gaia2')
         for col in df1.columns:
