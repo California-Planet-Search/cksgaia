@@ -4,21 +4,21 @@ import numpy as np
 
 def val_stat(return_dict=False):
     d = OrderedDict()
-    df = cksgaia.io.load_table('j17+m17+gaia2',cache=1)
-    stars = df.groupby('id_kic',as_index=False).first()
+
+    df = cksgaia.io.load_table('j17',cache=1)
+    stars = df.groupby('id_kic',as_index=False).nth(0)
     d['cks-star-count'] = len(stars)
     cut = stars.query('kic_kepmag < 14.2')
     d['cks-mag-star-count'] = len(cut)
 
-    '''
-    cut = stars.query('kic_kepmag < 14.2 & gaia2_angdist < 1 ')
+    df = cksgaia.io.load_table('j17+m17+gaia2',cache=1)
+    stars = df.groupby('id_kic',as_index=False).nth(0)
+    cut = stars.query('kic_kepmag < 14.2')
     d['cks-gaia-star-count'] = len(cut)
-    
-    cut = stars.query('kic_kepmag < 14.2 & gaia2_angdist < 1 & gaia1_angdist_n1 < 1')
-    d['cks-gaia-binary-count'] = len(cut.id_kic.drop_duplicates())
-    '''
+    d['cks-gaia-sparallax-ferr-median'] = "{:.1f}".format(cut.eval('gaia2_sparallax_err / gaia2_sparallax').median() * 100)
 
-    '''
+    d['cks-gaia-distmod-err-median'] = "{:.2f}".format(cut.eval('gaia2_sparallax_err / gaia2_sparallax').median())
+
     df = cksgaia.io.load_table('j17+m17+extinct',cache=0)
     df = df.query('kic_kepmag < 14.2')
     d['ak-median'] = "{:.03f}".format(df.ak.median())
@@ -26,19 +26,18 @@ def val_stat(return_dict=False):
     d['ebv-median'] = "{:.03f}".format(df.ebv.median())
     d['ebv-median-err'] = "{:.03f}".format(df.ebv_err.median())
     d['mk-err-median'] = "{:.03f}".format(df.m17_kmag_err.median())
-
-
+    
     # Properties of cks+gaia2 table
-    df = cksgaia.io.load_table('fakegaia-merged',cache=1)
+    df = cksgaia.io.load_table('cksgaia-planets',cache=1)
     cut = df.query('kic_kepmag < 14.2')
     ferr= cut.eval('0.5*(koi_ror_err1 - koi_ror_err2) / koi_ror')
     d['ror-ferr-median'] = "{:.1f}".format(100*np.nanmedian(ferr))
-    ferr = cut.eval('0.5*(iso_srad_err1 - iso_srad_err2) / iso_srad')
+    ferr = cut.eval('0.5*(giso_srad_err1 - giso_srad_err2) / giso_srad')
     d['srad-ferr-median'] = "{:.1f}".format(100*np.nanmedian(ferr))
-    ferr= cut.eval('0.5*(iso_prad_err1 - iso_prad_err2) / iso_prad')
+    ferr= cut.eval('0.5*(giso_prad_err1 - giso_prad_err2) / giso_prad')
     d['prad-ferr-median'] = "{:.1f}".format(100*np.nanmedian(ferr))
 
-    '''
+
     # Comparison with Silva15
     comp = cksgaia.plot.compare.ComparisonRadius('srad-s15')
     d['cks-s15-count'] = comp.x3.count()

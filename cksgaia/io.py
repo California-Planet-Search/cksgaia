@@ -100,6 +100,7 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
         m17 = load_table('m17')
         df = pd.merge(df, m17, on='id_kic')
 
+
     elif table == 'kic':
         fname = os.path.join(DATADIR, 'kic_q0_q17.hdf')
         kic = pd.read_hdf(fname)
@@ -242,6 +243,7 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
         mbest,mfull = cksgaia.xmatch.xmatch_gaia2(stars,gaia,'id_kic','gaia2')
         df = pd.merge(df,mbest.drop(['kic_kepmag'],axis=1),on='id_kic')
 
+
     elif table=='m17+gaia2':
         print "performing crossmatch on gaia2"
         df = cksgaia.io.load_table('m17')
@@ -251,6 +253,15 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
         stars = df['id_kic kic_kepmag'.split()].drop_duplicates()
         mbest,mfull = cksgaia.xmatch.xmatch_gaia2(stars,gaia,'id_kic','gaia2')
         df = pd.merge(df,mbest.drop(['kic_kepmag'],axis=1),on='id_kic')
+
+
+    elif table=='j17+m17+extinct':
+        df = load_table('j17+m17+gaia2')
+        df['distance'] = np.array(1 / df.gaia2_sparallax * 1000) * u.pc
+        df['ra'] = df['m17_ra']
+        df['dec'] = df['m17_dec']
+        df = cksgaia.extinction.add_extinction(df,'bayestar2017')
+        df = df.drop('distance ra dec'.split(),axis=1)
 
     elif table=='j17+m17+gaia2+iso':
         df1 = load_table('j17+m17+gaia2')
