@@ -131,6 +131,30 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
 
         df = kicselect
 
+    elif table=='cks':
+        # Adding in the specmatch uncerts
+        df = pd.read_csv(CKS_CSVFN)
+        namemap = {
+            'name':'id_starname',
+            'id_koi':'id_koi',
+            'cks_steff_err':'cks_steff_err1',
+            'cks_slogg_err':'cks_slogg_err1',
+            'cks_smet_err':'cks_smet_err1',
+            'cks_svsini_err':'cks_svsini_err1',
+        }
+
+        df = df.rename(columns=namemap)
+        for k in 'steff slogg smet svsini'.split():
+            df['cks_'+k+'_err2'] = -1.0 * df['cks_'+k+'_err1']
+        df = order_columns(df)
+
+    elif table=='cks+kmag':
+        # Load up CKS sample and merge in kmag
+        cks = load_table('cks')
+        df = load_table('stellar17')
+        df = df['id_kic kic_kepmag kic_jmag kic_hmag kic_kmag'.split()]
+        df = pd.merge(cks, df, how='left', on='id_kic')
+        df = order_columns(df,verbose=False)
 
     elif table=='cks+nea':
         cks = load_table('cks+kmag')
@@ -195,6 +219,17 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
         df['id_koi'] = df.id_koicand.str.slice(start=1, stop=6).astype(int)
         df = order_columns(df, verbose=False)
 
+    elif table == 'nea-cum':
+        csvfn = os.path.join(DATADIR, 'cumulative_koi_20170215.csv')
+        df = pd.read_csv(csvfn, comment='#', skipinitialspace=True)
+        namemap = {
+            'kepid': 'id_kic',
+            'kepoi_name': 'id_koicand',
+            'kepler_name': 'id_kepler_name',
+        }
+        df = df.rename(columns=namemap)
+        df['id_koi'] = df.id_koicand.str.slice(start=1, stop=6).astype(int)
+        df = order_columns(df, verbose=False)
 
     elif table == 'iso':
         df = pd.read_csv(ISO_CSVFN, index_col=None, skipinitialspace=True)
