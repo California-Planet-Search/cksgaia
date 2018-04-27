@@ -162,7 +162,7 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
         df2 = load_table('silva15')
         df = pd.merge(df1,df2)
 
-    elif table=='m17+gaia2+j17+extinct':
+    elif table=='m17+gaia2+j17+ext':
         df = load_table('m17+gaia2+j17')
         df['distance'] = np.array(1 / df.gaia2_sparallax * 1000) * u.pc
         df['ra'] = df['m17_ra']

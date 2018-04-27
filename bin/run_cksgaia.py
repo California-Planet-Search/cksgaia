@@ -122,8 +122,7 @@ def create_iso_jobs(args):
     if args.sample=='cks':
         df = cksgaia.io.load_table('j17+m17')
     elif args.sample == 'cks+gaia2':
-        df = cksgaia.io.load_table('j17+m17+gaia2')\
-            .groupby('id_kic').first()
+        df = cksgaia.io.load_table('m17+gaia2+j17').groupby('id_kic').nth(0)
     else:
         print("Invalid sample: {}".format(args.sample))
 
@@ -256,8 +255,10 @@ class Workflow(object):
 
         self.plot_dict = d
 
-        d = OrderedDict()
         # register different tables here
+        d = OrderedDict()
+        d['star-planet'] = lambda : cksgaia.table.star_planet()
+        #d['star-planet-stub'] = lambda : cksgaia.table.star_planet()
         d['weight-tex-stub'] = lambda : cksgaia.table.weight_table(lines=10)
         d['weight-tex-full'] = lambda: cksgaia.table.weight_table(lines='all')
         d['histbins'] = lambda: cksgaia.table.bins_table()
