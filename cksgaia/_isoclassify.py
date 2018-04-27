@@ -6,9 +6,13 @@ from matplotlib.pylab import *
 
 import grid.classify_grid 
 
-import cksgaia.io
+import cksgaia.io import DATADIR
 import cksgaia.iso
 import cksgaia.extinction
+
+def load_mist():
+    model = ebf.read(os.path.join(DATADIR,'mesa.ebf'))
+    return model
 
 class Pipeline(cksgaia.iso.Pipeline):
     def run(self, dmodel=None):
@@ -22,7 +26,7 @@ class Pipeline(cksgaia.iso.Pipeline):
         print "par", self.parallax, self.parallax_err
         print "dist", 1/self.parallax, 1/self.parallax - 1/(self.parallax + self.parallax_err)
 
-        model = cksgaia.io.load_mist()
+        model = load_mist()
         # prelims to manipulate some model variables (to be automated soon ...)
         model['rho']=np.log10(model['rho'])
         # next line turns off Dnu scaling relation corrections
@@ -97,10 +101,7 @@ class Pipeline(cksgaia.iso.Pipeline):
         outdf['iso_sparallax'] = self.parallax
         outdf['iso_sparallax_err1'] = self.parallax_err
         outdf['iso_sparallax_err2'] = -self.parallax_err
-
-
         outdf = pd.Series(outdf)
-        
         outdf.to_csv(self.csvfn)
         
 def _csv_reader(f):

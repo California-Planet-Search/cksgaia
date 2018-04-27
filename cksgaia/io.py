@@ -147,7 +147,6 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
             d['teff'] = line[2].split('$\\pm$')[0]
             d['teff_err1'] = line[2].split('$\\pm$')[1]
 
-
             d['fe'] = line[3].split('$\\pm$')[0]
             d['fe_err1'] = line[3].split('$\\pm$')[1]
  
@@ -202,11 +201,9 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
     elif table=='furlan17-table2':
         tablefn = os.path.join(DATADIR,'furlan17/Table2.txt')
         df = pd.read_csv(tablefn,sep='\s+')
-        namemap = {
-            'KOI':'id_koi','KICID':'id_kic','Observatories':'ao_obs'
-        }
+        namemap = {'KOI':'id_koi','KICID':'id_kic','Observatories':'ao_obs'}
         df = df.rename(columns=namemap)[namemap.values()]
-        df['id_starname'] = ['K'+str(x).rjust(5, '0') for x in df.id_koi] # LMW convert id_koi to id_starname for merge with cks
+        df['id_starname'] = ['K'+str(x).rjust(5, '0') for x in df.id_koi] 
         df = add_prefix(df,'fur17_')
 
     elif table=='furlan17-table9':
@@ -218,9 +215,8 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
         """.split()
 
         df = pd.read_csv(tablefn,sep='\s+',skiprows=2,names=names)
-        df['id_starname'] = ['K'+str(x).rjust(5, '0') for x in df.id_koi] # LMW convert id_koi to id_starname for merge with cks
+        df['id_starname'] = ['K'+str(x).rjust(5, '0') for x in df.id_koi] 
         df = add_prefix(df,'fur17_')
-
 
     elif table=='fur17':
         tab2 = load_table('furlan17-table2')
@@ -265,7 +261,9 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
         df = pd.merge(df1, df2, on='id_starname')
 
     elif table=='j17+m17+gaia2+iso+fur17':
-        df = pd.merge(load_table('j17+m17+gaia2+iso'), load_table('fur17'),how='left')
+        df1 = load_table('j17+m17+gaia2+iso')
+        df2 = load_table('fur17')
+        df = pd.merge(df1,df2 ,how='left')
 
     elif table == "cksgaia-planets":
         df2 = load_table('j17+m17+gaia2+iso+fur17')
@@ -281,12 +279,7 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
         assert False, "table {} not valid table name".format(table)
     return df
 
-
-def load_mist():
-    model = ebf.read(os.path.join(DATADIR,'mesa.ebf'))
-    return model
-
-# General table manipulation helper functions
+# Table manipulation
 
 def add_prefix(df,prefix,ignore=['id']):
     namemap = {}
