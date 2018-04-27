@@ -122,8 +122,7 @@ def create_iso_jobs(args):
     if args.sample=='cks':
         df = cksgaia.io.load_table('j17+m17')
     elif args.sample == 'cks+gaia2':
-        df = cksgaia.io.load_table('j17+m17+gaia2')\
-            .groupby('id_kic').first()
+        df = cksgaia.io.load_table('m17+gaia2+j17').groupby('id_kic').nth(0)
     else:
         print("Invalid sample: {}".format(args.sample))
 

@@ -12,7 +12,7 @@ class Pipeline(object):
         self.id_starname = id_starname
         self.outdir = outdir
 
-        df = cksgaia.io.load_table('m17+gaia2+j17', cache=0)
+        df = cksgaia.io.load_table('m17+gaia2+j17+ext', cache=1)
         g = df.groupby('id_starname',as_index=True)
         df = g.nth(0)
         star = df.ix[id_starname]
@@ -30,6 +30,8 @@ class Pipeline(object):
         self.parallax_err = star['gaia2_sparallax_err'] / 1e3
         self.ra = star.m17_ra
         self.dec = star.m17_dec
+        self.ak = star.ext_ak
+        self.ak_err = star.ext_ak_err
 
         self.pngfn = os.path.join(outdir,'isochrones.png')
         self.csvfn = os.path.join(outdir,'isochrones.csv')
