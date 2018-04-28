@@ -566,17 +566,17 @@ def desert_edge_cum():
 
         pl.semilogx()
 
-        pl.xlim(3000, 10)
+        pl.xlim(3000, 30)
         pl.ylim(0, 1)
 
         ax = pl.gca()
         ax.xaxis.set_major_formatter(matplotlib.ticker.ScalarFormatter())
         ax.xaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('%0.0f'))
-        ax.xaxis.set_ticks([10, 30, 100, 300, 1000, 3000])
+        ax.xaxis.set_ticks([30, 100, 300, 1000, 3000])
 
         pl.xlabel('Stellar light intensity relative to Earth (S)')
         # pl.ylabel('cumulative fraction of planet detections')
-        pl.ylabel('Fraction of planets with 10 < S$_{\inc}$ < 3000 S$_{\inc}$')
+        pl.ylabel(r'Fraction of planets with S$_{\rm inc} < S$')
 
     highcut, lowcut, high, medium, low, annotations = get_mass_samples()
 
@@ -585,7 +585,7 @@ def desert_edge_cum():
     fig = pl.figure(figsize=(12, 8))
     handles = []
     for i, sample in enumerate([high, medium, low]):
-        sample = sample.query('giso_prad > 1.7 & giso_prad < 4 & giso_insol > 10')
+        sample = sample.query('giso_prad > 1.7 & giso_prad < 4 & giso_insol > 30 & giso_insol < 3000')
 
         _cumdist(sample, color=colors[i])
         handles.append(mlines.Line2D([], [], color=colors[i], lw=3,
@@ -594,6 +594,8 @@ def desert_edge_cum():
     pl.legend(handles=handles, fontsize=14, loc='best')
 
     pl.annotate('$1.7 < R_p < 4 R_{\oplus}$', xy=(0.03, 0.75),
+                xycoords='axes fraction', fontsize=16)
+    pl.annotate(r'$30 < S_{\rm inc} < 3000 S_{\oplus}$', xy=(0.03, 0.70),
                 xycoords='axes fraction', fontsize=16)
 
 
