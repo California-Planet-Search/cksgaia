@@ -13,6 +13,7 @@ afs = 12  # font size for annotations
 full_sample = 'cksgaia-planets'
 filtered_sample = 'cksgaia-planets-weights'
 
+
 modpath = '/'.join(os.path.dirname(cksgaia.__file__).split('/')[:-1])
 
 print("Making plots with the {} table for the full sample and {} table for the filtered sample."

@@ -10,10 +10,10 @@ import cksgaia.completeness
 from cksgaia.config import *
 from cksgaia.plot.config import *
 
-matplotlib.rcParams['figure.figsize'] = (13, 8)
+matplotlib.rcParams['figure.figsize'] = (6, 4)
 
 def contour_plot_kde(physmerge, xcol, ycol, xlim, ylim, ylog=True, pltxlim=None, pltylim=None, epos=[3000, 5],
-                     cont=True, nodata=False, weighted=False, nstars=36075., eaoff=(0, -70), clabel=None,
+                     cont=True, nodata=False, weighted=False, nstars=36075., eaoff=(0, -30), clabel=None,
                      vlims=(0.0, 0.05), kwidth=None, single=False):
     """Plot contour plots
 
@@ -96,19 +96,19 @@ def contour_plot_kde(physmerge, xcol, ycol, xlim, ylim, ylog=True, pltxlim=None,
 
     # pl.plot(big_sdist, big_pdist, 'k.', color='0.3', ms=1.0)
     if not nodata:
-        pl.plot(crop[xcol], crop[ycol], 'ko', ms=3, markeredgewidth=1, markeredgecolor='w')
+        pl.plot(crop[xcol], crop[ycol], 'ko', ms=3, markeredgewidth=0.5, markeredgecolor='w')
 
     xe, ye = epos
     xerr1, xerr2 = cksgaia.misc.frac_err(physmerge, xe, xcol)
     yerr1, yerr2 = cksgaia.misc.frac_err(physmerge, ye, ycol)
 
     _, caps, _ = pl.errorbar(xe, ye, yerr=[[yerr1], [yerr2]], xerr=[[xerr1], [xerr2]],
-                             markeredgewidth=0, lw=2, capsize=6, markeredgecolor='w', fmt='k.', ms=0.1)
+                             markeredgewidth=0, lw=1, capsize=2, markeredgecolor='w', fmt='k.', ms=0.1)
     for cap in caps:
-        cap.set_markeredgewidth(2)
+        cap.set_markeredgewidth(1)
     pl.annotate("typical\nuncert.", xy=(xe, ye), xytext=eaoff,
                 xycoords="data", textcoords="offset points",
-                horizontalalignment='center', fontsize=18)
+                horizontalalignment='center', fontsize=10)
 
     # pl.semilogx()
     if ylog:
@@ -127,7 +127,7 @@ def contour_plot_kde(physmerge, xcol, ycol, xlim, ylim, ylog=True, pltxlim=None,
 
     ax = pl.gca()
     if ylog:
-        pl.yticks(yt)
+        # pl.yticks(yt)
         pl.xticks(xt)
     else:
         pl.xticks(xt)
@@ -143,7 +143,7 @@ def contour_plot_kde(physmerge, xcol, ycol, xlim, ylim, ylog=True, pltxlim=None,
     else:
         ax.yaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('%.1f'))
 
-    pl.grid(False)
+    pl.grid(True)
 
     if clabel is not None:
         clabel = clabel
@@ -175,8 +175,8 @@ def period_contour_q16():
     pl.title('Q16')
 
 
-def period_contour_cks(sample=None, kwidth=(0.20, 0.05), vlims=(0.0, 0.05),
-                       ylimits=(1.0, 10.0), clim=None, single=False, nodata=False):
+def period_contour_cks(sample=None, kwidth=(0.20, 0.05), vlims=(0.0, 0.03),
+                       ylimits=(1.0, 4.0), clim=None, single=False, nodata=False):
     if sample is None:
         physmerge = cksgaia.io.load_table(cksgaia.plot.config.filtered_sample)
     else:
@@ -186,17 +186,19 @@ def period_contour_cks(sample=None, kwidth=(0.20, 0.05), vlims=(0.0, 0.05),
 
     ax, xi, yi, zi = contour_plot_kde(physmerge, 'koi_period', 'giso_prad', xlim=[0.4, 1000.0],
                                       ylim=[0.5, 20], ylog=True,
-                                      pltxlim=[0.7, 100.0], pltylim=ylimits, epos=[1.2, 8.0],
+                                      pltxlim=[0.7, 100.0], pltylim=ylimits, epos=[1.2, 3.0],
                                       weighted=True, kwidth=kwidth, vlims=vlims, single=single,
                                       nodata=nodata)
 
     # pl.plot(wper, wsens, 'k-', color='0.6', linestyle='dashed', lw=3)
 
     # pl.xticks([0.6,0.8,1.0,1.2,1.5])
-    pl.yticks([1.0, 1.5, 2.4, 3.5])
+    pl.yticks([])
     ax.xaxis.set_major_formatter(matplotlib.ticker.ScalarFormatter())
     ax.xaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('%.0f'))
     ax.yaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('%.1f'))
+    # pl.yticks([1.0, 1.5, 2.4, 4.0, 6.0, 10.0])
+    pl.yticks([1.0, 1.5, 2.4, 3.5])
 
     if clim is not None:
         cx, cy = clim
@@ -342,11 +344,11 @@ def contour_masscuts():
     medium = physmerge.query('giso_smass <= @highcut & giso_smass >= @lowcut')
     low = physmerge.query('giso_smass < @lowcut')
 
-    fig = pl.figure(1, figsize=(36, 8))
+    fig = pl.figure(1, figsize=(13, 3))
 
     pl.subplot(1, 3, 1)
 
-    pl.subplots_adjust(left=0.05, right=0.95)
+    pl.subplots_adjust(left=0.05, right=0.95, wspace=0.28, bottom=0.2)
 
     vlimits = [(0.0, 0.03), (0.0, 0.02), (0.0, 0.03)]
 
@@ -369,7 +371,7 @@ def contour_masscuts():
 
         pl.figure(1)
         insol_contour_data(sample=sample, vlims=vlimits[i], kwidth=(0.75, 0.05))
-        pl.title(annotations[i], fontsize=afs + 6)
+        pl.title(annotations[i])
         pl.grid(lw=2, alpha=0.5)
 
 
@@ -384,10 +386,10 @@ def period_contour_masscuts():
     medium = physmerge.query('giso_smass <= @highcut & giso_smass >= @lowcut')
     low = physmerge.query('giso_smass < @lowcut')
 
-    fig = pl.figure(1, figsize=(18, 4))
+    fig = pl.figure(1, figsize=(13, 3))
 
     pl.subplot(1, 3, 1)
-    pl.subplots_adjust(left=0.05, right=0.95)
+    pl.subplots_adjust(left=0.05, right=0.95, wspace=0.28, bottom=0.2)
 
     fig2 = pl.figure(2)
 
@@ -414,5 +416,5 @@ def period_contour_masscuts():
         period_contour_cks(sample=sample, vlims=vlimits[i],
                            kwidth=(0.40, 0.05), ylimits=(1.0, 4.0), clim=(cx, cy))
         # pl.axhline(hlines[i], lw=3, color='r')
-        pl.title(annotations[i], fontsize=afs + 2)
+        pl.title(annotations[i])
         pl.grid(lw=2, alpha=0.5)
