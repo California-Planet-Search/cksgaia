@@ -225,33 +225,34 @@ class Workflow(object):
 
         # register different plots here
         # d['extinction'] = cksgaia.plot.extinction.fig_extinction
-        d['sample'] = cksgaia.plot.sample.hrplot
-        d['filters'] = cksgaia.plot.sample.filter_plot
-        d['mag-hist'] = cksgaia.plot.sample.magcuts
-        d['depth-hist'] = cksgaia.plot.sample.depth_hist
+        # d['sample'] = cksgaia.plot.sample.hrplot
+        # d['filters'] = cksgaia.plot.sample.filter_plot
+        # d['mag-hist'] = cksgaia.plot.sample.magcuts
+        # d['depth-hist'] = cksgaia.plot.sample.depth_hist
         d['srad-h13'] = lambda : CR('srad-h13').plot_comparison()
         d['srad-s15'] = lambda : CR('srad-s15').plot_comparison()
         d['srad-j17'] = lambda : CR('srad-j17').plot_comparison()
         d['srad-gaia2'] = lambda : CR('srad-gaia2').plot_comparison()
         # d['smass-h13'] = lambda : CR('smass-h13').plot_comparison()
         # d['sage-s15'] = lambda : CR('sage-s15').plot_comparison()
-        d['srad-hist'] = cksgaia.plot.sample.srad_hist
+        # d['srad-hist'] = cksgaia.plot.sample.srad_hist
         d['srad-err-hist'] = cksgaia.plot.sample.srad_err_hist
         d['prad-err-hist'] = cksgaia.plot.sample.prad_err_hist
         # d['parallax-err-hist'] = cksgaia.plot.sample.parallax_err_hist
-        d['insol-hist'] = cksgaia.plot.occur.insol_hist
-        d['radius-hist-fit'] = cksgaia.plot.occur.money_plot_fit
+        # d['insol-hist'] = cksgaia.plot.occur.insol_hist
+        # d['radius-hist-fit'] = cksgaia.plot.occur.money_plot_fit
         d['radius-hist-plain'] = cksgaia.plot.occur.money_plot_plain
         # d['period-contour-q16'] = cksgaia.plot.contour.period_contour_q16
         d['period-contour-cks'] = cksgaia.plot.contour.period_contour_cks
-        d['insol-contour-anno'] = cksgaia.plot.contour.insol_contour_anno
+        # d['insol-contour-anno'] = cksgaia.plot.contour.insol_contour_anno
         d['insol-contour-data'] = cksgaia.plot.contour.insol_contour_data
         d['insol-contour-masscuts'] = cksgaia.plot.contour.contour_masscuts
         d['period-contour-masscuts'] = cksgaia.plot.contour.period_contour_masscuts
-        d['srad-contour'] = cksgaia.plot.contour.srad_contour
-        d['smass-cuts'] = cksgaia.plot.occur.mass_cuts
-        d['desert-edge'] = cksgaia.plot.occur.desert_edge
+        # d['srad-contour'] = cksgaia.plot.contour.srad_contour
+        # d['smass-cuts'] = cksgaia.plot.occur.mass_cuts
+        # d['desert-edge'] = cksgaia.plot.occur.desert_edge
         d['desert-edge-cum'] = cksgaia.plot.occur.desert_edge_cum
+        d['mean-values'] = cksgaia.plot.occur.mean_values
 
         self.plot_dict = d
 

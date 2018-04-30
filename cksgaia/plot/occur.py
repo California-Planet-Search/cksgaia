@@ -13,6 +13,7 @@ import cksgaia.io
 import cksgaia.plot.sample
 from cksgaia.plot.config import modpath
 from cksgaia.completeness import num_stars
+from cksgaia.calc import *
 from cksgaia.plot.config import *
 
 
@@ -557,8 +558,8 @@ def desert_edge_cum():
         n = np.array(range(len(sample['weight'].values))) / float(len(sample))
         f = sample['giso_insol'].values[order]
 
-        pl.step(f, n, 'k-', lw=3, linestyle='dashed', alpha=0.25, color=color, label=None)
-        pl.step(f, w / np.max(w), 'k-', lw=3, color=color)
+        pl.step(f, n, 'k-', lw=2, linestyle='dashed', alpha=0.25, color=color, label=None)
+        pl.step(f, w / np.max(w), 'k-', lw=2, color=color)
 
         aloc = (0.1, 0.85)
         #pl.annotate(annotation, xy=aloc, xycoords='axes fraction', fontsize=20,
@@ -566,7 +567,7 @@ def desert_edge_cum():
 
         pl.semilogx()
 
-        pl.xlim(3000, 30)
+        pl.xlim(2000, 30)
         pl.ylim(0, 1)
 
         ax = pl.gca()
@@ -582,7 +583,7 @@ def desert_edge_cum():
 
     colors = ['blue', 'green', 'red']
 
-    fig = pl.figure(figsize=(12, 8))
+    fig = pl.figure(figsize=(6, 4))
     handles = []
     for i, sample in enumerate([high, medium, low]):
         sample = sample.query('giso_prad > 1.7 & giso_prad < 4 & giso_insol > 30 & giso_insol < 3000')
@@ -591,12 +592,12 @@ def desert_edge_cum():
         handles.append(mlines.Line2D([], [], color=colors[i], lw=3,
                                      label=annotations[i]))
 
-    pl.legend(handles=handles, fontsize=14, loc='best')
+    pl.legend(handles=handles, loc='best')
 
-    pl.annotate('$1.7 < R_p < 4 R_{\oplus}$', xy=(0.03, 0.75),
-                xycoords='axes fraction', fontsize=16)
-    pl.annotate(r'$30 < S_{\rm inc} < 3000 S_{\oplus}$', xy=(0.03, 0.70),
-                xycoords='axes fraction', fontsize=16)
+    pl.annotate('$1.7 < R_p < 4 R_{\oplus}$', xy=(0.03, 0.7),
+                xycoords='axes fraction')
+    pl.annotate(r'$30 < S_{\rm inc} < 3000 S_{\oplus}$', xy=(0.03, 0.65),
+                xycoords='axes fraction')
 
 
 def rocky_cores():
@@ -743,3 +744,128 @@ def rocky_cores():
     pl.xticks(xticks)
 
     pl.xlabel('Planet Radius [R$_{\oplus}$')
+
+
+def plot_box(corners, *args, **kwargs):
+    pl.plot([corners[0][0], corners[1][0]],
+            [corners[0][1], corners[0][1]], *args, **kwargs)
+    pl.plot([corners[0][0], corners[0][0]],
+            [corners[0][1], corners[1][1]], *args, **kwargs)
+    pl.plot([corners[0][0], corners[1][0]],
+            [corners[1][1], corners[1][1]], *args, **kwargs)
+    pl.plot([corners[1][0], corners[1][0]],
+            [corners[0][1], corners[1][1]], *args, **kwargs)
+
+
+def plot_dist(real_sample, data=False):
+    if data:
+        pl.errorbar(real_sample['koi_period'], real_sample['giso_prad'],
+                    yerr=real_sample['giso_prad_err1'], fmt='k.')
+    pl.loglog()
+    cksgaia.plot.config.logscale_rad(axis='y')
+
+    ax = pl.gca()
+    ax.xaxis.set_major_formatter(matplotlib.ticker.ScalarFormatter())
+    ax.xaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('%0.1f'))
+    pl.xlim(0.3, 100)
+    pl.xlabel('Orbital Period [days]')
+    pl.axhline(1.75, lw=3, color='r', linestyle='dashed')
+
+    # plot_box(e_corners, 'b-', lw=2)
+    # plot_box(sn_corners, 'b-', lw=2)
+    # plot_box(gap_corners, 'g-', lw=2)
+
+
+
+def mean_values():
+    real_sample = cksgaia.io.load_table(full_sample)
+    ikic = cksgaia.completeness.fit_cdpp(cksgaia.io.load_table('kic-filtered'))
+
+
+    sn_corners = [(0.0, 1.7), (100, 4.0)]
+    e_corners = [(0.0, 1.0), (30, 1.7)]
+
+    fig = pl.figure(figsize=(11, 8.5))
+    pl.subplot(2,3,1)
+
+    physmerge = real_sample.copy()
+    highcut = np.percentile(physmerge['giso_smass'], 67)
+    lowcut = np.percentile(physmerge['giso_smass'], 33)
+
+    high = physmerge.query('giso_smass > @highcut')
+    kicselect = ikic.query('kic_smass > @highcut')
+    high = cksgaia.completeness.get_weights(high, kicselect)
+
+    medium = physmerge.query('giso_smass <= @highcut & giso_smass >= @lowcut')
+    kicselect = ikic.query('kic_smass <= @highcut & kic_smass >= @lowcut')
+    medium = cksgaia.completeness.get_weights(medium, kicselect)
+
+    low = physmerge.query('giso_smass < @lowcut')
+    kicselect = ikic.query('kic_smass < @lowcut')
+    low = cksgaia.completeness.get_weights(low, kicselect)
+
+    sn_smasses = []
+    se_smasses = []
+    se_rads = []
+    sn_rads = []
+    se_fluxes = []
+    sn_fluxes = []
+    se_periods = []
+    sn_periods = []
+    for i, sample in enumerate([high, medium, low]):
+        mean_sn = average_in_box(sample, sn_corners)
+        mean_se = average_in_box(sample, e_corners)
+        mean_smass_sn = average_in_box(sample, sn_corners, col1='giso_smass')
+        mean_smass_se = average_in_box(sample, e_corners, col1='giso_smass')
+        mean_sn_flux = average_in_box(sample, sn_corners, col1='giso_insol')
+        mean_se_flux = average_in_box(sample, e_corners, col1='giso_insol')
+
+        sn_smasses.append((mean_smass_sn[0][1], mean_smass_sn[1][1]))
+        se_smasses.append((mean_smass_se[0][1], mean_smass_se[1][1]))
+        sn_rads.append((mean_sn[0][1], mean_sn[1][1]))
+        se_rads.append((mean_se[0][1], mean_se[1][1]))
+        sn_fluxes.append((mean_sn_flux[0][1], mean_sn_flux[1][1]))
+        se_fluxes.append((mean_se_flux[0][1], mean_se_flux[1][1]))
+        se_periods.append((mean_se[0][0], mean_se[1][0]))
+        sn_periods.append((mean_sn[0][0], mean_sn[1][0]))
+
+    pl.subplot(2, 3, 1)
+    colors = ['b', 'g', 'r']
+    for i, c in enumerate(colors):
+        x = se_smasses[i][0]
+        x_err = se_smasses[i][1]
+        y = se_rads[i][0]
+        y_err = se_rads[i][1]
+        pl.errorbar(x, y, yerr=y_err,
+                    fmt='ko', ms=22, mfc='none', mew=2)
+
+    pl.xlabel('average stellar mass [M$_{\odot}$]')
+    pl.ylabel('average planet size [R$_{\oplus}$]')
+    pl.xlim(0.8, 1.25)
+
+    pl.annotate("{} < P <= {} days".format(e_corners[0][0], e_corners[1][0]), xy=(0.15, 0.75),
+                xycoords='axes fraction')
+    pl.annotate("%.1f < R$_P$ <= %.1f R$_{\oplus}$" % (e_corners[0][1], e_corners[1][1]),
+                xy=(0.15, 0.65), xycoords='axes fraction')
+    pl.show()
+
+    pl.subplot(2, 3, 2)
+    colors = ['b', 'g', 'r']
+    for i, c in enumerate(colors):
+        x = sn_smasses[i][0]
+        x_err = sn_smasses[i][1]
+        y = sn_rads[i][0]
+        y_err = sn_rads[i][1]
+        pl.errorbar(x, y, yerr=y_err,
+                    fmt='ko', ms=22, mfc='none', mew=2)
+
+    pl.xlabel('average stellar mass [M$_{\odot}$]')
+    pl.ylabel('average planet size [R$_{\oplus}$]')
+    pl.xlim(0.8, 1.25)
+
+    pl.annotate("{} < P <= {} days".format(sn_corners[0][0], sn_corners[1][0]), xy=(0.15, 0.75),
+                xycoords='axes fraction')
+    pl.annotate("%.1f < R$_P$ <= %.1f R$_{\oplus}$" % (sn_corners[0][1], sn_corners[1][1]),
+                xy=(0.15, 0.65), xycoords='axes fraction')
+
+
