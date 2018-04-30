@@ -49,10 +49,10 @@ def detection_prob(prad, per, kicselect, nkic=None, step=False):
 
     # Put this planet around all other stars
     # Calculate new durations
-    a = (C.G * kicselect['kic_smass'].values * C.Ms * ((per * (24 * 3600.)) / (2 * np.pi)) ** 2) ** (1 / 3.) * C.aupercm
-    R = kicselect['kic_srad'].values * C.Rs * C.aupercm
+    a = (C.G * kicselect['m17_smass'].values * C.Ms * ((per * (24 * 3600.)) / (2 * np.pi)) ** 2) ** (1 / 3.) * C.aupercm
+    R = kicselect['gaia2_srad'].values * C.Rs * C.aupercm
     durations = (per * 24. / np.pi) * np.arcsin(R / a)
-    rors = (prad * (C.Re / C.Rs)) / kicselect['kic_srad'].values
+    rors = (prad * (C.Re / C.Rs)) / kicselect['gaia2_srad'].values
 
     x = 1 / np.sqrt(durations)
     cdpp_durs = kicselect['kic_cdpp_fit0'].values + \
@@ -117,7 +117,7 @@ def get_weights(kois, kicselect):
     a_cm = (C.G * mstar_g * (per_s / (2 * np.pi)) ** 2) ** (1 / 3.)
     # a = (num/(2*np.pi)**2)**(1/3.) * C.aupercm
     R_cm = kois['giso_srad'].values * C.Rs
-    tr_prob = 0.7 * R_cm / a_cm
+    tr_prob = 0.9 * R_cm / a_cm
 
     weights = 1 / (det_prob * tr_prob)
 
@@ -152,21 +152,21 @@ def get_sensitivity_contour(kicselect, percentile):
 
     for i, p in enumerate(pgrid):
         smas = (kicselect['kic_smass'] * (p / 365.) ** 2) ** (1 / 3.)
-        a = (C.G * kicselect['kic_srad'] * C.Ms * ((p * (24 * 3600.)) / (2 * np.pi)) ** 2) ** (1 / 3.) * C.aupercm
-        R = kicselect['kic_srad'] * C.Rs * C.aupercm
+        a = (C.G * kicselect['gaia2_srad'] * C.Ms * ((p * (24 * 3600.)) / (2 * np.pi)) ** 2) ** (1 / 3.) * C.aupercm
+        R = kicselect['gaia2_srad'] * C.Rs * C.aupercm
         durations = (p * 24. / np.pi) * np.arcsin(R / a)
-        aors = (smas / 0.00465047) / kicselect['kic_srad']
+        aors = (smas / 0.00465047) / kicselect['gaia2_srad']
 
         x = 1 / np.sqrt(durations)
         cdpp_dur = kicselect['kic_cdpp_fit0'] + kicselect['kic_cdpp_fit1'] * x + kicselect['kic_cdpp_fit2'] * x ** 2
 
         for j, r in enumerate(rgrid):
-            rors = (r * (C.Re / C.Rs)) / kicselect['kic_srad']
+            rors = (r * (C.Re / C.Rs)) / kicselect['gaia2_srad']
 
             snr = (r * (C.Re / C.Rs) / kicselect['kic_smass']) ** 2 * (p / kicselect['kic_tobs']) ** -0.5 * (
                         1 / (cdpp_dur * 1e-6))
 
-            tr = np.nanmedian((0.7 / aors))
+            tr = np.nanmedian((0.9 / aors))
             sens = cksgaia.completeness.detection_prob(r, p, kicselect, nkic=nkic, step=True)
             prob = sens * tr
 

@@ -71,7 +71,7 @@ def simulated_survey(nsim):
 
     random_kic = kicselect.iloc[np.random.choice(kicselect.index, size=nsim, replace=True)]
     simdf['id_kic'] = random_kic['id_kic'].values
-    simdf['iso_srad'] = random_kic['kic_srad'].values
+    simdf['iso_srad'] = random_kic['gaia2_srad'].values
     simdf['iso_smass'] = random_kic['kic_smass'].values
 
 
@@ -90,11 +90,11 @@ def simulated_survey(nsim):
 
     # Add systematic offset to KIC stellar radii
     star_scale = np.random.normal(1.0, 0.05)  # 5% systematic for GAIA
-    kicselect['kic_srad'] = kicselect['kic_srad'].values * np.clip(star_scale, 0.2, 5.0)
+    kicselect['gaia2_srad'] = kicselect['gaia2_srad'].values * np.clip(star_scale, 0.2, 5.0)
 
     # Add noise to KIC stellar radii
-    star_noise = np.random.normal(0, kicselect['kic_srad'].values*0.1, size=len(kicselect))  # 10% radii unc. for GAIA
-    kicselect['kic_srad'] += star_noise
+    star_noise = np.random.normal(0, kicselect['gaia2_srad'].values*0.1, size=len(kicselect))  # 10% radii unc. for GAIA
+    kicselect['gaia2_srad'] += star_noise
     
     kois = pd.merge(kois, kicselect, on='id_kic', suffixes=['','_ks'])
 
