@@ -153,3 +153,32 @@ def kdeslice(x, xvalue, kde):
     sl = kde[pos,:].flatten()
 
     return sl
+
+
+def weighted_avg_and_std(values, weights):
+    """
+    Return the weighted average and standard deviation.
+
+    values, weights -- Numpy ndarrays with the same shape.
+    """
+    average = np.average(values, weights=weights)
+    # Fast and numerically precise:
+    variance = np.average((values - average) ** 2, weights=weights)
+    return (average, np.sqrt(variance / len(values)))
+
+
+def average_in_box(sample, box, col1='giso_prad', col2='koi_period'):
+    radlim_low = box[0][1]
+    radlim_high = box[1][1]
+    plim_low = box[0][0]
+    plim_high = box[1][0]
+    q = sample.query('@radlim_low <= giso_prad < @radlim_high & @plim_low < koi_period <= @plim_high')
+    n = len(q)
+
+    logcol1 = np.log10(q[col1])
+    logcol2 = np.log10(q[col2])
+
+    avg_rad, err_rad = weighted_avg_and_std(logcol1, q['weight'])
+    avg_per, err_per = weighted_avg_and_std(logcol2, q['weight'])
+
+    return [(10 ** avg_per, 10 ** avg_rad), (err_per * (10 ** avg_per), err_rad * (10 ** avg_rad))]
