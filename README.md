@@ -4,6 +4,13 @@ A re-analysis of the CKS dataset using Gaia constrained parallaxes.
 
 ## Installation
 
+Download data tables
+
+1. xmatch_m17_gaiadr2-result.csv # CKS-Gaia crossmatch
+2. kic_q0_q17.hdf # Table of noise properties
+3. kepler_stellar17.csv.gz # Mathur 2017 stellar properties tables
+
+
 ## Cross-match the CKS stars with Gaia IDs.
 
 Follow instructions [here](docs/gaia-xmatch.md)
@@ -41,15 +48,13 @@ $ run_cksgaia.py create-iso-table isoclassify isocla-j17-fakegaia isocla-j17-fak
 $ run_cksgaia.py create-iso-table isochrones isocla+isochr-dsep data/isochrones.csv
 ```
 
-Run a suite of simulated surveys to determine occurance error scaling
 
 ```
 $ run_cksgaia.py simulate-surveys
 
 ```
-
 $ run_cksgaia.py tex-tables # LaTeX tables
 $ run_cksgaia.py tex-stats # Summary statistics
-$ run_cksgaia.py create-plots # Make figures
-$ run_cksgaia.py update-paper # Move files to paper directory
+$ run_cksgaia.py create-table all -d ./ # Make Tables
+$ run_cksgaia.py create-plots all -d ./ # Make figures
 ```

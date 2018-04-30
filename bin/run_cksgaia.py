@@ -122,8 +122,7 @@ def create_iso_jobs(args):
     if args.sample=='cks':
         df = cksgaia.io.load_table('j17+m17')
     elif args.sample == 'cks+gaia2':
-        df = cksgaia.io.load_table('j17+m17+gaia2')\
-            .groupby('id_kic').first()
+        df = cksgaia.io.load_table('m17+gaia2+j17').groupby('id_kic').nth(0)
     else:
         print("Invalid sample: {}".format(args.sample))
 
@@ -234,16 +233,16 @@ class Workflow(object):
         d['srad-s15'] = lambda : CR('srad-s15').plot_comparison()
         d['srad-j17'] = lambda : CR('srad-j17').plot_comparison()
         d['srad-gaia2'] = lambda : CR('srad-gaia2').plot_comparison()
-        #d['smass-h13'] = lambda : CR('smass-h13').plot_comparison()
-        #d['sage-s15'] = lambda : CR('sage-s15').plot_comparison()
+        # d['smass-h13'] = lambda : CR('smass-h13').plot_comparison()
+        # d['sage-s15'] = lambda : CR('sage-s15').plot_comparison()
         d['srad-hist'] = cksgaia.plot.sample.srad_hist
         d['srad-err-hist'] = cksgaia.plot.sample.srad_err_hist
         d['prad-err-hist'] = cksgaia.plot.sample.prad_err_hist
-        d['parallax-err-hist'] = cksgaia.plot.sample.parallax_err_hist
+        # d['parallax-err-hist'] = cksgaia.plot.sample.parallax_err_hist
         d['insol-hist'] = cksgaia.plot.occur.insol_hist
         d['radius-hist-fit'] = cksgaia.plot.occur.money_plot_fit
         d['radius-hist-plain'] = cksgaia.plot.occur.money_plot_plain
-        d['period-contour-q16'] = cksgaia.plot.contour.period_contour_q16
+        # d['period-contour-q16'] = cksgaia.plot.contour.period_contour_q16
         d['period-contour-cks'] = cksgaia.plot.contour.period_contour_cks
         d['insol-contour-anno'] = cksgaia.plot.contour.insol_contour_anno
         d['insol-contour-data'] = cksgaia.plot.contour.insol_contour_data
@@ -256,7 +255,6 @@ class Workflow(object):
 
         self.plot_dict = d
 
-        d = OrderedDict()
         # register different tables here
         #d['weight-tex-stub'] = lambda : cksgaia.table.weight_table(lines=10)
         #d['weight-tex-full'] = lambda: cksgaia.table.weight_table(lines='all')
