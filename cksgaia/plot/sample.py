@@ -7,8 +7,50 @@ import cksgaia.misc
 import cksgaia.errors
 from cksgaia.plot.config import *
 
-def hrplot():
 
+def fig_per_prad():
+    fig = pl.figure(figsize=(4,3.5))
+    pl.loglog()
+    df = cksgaia.io.load_table('cksgaia-planets')
+    df = df
+    #df = df.query('cks_fp==0 and ((giso_prad /giso_prad_err1)  > 0.1 ) ')
+    df = df.query('cks_fp==0')
+    pl.plot(df.koi_period,df.giso_prad,'.',color='RoyalBlue',ms=2)
+
+    yt = [0.2,0.3,0.5,0.7,1,2,3,5,7,10,20]
+    pl.yticks(yt,yt)
+    xt = [0.1,0.3,1,3,10,30,100,300,1000]
+    _xt, _xtl =     pl.xticks(xt,xt)
+    pl.setp(_xtl, rotation=45)
+    pl.xlim(0.1,1000)
+    pl.ylim(0.25,20)
+    pl.xlabel('Period (days)')
+    pl.ylabel('Planet Size (Earth-Radii)')
+    pl.tight_layout(True)
+
+def fig_insol_prad():
+    fig = pl.figure(figsize=(4,3.5))
+    pl.loglog()
+    df = cksgaia.io.load_table('cksgaia-planets')
+    df = df
+    df = df.query('cks_fp==0')
+
+    pl.plot(df.giso_insol,df.giso_prad,'.',color='RoyalBlue',ms=2)
+
+    yt = [0.2,0.3,0.5,0.7,1,2,3,5,7,10,20]
+    pl.yticks(yt,yt)
+    #xt = [10000,3000,1000,300,100,30,10,3,1]
+    #_xt, _xtl = pl.xticks(xt,xt)
+    #pl.setp(_xtl, rotation=45)
+    
+    pl.xlim(10000,1)
+    pl.ylim(0.25,20)
+    pl.xlabel('Incident Stetllar Flux (Earth-Units)')
+    pl.ylabel('Planet Size (Earth-radii)')
+    pl.tight_layout(True)
+
+
+def hrplot():
     physmerge = cksgaia.io.load_table(full_sample)
     crop = cksgaia.io.load_table(filtered_sample)
 

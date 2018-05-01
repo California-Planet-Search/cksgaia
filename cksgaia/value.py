@@ -7,35 +7,36 @@ def val_stat(return_dict=False):
 
     df = cksgaia.io.load_table('j17',cache=1)
     stars = df.groupby('id_kic',as_index=False).nth(0)
+    cut = stars
     d['cks-star-count'] = len(stars)
-    cut = stars.query('kic_kepmag < 14.2')
     d['cks-mag-star-count'] = len(cut)
 
     df = cksgaia.io.load_table('m17+gaia2+j17',cache=1)
     stars = df.groupby('id_kic',as_index=False).nth(0)
-    cut = stars.query('kic_kepmag < 14.2')
+    cut = stars
     d['cks-gaia-star-count'] = len(cut)
     d['cks-gaia-sparallax-ferr-median'] = "{:.1f}".format(cut.eval('gaia2_sparallax_err / gaia2_sparallax').median() * 100)
 
     d['cks-gaia-distmod-err-median'] = "{:.2f}".format(cut.eval('gaia2_sparallax_err / gaia2_sparallax').median())
 
-    df = cksgaia.io.load_table('m17+gaia2+j17+extinct',cache=0)
-    df = df.query('kic_kepmag < 14.2')
-    d['ak-median'] = "{:.03f}".format(df.ak.median())
-    d['ak-median-err'] = "{:.03f}".format(df.ak_err.median())
-    d['ebv-median'] = "{:.03f}".format(df.ebv.median())
-    d['ebv-median-err'] = "{:.03f}".format(df.ebv_err.median())
+    df = cksgaia.io.load_table('m17+gaia2+j17+ext',cache=0)
+    d['ak-median'] = "{:.03f}".format(df.ext_ak.median())
+    d['ak-min'] = "{:.03f}".format(df.ext_ak.min())
+    d['ak-max'] = "{:.03f}".format(df.ext_ak.max())
+    d['ak-median-err'] = "{:.03f}".format(df.ext_ak_err.median())
+    d['ebv-median'] = "{:.03f}".format(df.ext_ebv.median())
+    d['ebv-median-err'] = "{:.03f}".format(df.ext_ebv_err.median())
     d['mk-err-median'] = "{:.03f}".format(df.m17_kmag_err.median())
     
     # Properties of cks+gaia2 table
     df = cksgaia.io.load_table('cksgaia-planets',cache=1)
-    cut = df.query('kic_kepmag < 14.2')
-    ferr= cut.eval('0.5*(koi_ror_err1 - koi_ror_err2) / koi_ror')
-    d['ror-ferr-median'] = "{:.1f}".format(100*np.nanmedian(ferr))
+    cut = df
+    ferr = cut.eval('0.5*(koi_ror_err1 - koi_ror_err2) / koi_ror')
+    d['ror-ferr-median'] = "{:.1f}".format(100*ferr.median())
     ferr = cut.eval('0.5*(giso_srad_err1 - giso_srad_err2) / giso_srad')
-    d['srad-ferr-median'] = "{:.1f}".format(100*np.nanmedian(ferr))
+    d['srad-ferr-median'] = "{:.1f}".format(100*ferr.median())
     ferr= cut.eval('0.5*(giso_prad_err1 - giso_prad_err2) / giso_prad')
-    d['prad-ferr-median'] = "{:.1f}".format(100*np.nanmedian(ferr))
+    d['prad-ferr-median'] = "{:.1f}".format(100*ferr.median())
 
 
     # Comparison with Silva15
