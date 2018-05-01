@@ -17,11 +17,9 @@ import cksgaia.plot.contour   # submodule for including plots
 import cksgaia.plot.occur   # submodule for including plots
 import cksgaia.errors
 import cksgaia.calc
-#import cksgaia.plot.extinction
-
-import cksgaia.extinction
 import cksgaia.config
 import cksgaia.sim.simulations
+from cksgaia.plot.compare import ComparisonRadius as CR 
 
 def main():
     psr = ArgumentParser()
@@ -218,7 +216,6 @@ def update_paper(args):
     w.update_paper() 
 
 
-#from cksgaia.plot.compare import ComparisonRadius as CR 
 
 class Workflow(object):
     def __init__(self, outputdir='./'):

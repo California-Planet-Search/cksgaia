@@ -1,7 +1,7 @@
-#import seaborn as sns
 import pandas as pd
 
-from matplotlib.pylab import *
+from matplotlib import pylab as plt
+import numpy as np
 from matplotlib.ticker import MaxNLocator
 from mpl_toolkits.axes_grid.anchored_artists import AnchoredText
 import cksgaia.io
@@ -9,11 +9,6 @@ import cksgaia
 errorbar_kw = dict(markersize=6,color='b')
 
 def comparison(key):
-    sns.set(style='ticks',rc={
-        'ytick.major.size':3.0,'xtick.major.size':3.0,
-        'xtick.direction': u'in','ytick.direction': u'in',}
-    )
-
     if key=='smass-h13':
         df = cksgaia.io.load_table('cks+gaia2+h13')
         x1 = df.h13_smass
@@ -89,38 +84,33 @@ class Comparison(object):
     """ 
     Code for generic comparisons (all parameters)
     """
-    sns.set(style='ticks',rc={
-        'ytick.major.size':3.0,'xtick.major.size':3.0,
-        'xtick.direction': u'in','ytick.direction': u'in',}
-    )
-
     def __init__(self):
         pass
 
     def _provision_figure(self):
-        self.fig = figure(figsize=figsize)
-        ax1 = subplot2grid((4,1), (0,0), rowspan=3)
-        ax2 = subplot2grid((4,1), (3,0), rowspan=1, sharex=ax1)
+        self.fig = plt.figure(figsize=figsize)
+        ax1 = plt.subplot2grid((4,1), (0,0), rowspan=3)
+        ax2 = plt.subplot2grid((4,1), (3,0), rowspan=1, sharex=ax1)
         self.axL = [ax1,ax2]
 
     def _label_figure(self):
-        sca(self.axL[0])
-        setp(self.axL[0],ylabel=self.ylabel0,xlim=self.xlim0,ylim=self.xlim0)
-        xticks(self.xt0,self.xt0)
-        yticks(self.xt0,self.xt0)
-        sca(self.axL[1])
-        setp(self.axL[1],ylabel=self.ylabel1,xlabel=self.xlabel0,ylim=self.ylim1)
-        xticks(self.xt0,self.xt0)
-        yticks(self.yt1,self.yt1)
+        plt.sca(self.axL[0])
+        plt.setp(self.axL[0],ylabel=self.ylabel0,xlim=self.xlim0,ylim=self.xlim0)
+        plt.xticks(self.xt0,self.xt0)
+        plt.yticks(self.xt0,self.xt0)
+        plt.sca(self.axL[1])
+        plt.setp(self.axL[1],ylabel=self.ylabel1,xlabel=self.xlabel0,ylim=self.ylim1)
+        plt.xticks(self.xt0,self.xt0)
+        plt.yticks(self.yt1,self.yt1)
 
         one2one_kw = dict(linestyle='--',lw=1,color='g')
-        sca(self.axL[0])
-        xt = gca().get_xticklabels()
-        setp(xt,visible=False)
+        plt.sca(self.axL[0])
+        xt = plt.gca().get_xticklabels()
+        plt.setp(xt,visible=False)
 
         one2one(**one2one_kw)
-        sca(self.axL[1])
-        axhline(1, **one2one_kw)
+        plt.sca(self.axL[1])
+        plt.axhline(1, **one2one_kw)
 
     def _subplots_compare(self, **errorbar_kw):
         subplots_compare(
@@ -236,31 +226,32 @@ class ComparisonRadius(Comparison):
         return s
 
 def subplots_compare(x1, x2, x3, fig, axL, x1err=None, x2err=None, x3err=None, **kwargs):
+    mfc = 'RoyalBlue'
     fig.set_tight_layout(False)
     fig.subplots_adjust(hspace=0.001,left=0.17,top=0.95,right=0.90,bottom=0.12)
-    sca(axL[0])
-    plot(x1, x2, 'o',markersize=5,color='k')
-    errorbar(
+    plt.sca(axL[0])
+    plt.plot(x1, x2, 'o',markersize=5,color='k')
+    plt.errorbar(
         x1, x2, xerr=x1err, yerr=x2err, fmt='o',markersize=3.5,elinewidth=1,
-        ecolor='DarkGray'
+        ecolor='DarkGray',color=mfc
     )
 
-    sca(axL[1])
-    plot(x1, x3, 'o',markersize=5,color='k')
-    errorbar(
+    plt.sca(axL[1])
+    plt.plot(x1, x3, 'o',markersize=5,color='k')
+    plt.errorbar(
         x1, x3, xerr=x1err, yerr=x3err, fmt='o',markersize=3.5,elinewidth=1,
-        ecolor='DarkGray'
+        ecolor='DarkGray',color=mfc
     )
     return fig,axL
 
 def add_anchored(*args,**kwargs):
-    ax = gca()
+    ax = plt.gca()
     at = AnchoredText(*args,**kwargs)
     ax.add_artist(at)
 
 def one2one(**kwargs):
-    xl = xlim()
-    plot(xl,xl,**kwargs)
+    xl = plt.xlim()
+    plt.plot(xl,xl,**kwargs)
 
 figsize = (4,4.5)
 
