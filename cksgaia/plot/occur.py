@@ -881,6 +881,7 @@ def mean_values():
     pl.xlabel('average stellar mass [M$_{\odot}$]')
     pl.ylabel('average insolation flux [S$_{\oplus}$]')
     pl.xlim(0.8, 1.25)
+    pl.ylim(10, 70)
 
     pl.annotate("{} < P <= {} days".format(sn_corners[0][0], sn_corners[1][0]), xy=(0.15, 0.75),
                 xycoords='axes fraction')
