@@ -19,26 +19,26 @@ def fit_cdpp(kicselect):
         DataFrame : same as input with several columns added
     """
 
-    kicselect['kic_nquarters'] = kicselect['CDPP3'].apply(lambda x: np.clip(np.sum(x > 0), 0, 17))
-    kicselect['kic_tobs'] = kicselect['kic_nquarters'].values * 90
+    kicselect['m17_nquarters'] = kicselect['CDPP3'].apply(lambda x: np.clip(np.sum(x > 0), 0, 17))
+    kicselect['m17_tobs'] = kicselect['m17_nquarters'].values * 90
 
-    kicselect['kic_cdpp3'] = kicselect['CDPP3'].apply(lambda x: np.median(x[x > 0]))
-    kicselect['kic_cdpp6'] = kicselect['CDPP6'].apply(lambda x: np.median(x[x > 0]))
-    kicselect['kic_cdpp12'] = kicselect['CDPP12'].apply(lambda x: np.median(x[x > 0]))
+    kicselect['m17_cdpp3'] = kicselect['CDPP3'].apply(lambda x: np.median(x[x > 0]))
+    kicselect['m17_cdpp6'] = kicselect['CDPP6'].apply(lambda x: np.median(x[x > 0]))
+    kicselect['m17_cdpp12'] = kicselect['CDPP12'].apply(lambda x: np.median(x[x > 0]))
 
     # c3 = np.ma.masked_values(np.vstack(kicselect.as_matrix(columns=['CDPP3'])[:,0]), 0.0)
     # c6 = np.ma.masked_values(np.vstack(kicselect.as_matrix(columns=['CDPP6'])[:,0]), 0.0)
     # c12 = np.ma.masked_values(np.vstack(kicselect.as_matrix(columns=['CDPP12'])[:,0]), 0.0)
-    # kicselect['kic_cdpp3'] = np.median(c3, axis=1)
-    # kicselect['kic_cdpp6'] = np.median(c6, axis=1)
-    # kicselect['kic_cdpp12'] = np.median(c12, axis=1)
+    # kicselect['m17_cdpp3'] = np.median(c3, axis=1)
+    # kicselect['m17_cdpp6'] = np.median(c6, axis=1)
+    # kicselect['m17_cdpp12'] = np.median(c12, axis=1)
 
-    cdpp_arr = kicselect.as_matrix(columns=['kic_cdpp3', 'kic_cdpp6', 'kic_cdpp12']).transpose()
+    cdpp_arr = kicselect.as_matrix(columns=['m17_cdpp3', 'm17_cdpp6', 'm17_cdpp12']).transpose()
     pfit = np.polyfit(1 / np.sqrt([3., 6., 12.]), cdpp_arr, 2)
 
-    kicselect['kic_cdpp_fit0'] = pfit[2, :]
-    kicselect['kic_cdpp_fit1'] = pfit[1, :]
-    kicselect['kic_cdpp_fit2'] = pfit[0, :]
+    kicselect['m17_cdpp_fit0'] = pfit[2, :]
+    kicselect['m17_cdpp_fit1'] = pfit[1, :]
+    kicselect['m17_cdpp_fit2'] = pfit[0, :]
 
     return kicselect
 
@@ -55,12 +55,12 @@ def detection_prob(prad, per, kicselect, nkic=None, step=False):
     rors = (prad * (C.Re / C.Rs)) / kicselect['gaia2_srad'].values
 
     x = 1 / np.sqrt(durations)
-    cdpp_durs = kicselect['kic_cdpp_fit0'].values + \
-                kicselect['kic_cdpp_fit1'].values * x + \
-                kicselect['kic_cdpp_fit2'].values * x ** 2
+    cdpp_durs = kicselect['m17_cdpp_fit0'].values + \
+                kicselect['m17_cdpp_fit1'].values * x + \
+                kicselect['m17_cdpp_fit2'].values * x ** 2
 
     # Calculate SNR for other stars
-    other_snr = rors ** 2 * (per / kicselect['kic_tobs'].values) ** -0.5 * (1 / (cdpp_durs * 1e-6))
+    other_snr = rors ** 2 * (per / kicselect['m17_tobs'].values) ** -0.5 * (1 / (cdpp_durs * 1e-6))
 
     # s = cksrad.fitting.logistic(other_snr, step=step)
     s = cksgaia.fitting.gamma_complete(other_snr, step=step)
@@ -85,11 +85,11 @@ def get_weights(kois, kicselect):
     """
 
     x = 1 / np.sqrt(kois['koi_duration'].values)
-    kois['koi_cdpp_dur'] = kois['kic_cdpp_fit0'].values + \
-                           kois['kic_cdpp_fit1'].values * x + \
-                           kois['kic_cdpp_fit2'].values * x ** 2
+    kois['koi_cdpp_dur'] = kois['m17_cdpp_fit0'].values + \
+                           kois['m17_cdpp_fit1'].values * x + \
+                           kois['m17_cdpp_fit2'].values * x ** 2
     kois['koi_snr'] = kois['koi_ror'].values ** 2 * \
-                      (kois['koi_period'].values / kois['kic_tobs'].values) ** -0.5 * \
+                      (kois['koi_period'].values / kois['m17_tobs'].values) ** -0.5 * \
                       1 / (kois['koi_cdpp_dur'].values * 1e-6)
 
     det_prob = []
@@ -158,12 +158,12 @@ def get_sensitivity_contour(kicselect, percentile):
         aors = (smas / 0.00465047) / kicselect['gaia2_srad']
 
         x = 1 / np.sqrt(durations)
-        cdpp_dur = kicselect['kic_cdpp_fit0'] + kicselect['kic_cdpp_fit1'] * x + kicselect['kic_cdpp_fit2'] * x ** 2
+        cdpp_dur = kicselect['m17_cdpp_fit0'] + kicselect['m17_cdpp_fit1'] * x + kicselect['m17_cdpp_fit2'] * x ** 2
 
         for j, r in enumerate(rgrid):
             rors = (r * (C.Re / C.Rs)) / kicselect['gaia2_srad']
 
-            snr = (r * (C.Re / C.Rs) / kicselect['m17_smass']) ** 2 * (p / kicselect['kic_tobs']) ** -0.5 * (
+            snr = (r * (C.Re / C.Rs) / kicselect['m17_smass']) ** 2 * (p / kicselect['m17_tobs']) ** -0.5 * (
                         1 / (cdpp_dur * 1e-6))
 
             tr = np.nanmedian((0.9 / aors))

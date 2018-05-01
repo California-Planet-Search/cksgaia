@@ -151,7 +151,7 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
                       gaia2_gflux_ratio < 1.1 & \
                       gaia2_srad / gaia2_srad_err1 > 10')
         df = df[df['gaia2_srad'] <= 10**(ls*(df['gaia2_steff']-5500)+li)]
-        df = df.dropna(subset=['kic_smass']).reset_index()
+        df = df.dropna(subset=['m17_smass']).reset_index()
 
     # Used for AS plots
     elif table=='cks+gaia2+h13':
