@@ -135,13 +135,13 @@ def contour_plot_kde(physmerge, xcol, ycol, xlim, ylim, ylog=True, pltxlim=None,
     pl.xlim(pltxlim)
     pl.ylim(pltylim)
 
-    ax.xaxis.set_major_formatter(matplotlib.ticker.ScalarFormatter())
-    ax.xaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('%.0f'))
-    if ylog:
-        ax.yaxis.set_major_formatter(matplotlib.ticker.ScalarFormatter())
-        ax.yaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('%.0f'))
-    else:
-        ax.yaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('%.1f'))
+    #ax.xaxis.set_major_formatter(matplotlib.ticker.ScalarFormatter())
+    #ax.xaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('%.0f'))
+    #if ylog:
+    #    ax.yaxis.set_major_formatter(matplotlib.ticker.ScalarFormatter())
+    #    ax.yaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('%.0f'))
+    #else:
+    #    ax.yaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('%.1f'))
 
     pl.grid(True)
 
@@ -177,6 +177,10 @@ def period_contour_q16():
 
 def period_contour_cks(sample=None, kwidth=(0.20, 0.05), vlims=(0.0, 0.03),
                        ylimits=(1.0, 4.0), clim=None, single=False, nodata=False):
+    fig = pl.figure(figsize=(6,4))
+    #import seaborn as sns
+    #sns.set_style('ticks')
+
     if sample is None:
         physmerge = cksgaia.io.load_table(cksgaia.plot.config.filtered_sample)
     else:
@@ -193,13 +197,12 @@ def period_contour_cks(sample=None, kwidth=(0.20, 0.05), vlims=(0.0, 0.03),
     # pl.plot(wper, wsens, 'k-', color='0.6', linestyle='dashed', lw=3)
 
     # pl.xticks([0.6,0.8,1.0,1.2,1.5])
-    pl.yticks([])
-    ax.xaxis.set_major_formatter(matplotlib.ticker.ScalarFormatter())
-    ax.xaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('%.0f'))
-    ax.yaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('%.1f'))
-    # pl.yticks([1.0, 1.5, 2.4, 4.0, 6.0, 10.0])
-    pl.yticks([1.0, 1.5, 2.4, 3.5])
+    #pl.yticks([])
+    #ax.xaxis.set_major_formatter(matplotlib.ticker.ScalarFormatter())
+    #ax.xaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('%.0f'))
+    #ax.yaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('%.1f'))
 
+    pl.minorticks_off()
     if clim is not None:
         cx, cy = clim
     else:
@@ -218,8 +221,14 @@ def period_contour_cks(sample=None, kwidth=(0.20, 0.05), vlims=(0.0, 0.03),
     #     np.savetxt(os.path.join(DATADIR, 'kde_slices_{}.txt'.format(v)),
     #                np.transpose((xi, k)))
 
+    yt = [1.0, 1.5, 2.4, 3.5]
+    xt = [1,3,10,30,100]
+    pl.yticks(yt,yt)
+    pl.xticks(xt,xt)
+
     pl.xlabel('Orbital period [days]')
     pl.ylabel('Planet Size [Earth radii]')
+    fig.set_tight_layout(True)
     # pl.title('CKS')
 
 
