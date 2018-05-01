@@ -310,6 +310,7 @@ def contour_masscuts():
     kicselect = cksgaia.completeness.fit_cdpp(kicselect)
 
     highcut, lowcut, _, _, _, annotations = cksgaia.plot.occur.get_mass_samples()
+    annotations = annotations[::-1]
 
     high = physmerge.query('giso_smass > @highcut')
     medium = physmerge.query('giso_smass <= @highcut & giso_smass >= @lowcut')
@@ -352,6 +353,7 @@ def period_contour_masscuts():
     kicselect = cksgaia.completeness.fit_cdpp(kicselect)
 
     highcut, lowcut, _, _, _, annotations = cksgaia.plot.occur.get_mass_samples()
+    annotations = annotations[::-1]
 
     high = physmerge.query('giso_smass > @highcut')
     medium = physmerge.query('giso_smass <= @highcut & giso_smass >= @lowcut')
