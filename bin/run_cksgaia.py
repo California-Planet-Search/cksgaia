@@ -216,10 +216,6 @@ def update_paper(args):
     w.update_paper() 
 
 
-<<<<<<< HEAD
-=======
-
->>>>>>> master
 class Workflow(object):
     def __init__(self, outputdir='./'):
         self.outputdir = outputdir
