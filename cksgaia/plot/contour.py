@@ -143,8 +143,6 @@ def contour_plot_kde(physmerge, xcol, ycol, xlim, ylim, ylog=True, pltxlim=None,
     #else:
     #    ax.yaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('%.1f'))
 
-    pl.grid(True)
-
     if clabel is not None:
         clabel = clabel
     elif weighted:
@@ -152,6 +150,8 @@ def contour_plot_kde(physmerge, xcol, ycol, xlim, ylim, ylog=True, pltxlim=None,
     else:
         clabel = 'Relative Density of Planets'
     cmap = pl.colorbar(pad=0, label=clabel)
+
+    ax.xaxis.grid(True)
 
     return (ax, 10 ** xi, 10 ** yi, zi)
 
@@ -175,7 +175,7 @@ def period_contour_q16():
     pl.title('Q16')
 
 
-def period_contour_cks(sample=None, kwidth=(0.20, 0.05), vlims=(0.0, 0.03),
+def period_contour_cks(sample=None, kwidth=(0.20, 0.05), vlims=(0.0, 0.025),
                        ylimits=(1.0, 4.0), clim=None, single=False, nodata=False):
     fig = pl.figure(figsize=(6,4))
     #import seaborn as sns
@@ -202,7 +202,9 @@ def period_contour_cks(sample=None, kwidth=(0.20, 0.05), vlims=(0.0, 0.03),
     #ax.xaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('%.0f'))
     #ax.yaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('%.1f'))
 
-    pl.minorticks_off()
+    # ax.get_xaxis().set_major_locator(matplotlib.ticker.AutoMajorLocator())
+    # ax.get_yaxis().set_major_locator(matplotlib.ticker.AutoMajorLocator())
+    # ax.grid(b=True, which='major', color='0.8', lw=2)
     if clim is not None:
         cx, cy = clim
     else:
@@ -301,7 +303,7 @@ def insol_contour_data(sample=None, vlims=None, kwidth=(0.4, 0.05), clims=None):
     cy = np.append(cy, 6)
 
     if vlims is None:
-        vlims = (0.0, 0.035)
+        vlims = (0.0, 0.03)
     else:
         vlims = vlims
 
@@ -359,18 +361,18 @@ def contour_masscuts():
 
     pl.subplots_adjust(left=0.05, right=0.95, wspace=0.28, bottom=0.2)
 
-    vlimits = [(0.0, 0.03), (0.0, 0.02), (0.0, 0.03)]
+    vlimits = [(0.0, 0.022), (0.0, 0.022), (0.0, 0.022)]
 
     for i, sample in enumerate([high, medium, low]):
 
         pl.subplot(1, 3, i+1)
 
         if sample is high:
-            kicsample = kicselect.query('kic_smass > @highcut')
+            kicsample = kicselect.query('m17_smass > @highcut')
         elif sample is medium:
-            kicsample = kicselect.query('kic_smass <= @highcut & kic_smass >= @lowcut')
+            kicsample = kicselect.query('m17_smass <= @highcut & m17_smass >= @lowcut')
         elif sample is low:
-            kicsample = kicselect.query('kic_smass < @lowcut')
+            kicsample = kicselect.query('m17_smass < @lowcut')
 
         sample = cksgaia.completeness.get_weights(sample, kicsample)
 
@@ -402,17 +404,17 @@ def period_contour_masscuts():
 
     fig2 = pl.figure(2)
 
-    vlimits = [(0.0, 0.025), (0.0, 0.015), (0.0, 0.025)]
+    vlimits = [(0.0, 0.02), (0.0, 0.02), (0.0, 0.02)]
     hlines = [2.63, 2.46, 2.33]
 
     for i, sample in enumerate([high, medium, low]):
 
         if sample is high:
-            kicsample = kicselect.query('kic_smass > @highcut')
+            kicsample = kicselect.query('m17_smass > @highcut')
         elif sample is medium:
-            kicsample = kicselect.query('kic_smass <= @highcut & kic_smass >= @lowcut')
+            kicsample = kicselect.query('m17_smass <= @highcut & m17_smass >= @lowcut')
         elif sample is low:
-            kicsample = kicselect.query('kic_smass < @lowcut')
+            kicsample = kicselect.query('m17_smass < @lowcut')
 
         sample = cksgaia.completeness.get_weights(sample, kicsample)
 

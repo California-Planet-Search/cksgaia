@@ -19,7 +19,7 @@ import cksgaia.errors
 import cksgaia.calc
 import cksgaia.config
 import cksgaia.sim.simulations
-from cksgaia.plot.compare import ComparisonRadius as CR 
+from cksgaia.plot.compare import ComparisonRadius as CR
 
 def main():
     psr = ArgumentParser()
@@ -214,7 +214,6 @@ def create_val(args):
 def update_paper(args):
     w = Workflow(outputdir=args.outputdir)
     w.update_paper() 
-
 
 
 class Workflow(object):

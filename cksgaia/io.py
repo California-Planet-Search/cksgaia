@@ -140,13 +140,17 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
     elif table == 'kic':
         fname = os.path.join(DATADIR, 'kic_q0_q17.hdf')
         kic = pd.read_hdf(fname)
-        s17 = load_table('stellar17')
+        s17 = load_table('m17+gaia2')
         df = pd.merge(s17, kic, left_on='id_kic', right_on='KICID')
 
     elif table == 'kic-filtered':
         df = load_table('kic')
-        df = df.query('kic_kepmag <= 14.2 & kic_steff >= 4700 & kic_steff <= 6500')
-        df = df[df['kic_srad'] <= 10**(ls*(df['kic_steff']-5500)+li)]
+        df = df.query('kic_kepmag <= 14.2 & \
+                      gaia2_steff >= 4700 & \
+                      gaia2_steff <= 6500 & \
+                      gaia2_gflux_ratio < 1.1 & \
+                      gaia2_srad / gaia2_srad_err1 > 10')
+        df = df[df['gaia2_srad'] <= 10**(ls*(df['gaia2_steff']-5500)+li)]
         df = df.dropna(subset=['kic_smass']).reset_index()
 
     # Used for AS plots

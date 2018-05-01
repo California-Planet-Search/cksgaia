@@ -13,4 +13,4 @@ MERGED_TABLE_NAME = os.path.join('cksgaia-planets')
 ls, li = 0.00025, 0.20
 
 # Total number of stars in the search sample
-num_stars = 36075
+num_stars = 36103

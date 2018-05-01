@@ -34,18 +34,18 @@ def get_mass_samples():
     return (highcut, lowcut, high, medium, low, annotations)
 
 def histfitplot(physmerge, bin_centers, N, e, mask, result, result2, completeness=False, plotmod=True,
-                eloc=[10.0, 0.10], alpha=1.0, unc=True):
+                eloc=[10.0, 0.06], alpha=1.0, unc=True):
     xmod = np.logspace(-2, 1, 1000)
 
     masklim = (np.min(bin_centers[mask]), np.max(bin_centers[mask]))
 
-    fig = pl.figure(figsize=(12, 8))
+    fig = pl.figure(figsize=(6, 4))
 
     pl.subplots_adjust(left=0.15)
 
-    pl.step(bin_centers, N, color='k', where='mid', lw=4, alpha=alpha)
+    pl.step(bin_centers, N, color='k', where='mid', lw=2, alpha=alpha)
     # pl.bar(bin_centers, N, color='k', lw=4, alpha=alpha)
-    pl.step(bin_centers[0:8], N[0:8], color='0.9', where='mid', lw=5, alpha=alpha)
+    pl.step(bin_centers[0:8], N[0:8], color='0.9', where='mid', lw=3, alpha=alpha)
     # pl.step(bin_centers[~mask][0:9], N[~mask][0:9], color='0.9', where='mid', lw=5, alpha=alpha)
     # pl.step(bin_centers[~mask][8:], N[~mask][8:], color='0.9', where='mid', lw=4)
     # pl.step(bin_centers[~mask][7:], NF[~mask][7:], color='0.9', where='mid', lw=3)
@@ -58,12 +58,12 @@ def histfitplot(physmerge, bin_centers, N, e, mask, result, result2, completenes
     print "err+, err- = ", err1, err2
 
     _, caps, _ = pl.errorbar([xpos], [ypos], fmt='k.', xerr=[[err1], [err2]],
-                             lw=2, capsize=6, mew=0, ms=0.1)
+                             lw=1, capsize=3, mew=0, ms=0.1)
     for cap in caps:
-        cap.set_markeredgewidth(2)
+        cap.set_markeredgewidth(1)
     pl.annotate("typical\nuncert.", xy=(xpos, ypos), xytext=(0, -50),
                 xycoords="data", textcoords="offset points",
-                horizontalalignment='center', fontsize=18)
+                horizontalalignment='center', fontsize=14)
 
     if unc:
         _, caps, _ = pl.errorbar(
@@ -75,13 +75,13 @@ def histfitplot(physmerge, bin_centers, N, e, mask, result, result2, completenes
             drawstyle='steps-mid',
             linestyle='none',
             color='k',
-            lw=2,
-            capsize=6,
+            lw=1,
+            capsize=3,
             alpha=alpha
         )
 
     for cap in caps:
-        cap.set_markeredgewidth(2)
+        cap.set_markeredgewidth(1)
 
     # fit0 = cksrad.fitting.lognorm(xmod, result.params['amp'].value,
     #                          result.params['mu'].value,
@@ -297,7 +297,7 @@ def money_plot_plain():
     # pl.axvline(3.5, color=c2, linestyle='dashed', lw=2)
     # pl.axvspan(1.75, 3.5, color=c2, alpha=0.1)
 
-    pl.ylim(0, 0.125)
+    pl.ylim(0, 0.08)
 
 
 def mass_cuts():
