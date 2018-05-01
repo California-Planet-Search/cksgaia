@@ -1,5 +1,5 @@
 import cksgaia.io
-import seaborn as sns
+#import seaborn as sns
 from matplotlib.pylab import *
 # sns.set_context('paper',font_scale=1.2)
 # sns.set_style('ticks')
