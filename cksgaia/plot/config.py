@@ -5,10 +5,13 @@ import os
 
 import cksgaia
 
-matplotlib.rcParams['font.size'] = 12
+matplotlib.rcParams['font.size'] = 10
 matplotlib.rcParams['figure.figsize'] = (6, 4)
 
-afs = 12  # font size for annotations
+matplotlib.rcParams['figure.subplot.left'] = 0.13
+matplotlib.rcParams['figure.subplot.bottom'] = 0.13
+
+afs = 10  # font size for annotations
 
 full_sample = 'cksgaia-planets'
 filtered_sample = 'cksgaia-planets-weights'

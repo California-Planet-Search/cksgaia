@@ -4,7 +4,6 @@ import os
 from collections import OrderedDict
 
 import pylab as pl
-import numpy as np
 
 import pandas as pd
 import glob
@@ -223,6 +222,8 @@ class Workflow(object):
         d = OrderedDict()
 
         # register different plots here
+        d['insol-contour-masscuts'] = cksgaia.plot.contour.contour_masscuts
+        d['period-contour-masscuts'] = cksgaia.plot.contour.period_contour_masscuts
         # d['extinction'] = cksgaia.plot.extinction.fig_extinction
         # d['sample'] = cksgaia.plot.sample.hrplot
         # d['filters'] = cksgaia.plot.sample.filter_plot
@@ -245,8 +246,6 @@ class Workflow(object):
         d['period-contour-cks'] = cksgaia.plot.contour.period_contour_cks
         # d['insol-contour-anno'] = cksgaia.plot.contour.insol_contour_anno
         d['insol-contour-data'] = cksgaia.plot.contour.insol_contour_data
-        d['insol-contour-masscuts'] = cksgaia.plot.contour.contour_masscuts
-        d['period-contour-masscuts'] = cksgaia.plot.contour.period_contour_masscuts
         # d['srad-contour'] = cksgaia.plot.contour.srad_contour
         # d['smass-cuts'] = cksgaia.plot.occur.mass_cuts
         # d['desert-edge'] = cksgaia.plot.occur.desert_edge

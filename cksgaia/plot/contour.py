@@ -10,8 +10,6 @@ import cksgaia.completeness
 from cksgaia.config import *
 from cksgaia.plot.config import *
 
-matplotlib.rcParams['figure.figsize'] = (6, 4)
-
 def contour_plot_kde(physmerge, xcol, ycol, xlim, ylim, ylog=True, pltxlim=None, pltylim=None, epos=[3000, 5],
                      cont=True, nodata=False, weighted=False, nstars=36075., eaoff=(0, -30), clabel=None,
                      vlims=(0.0, 0.05), kwidth=None, single=False):
@@ -135,14 +133,6 @@ def contour_plot_kde(physmerge, xcol, ycol, xlim, ylim, ylog=True, pltxlim=None,
     pl.xlim(pltxlim)
     pl.ylim(pltylim)
 
-    #ax.xaxis.set_major_formatter(matplotlib.ticker.ScalarFormatter())
-    #ax.xaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('%.0f'))
-    #if ylog:
-    #    ax.yaxis.set_major_formatter(matplotlib.ticker.ScalarFormatter())
-    #    ax.yaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('%.0f'))
-    #else:
-    #    ax.yaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('%.1f'))
-
     if clabel is not None:
         clabel = clabel
     elif weighted:
@@ -156,30 +146,8 @@ def contour_plot_kde(physmerge, xcol, ycol, xlim, ylim, ylog=True, pltxlim=None,
     return (ax, 10 ** xi, 10 ** yi, zi)
 
 
-def period_contour_q16():
-    physmerge = cksgaia.io.load_table(cksgaia.plot.config.filtered_sample)
-
-    ax, xi, yi, zi = contour_plot_kde(physmerge, 'koi_period', 'koi_prad', xlim=[0.4, 1000.0],
-                                                      ylim=[0.5, 20], ylog=True,
-                                                      pltxlim=[0.7, 100.0], pltylim=[1.0, 10], epos=[1.2, 6.0],
-                                                      eaoff=(0, -100), weighted=True,
-                                                      vlims=(0.0, 0.07))
-
-    # pl.xticks([0.6,0.8,1.0,1.2,1.5])
-    ax.xaxis.set_major_formatter(matplotlib.ticker.ScalarFormatter())
-    ax.xaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('%.0f'))
-
-    pl.xlabel('Orbital period [days]')
-    pl.ylabel('Planet Size [Earth radii]')
-
-    pl.title('Q16')
-
-
 def period_contour_cks(sample=None, kwidth=(0.20, 0.05), vlims=(0.0, 0.025),
                        ylimits=(1.0, 4.0), clim=None, single=False, nodata=False):
-    fig = pl.figure(figsize=(6,4))
-    #import seaborn as sns
-    #sns.set_style('ticks')
 
     if sample is None:
         physmerge = cksgaia.io.load_table(cksgaia.plot.config.filtered_sample)
@@ -194,17 +162,6 @@ def period_contour_cks(sample=None, kwidth=(0.20, 0.05), vlims=(0.0, 0.025),
                                       weighted=True, kwidth=kwidth, vlims=vlims, single=single,
                                       nodata=nodata)
 
-    # pl.plot(wper, wsens, 'k-', color='0.6', linestyle='dashed', lw=3)
-
-    # pl.xticks([0.6,0.8,1.0,1.2,1.5])
-    #pl.yticks([])
-    #ax.xaxis.set_major_formatter(matplotlib.ticker.ScalarFormatter())
-    #ax.xaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('%.0f'))
-    #ax.yaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('%.1f'))
-
-    # ax.get_xaxis().set_major_locator(matplotlib.ticker.AutoMajorLocator())
-    # ax.get_yaxis().set_major_locator(matplotlib.ticker.AutoMajorLocator())
-    # ax.grid(b=True, which='major', color='0.8', lw=2)
     if clim is not None:
         cx, cy = clim
     else:
@@ -230,7 +187,7 @@ def period_contour_cks(sample=None, kwidth=(0.20, 0.05), vlims=(0.0, 0.025),
 
     pl.xlabel('Orbital period [days]')
     pl.ylabel('Planet Size [Earth radii]')
-    fig.set_tight_layout(True)
+    # fig.set_tight_layout(True)
     # pl.title('CKS')
 
 
@@ -322,8 +279,11 @@ def insol_contour_data(sample=None, vlims=None, kwidth=(0.4, 0.05), clims=None):
 
     ax.yaxis.set_major_formatter(matplotlib.ticker.ScalarFormatter())
     ax.yaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('%.1f'))
-    pl.yticks([])
-    pl.yticks([1.0, 1.5, 2.4, 3.5])
+
+    xt = [10, 30, 100, 300, 1000, 3000]
+    yt = [1.0, 1.5, 2.4, 3.5]
+    pl.xticks(xt, xt)
+    pl.yticks(yt, yt)
 
 
 def srad_contour():
@@ -359,11 +319,11 @@ def contour_masscuts():
 
     pl.subplot(1, 3, 1)
 
-    pl.subplots_adjust(left=0.05, right=0.95, wspace=0.28, bottom=0.2)
+    pl.subplots_adjust(left=0.05, right=0.95, wspace=0.35, bottom=0.2)
 
     vlimits = [(0.0, 0.022), (0.0, 0.022), (0.0, 0.022)]
 
-    for i, sample in enumerate([high, medium, low]):
+    for i, sample in enumerate([low, medium, high]):
 
         pl.subplot(1, 3, i+1)
 
@@ -400,7 +360,8 @@ def period_contour_masscuts():
     fig = pl.figure(1, figsize=(13, 3))
 
     pl.subplot(1, 3, 1)
-    pl.subplots_adjust(left=0.05, right=0.95, wspace=0.28, bottom=0.2)
+
+    pl.subplots_adjust(left=0.05, right=0.95, wspace=0.35, bottom=0.2)
 
     fig2 = pl.figure(2)
 
