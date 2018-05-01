@@ -6,7 +6,7 @@ import os
 import cksgaia
 
 matplotlib.rcParams['font.size'] = 12
-matplotlib.rcParams['figure.figsize'] = (12, 10)
+matplotlib.rcParams['figure.figsize'] = (6, 4)
 
 afs = 12  # font size for annotations
 

@@ -151,7 +151,7 @@ def get_sensitivity_contour(kicselect, percentile):
     nkic = kicselect['id_kic'].count()
 
     for i, p in enumerate(pgrid):
-        smas = (kicselect['kic_smass'] * (p / 365.) ** 2) ** (1 / 3.)
+        smas = (kicselect['m17_smass'] * (p / 365.) ** 2) ** (1 / 3.)
         a = (C.G * kicselect['gaia2_srad'] * C.Ms * ((p * (24 * 3600.)) / (2 * np.pi)) ** 2) ** (1 / 3.) * C.aupercm
         R = kicselect['gaia2_srad'] * C.Rs * C.aupercm
         durations = (p * 24. / np.pi) * np.arcsin(R / a)
@@ -163,7 +163,7 @@ def get_sensitivity_contour(kicselect, percentile):
         for j, r in enumerate(rgrid):
             rors = (r * (C.Re / C.Rs)) / kicselect['gaia2_srad']
 
-            snr = (r * (C.Re / C.Rs) / kicselect['kic_smass']) ** 2 * (p / kicselect['kic_tobs']) ** -0.5 * (
+            snr = (r * (C.Re / C.Rs) / kicselect['m17_smass']) ** 2 * (p / kicselect['kic_tobs']) ** -0.5 * (
                         1 / (cdpp_dur * 1e-6))
 
             tr = np.nanmedian((0.9 / aors))

@@ -33,7 +33,7 @@ def hrplot():
     ax.yaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('%0.1f'))
     ax.yaxis.set_ticks(np.logspace(np.log10(0.5), np.log10(6.0), 8))
     #pl.yticks(np.logspace(np.log10(0.5), np.log10(6.0), 8))
-    pl.minorticks_off()
+    ax.minorticks_off()
 
     pl.xlim(6600, 4500)
     pl.ylim(0.5,6.0)
