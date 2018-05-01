@@ -19,7 +19,7 @@ def val_stat(return_dict=False):
 
     d['cks-gaia-distmod-err-median'] = "{:.2f}".format(cut.eval('gaia2_sparallax_err / gaia2_sparallax').median())
 
-    df = cksgaia.io.load_table('m17+gaia2+j17+extinct',cache=0)
+    df = cksgaia.io.load_table('m17+gaia2+j17+ext',cache=0)
     df = df.query('kic_kepmag < 14.2')
     d['ak-median'] = "{:.03f}".format(df.ak.median())
     d['ak-median-err'] = "{:.03f}".format(df.ak_err.median())
@@ -62,6 +62,10 @@ def val_stat(return_dict=False):
     d['cks-gaia2-srad-err-mean'] = "{:.1f}\%".format((comp.x2err[0]/  comp.x2).mean() * 100)
     d['cks-gaia2-srad-mean'] = comp.mean_string()
     d['cks-gaia2-srad-std'] = comp.std_string()
+
+    # Planet population
+    df = cksgaia.io.load_table('cksgaia-planets-filtered',cache=1)
+    d['num-planets-filtered'] = len(df)
 
 
     lines = []

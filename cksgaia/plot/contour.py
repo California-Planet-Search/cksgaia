@@ -146,7 +146,7 @@ def contour_plot_kde(physmerge, xcol, ycol, xlim, ylim, ylog=True, pltxlim=None,
     return (ax, 10 ** xi, 10 ** yi, zi)
 
 
-def period_contour_cks(sample=None, kwidth=(0.20, 0.05), vlims=(0.0, 0.025),
+def period_contour_cks(sample=None, kwidth=(0.40, 0.05), vlims=(0.0, 0.025),
                        ylimits=(1.0, 4.0), clim=None, single=False, nodata=False):
 
     if sample is None:

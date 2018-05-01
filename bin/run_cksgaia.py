@@ -227,7 +227,7 @@ class Workflow(object):
         d['period-contour-masscuts'] = cksgaia.plot.contour.period_contour_masscuts
         # d['extinction'] = cksgaia.plot.extinction.fig_extinction
         # d['sample'] = cksgaia.plot.sample.hrplot
-        # d['filters'] = cksgaia.plot.sample.filter_plot
+        d['filters'] = cksgaia.plot.sample.filter_plot
         # d['mag-hist'] = cksgaia.plot.sample.magcuts
         # d['depth-hist'] = cksgaia.plot.sample.depth_hist
         d['srad-h13'] = lambda : CR('srad-h13').plot_comparison()
