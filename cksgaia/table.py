@@ -63,35 +63,59 @@ def filters_table():
     lines = [l.replace('\n', '') for l in lines]
     return lines
 
-def planet_params_table(lines='all'):
-    physmerge = cksgaia.io.load_table('j17')
-    cols = [
-        'id_koicand', 'koi_period', 'koi_ror', 'iso_prad', 'iso_insol', 
-        'iso_teq'
-    ]
-    if lines == 'all':
-        outstr = physmerge.to_latex(columns=cols, escape=False, header=False,
-                                    index=False, float_format='%4.2f')
-    else:
-        outstr = physmerge.iloc[0:int(lines)].to_latex(columns=cols, escape=False, header=False,
-                                                       index=False, float_format='%4.2f')
 
-    return outstr.split('\n')
+def star():
+    df = cksgaia.io.load_table('cksgaia-planets',cache=1)
+    df = df.groupby('id_starname',as_index=False).nth(0)
+    df = df.sort_values(by='id_starname')
+    lines = []
+    for i, row in df.iterrows():
+        s = r""
+        s+="{id_starname:s} & "
+        s+="{cks_steff:0.0f} & "
+        s+="{cks_smet:0.2f} & "
+        s+="{m17_kmag:0.1f} & "
+        s+="{gaia2_sparallax:0.2f} & "
+        s+="{ext_ak:0.3f} & "
+        s+="{giso_srad:0.2f} & "
+        s+="{giso_smass:0.2f} & "
+        s+="{giso_slogage:0.2f} & "
+        s+=r"{gaia2_gflux_ratio:0.2f} & " 
+        s+=r"{fur17_rcorr_avg:.3f} \\"
+        s = s.format(**row)
+        s = s.replace('nan','\\nodata')
+        lines.append(s)
+
+    return lines
+
+def planet():
+    df = cksgaia.io.load_table('cksgaia-planets',cache=1)
+    df = df.sort_values(by='id_koicand')
+    lines = []
+    for i, row in df.iterrows():
+        
+        # Include errors
+        '''
+        s = r""
+        s+=r"{id_koicand:s} & "
+        s+=r"{koi_period:0.1f} & "
+        s+=r"{koi_ror:.5f}_{{ {koi_ror_err2:.5f} }}^{{ +{koi_ror_err1:.5f} }} & "  
+        s+=r"{giso_prad:.2f}_{{ {giso_prad_err2:.2f} }}^{{ +{giso_prad_err1:.2f} }} & "  
+        s+=r"{giso_sma:.5f}_{{ {giso_sma_err2:.5f} }}^{{ +{giso_sma_err1:.5f} }} & "  
+        s+=r"{giso_insol:.0f}_{{ {giso_insol_err2:.0f} }}^{{ +{giso_insol_err1:.0f} }} \\  "
+        '''
 
 
-def stellar_params_table(lines='all'):
-    physmerge = cksgaia.io.load_table('j17')
-    cols = [
-        'id_koicand', 'id_tycho2', 'kic_kmag', 'cks_teff', 'iso_insol', 
-        'iso_teq', 'iso_logg','iso_feh', 'iso_smass', 'iso_srad', 
-        'iso_slogage', 'gaia2_sparallax'
-    ]
+        s = r""
+        s+=r"{id_koicand:s} & "
+        s+=r"{koi_period:0.1f} & "
+        s+=r"{koi_ror:.5f}  & "  
+        s+=r"{giso_prad:.2f} & "  
+        s+=r"{giso_sma:.5f} & "  
+        s+=r"{giso_insol:.0f} \\  "
 
-    if lines == 'all':
-        outstr = physmerge.to_latex(columns=cols, escape=False, header=False,
-                                    index=False, float_format='%4.2f')
-    else:
-        outstr = physmerge.iloc[0:int(lines)].to_latex(columns=cols, escape=False, header=False,
-                                                       index=False, float_format='%4.2f')
-    return outstr.split('\n')
 
+        s = s.format(**row)
+        s = s.replace('nan','\\nodata')
+        lines.append(s)
+    return lines
