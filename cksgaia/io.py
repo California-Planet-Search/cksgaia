@@ -171,7 +171,7 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
         df = df.drop('distance ra dec'.split(),axis=1)
 
     elif table=='m17+gaia2+j17+iso':
-        df1 = load_table('m17+gaia2+j17+extinct')
+        df1 = load_table('m17+gaia2+j17+ext')
         df2 = pd.read_csv(os.path.join(DATADIR, 'isochrones_gaia2.csv'))
         df = pd.merge(df1, df2, on='id_starname')
 

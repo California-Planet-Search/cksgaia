@@ -258,6 +258,7 @@ class Workflow(object):
         # register different tables here
         #d['weight-tex-stub'] = lambda : cksgaia.table.weight_table(lines=10)
         #d['weight-tex-full'] = lambda: cksgaia.table.weight_table(lines='all')
+        d = OrderedDict()
         d['star-stub'] = lambda: cksgaia.table.star()[:12]
         d['planet-stub'] = lambda: cksgaia.table.planet()[:15]
         #d['histbins'] = lambda: cksgaia.table.bins_table()
