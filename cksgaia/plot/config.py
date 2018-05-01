@@ -6,8 +6,8 @@ import os
 import cksgaia
 
 matplotlib.rcParams['font.size'] = 10
-matplotlib.rcParams['figure.figsize'] = (6, 4)
 
+matplotlib.rcParams['figure.figsize'] = (6, 4)
 matplotlib.rcParams['figure.subplot.left'] = 0.13
 matplotlib.rcParams['figure.subplot.bottom'] = 0.13
 
