@@ -177,7 +177,6 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
 
     elif table=='m17+gaia2+j17+iso+fur17':
         df1 = load_table('m17+gaia2+j17+iso')
-        import pdb;pdb.set_trace()
         df2 = load_table('fur17')
         df = pd.merge(df1,df2 ,how='left')
 
