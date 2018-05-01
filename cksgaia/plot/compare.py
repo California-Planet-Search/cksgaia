@@ -1,4 +1,4 @@
-import seaborn as sns
+#import seaborn as sns
 import pandas as pd
 
 from matplotlib.pylab import *

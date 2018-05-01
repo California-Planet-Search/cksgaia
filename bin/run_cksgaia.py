@@ -12,10 +12,13 @@ import glob
 import cksgaia.io     # module for reading and writing datasets
 import cksgaia.value  # module for computing scalar values for table
 import cksgaia.table  # module for computing scalar values for table
-import cksgaia.plot   # submodule for including plots
+import cksgaia.plot.sample   # submodule for including plots
+import cksgaia.plot.contour   # submodule for including plots
+import cksgaia.plot.occur   # submodule for including plots
 import cksgaia.errors
 import cksgaia.calc
-import cksgaia.plot.extinction
+#import cksgaia.plot.extinction
+
 import cksgaia.extinction
 import cksgaia.config
 import cksgaia.sim.simulations
@@ -215,7 +218,7 @@ def update_paper(args):
     w.update_paper() 
 
 
-from cksgaia.plot.compare import ComparisonRadius as CR 
+#from cksgaia.plot.compare import ComparisonRadius as CR 
 
 class Workflow(object):
     def __init__(self, outputdir='./'):
