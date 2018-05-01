@@ -14,6 +14,7 @@ import cksgaia.table  # module for computing scalar values for table
 import cksgaia.plot.sample   # submodule for including plots
 import cksgaia.plot.contour   # submodule for including plots
 import cksgaia.plot.occur   # submodule for including plots
+import cksgaia.plot.sim
 import cksgaia.errors
 import cksgaia.calc
 import cksgaia.config
@@ -251,6 +252,7 @@ class Workflow(object):
         # d['desert-edge'] = cksgaia.plot.occur.desert_edge
         d['desert-edge-cum'] = cksgaia.plot.occur.desert_edge_cum
         d['mean-values'] = cksgaia.plot.occur.mean_values
+        d['width-sim-plot'] = cksgaia.plot.sim.wid_sim_plot
 
         self.plot_dict = d
 
