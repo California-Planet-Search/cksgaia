@@ -6,7 +6,7 @@ import cksgaia.fitting
 def weight_table(lines='all'):
     physmerge = cksgaia.io.load_table('cksgaia-planets-weights')
     cols = [
-        'id_koicand', 'koi_period', 'iso_prad', 'koi_snr', 'det_prob', 
+        'id_koicand', 'koi_snr', 'det_prob',
         'tr_prob', 'weight'
     ]
     if lines == 'all':
@@ -20,25 +20,22 @@ def weight_table(lines='all'):
             float_format='%4.2f'
         )
 
-    return outstr.split('\n')
+    return outstr.split('\n')[2:-3]
 
 def weight_table_machine():
-    physmerge = cksgaia.io.load_table('fulton17-weights')
+    physmerge = cksgaia.io.load_table('cksgaia-planets-weights')
 
     full_cols = [
-        'id_koicand', 'koi_period', 'koi_period_err1', 'koi_period_err2',
-        'iso_prad', 'iso_prad_err1', 'iso_prad_err2'
-        'koi_snr', 'det_prob', 'tr_prob', 'weight'
+        'id_koicand', 'koi_snr', 'det_prob', 'tr_prob', 'weight'
     ]
 
     lines = []
     lines.append(", ".join(full_cols))
 
     for i, row in physmerge.iterrows():
-        row_str = "{:s}, {:10.8f}, {:.1e}, {:.1e}, {:.2f}, {:.2f}, {:.2f}, {:.2f}, {:.3f}, {:.4f}, {:.2f}".format(
-            row['id_koicand'], row['koi_period'], row['koi_period_err1'], row['koi_period_err2'],
-            row['iso_prad'], row['iso_prad_err1'], row['iso_prad_err2'],
-            row['koi_snr'], row['det_prob'], row['tr_prob'], row['weight']
+        row_str = "{:s}, {:.2f}, {:.3f}, {:.4f}, {:.2f}".format(
+            row['id_koicand'], row['koi_snr'], row['det_prob'],
+            row['tr_prob'], row['weight']
         )
         lines.append(row_str)
 

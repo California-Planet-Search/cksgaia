@@ -106,6 +106,11 @@ def main():
     psr2.add_argument('name',type=str)
     psr2.set_defaults(func=create_table)
 
+    psr2 = subpsr.add_parser('create-csv', parents=[psr_parent], )
+    psr2.add_argument('name',type=str)
+    psr2.set_defaults(func=create_csv)
+
+
     psr2 = subpsr.add_parser('update-paper', parents=[psr_parent])
     psr2.set_defaults(func=update_paper)
 
@@ -259,9 +264,9 @@ class Workflow(object):
         self.plot_dict = d
 
         # register different tables here
-        #d['weight-tex-stub'] = lambda : cksgaia.table.weight_table(lines=10)
-        #d['weight-tex-full'] = lambda: cksgaia.table.weight_table(lines='all')
         d = OrderedDict()
+        d['weight-tex-stub'] = lambda : cksgaia.table.weight_table(lines=10)
+        d['weight-tex-full'] = lambda: cksgaia.table.weight_table(lines='all')
         d['star-stub'] = lambda: cksgaia.table.star()[:12]
         d['planet-stub'] = lambda: cksgaia.table.planet()[:15]
         #d['histbins'] = lambda: cksgaia.table.bins_table()
