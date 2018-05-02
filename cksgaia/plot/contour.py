@@ -324,7 +324,7 @@ def contour_masscuts():
 
     vlimits = [(0.0, 0.022), (0.0, 0.022), (0.0, 0.022)]
 
-    for i, sample in enumerate([low, medium, high]):
+    for i, sample in enumerate([high, medium, low]):
 
         pl.subplot(1, 3, i+1)
 
@@ -345,6 +345,9 @@ def contour_masscuts():
         insol_contour_data(sample=sample, vlims=vlimits[i], kwidth=(0.75, 0.05))
         pl.title(annotations[i])
         pl.grid(lw=2, alpha=0.5)
+
+        if i < 2:
+
 
 
 def period_contour_masscuts():

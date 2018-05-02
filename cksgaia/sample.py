@@ -73,12 +73,12 @@ def apply_filters(physmerge, mkplot=False, verbose=False, textable=False):
         print "Kp < 14.2 filter removes %d planets." % (pre - post)
     plti = _bipanel(crop, nrow, ncol, plti, eloc=(12.0, 70), atxt='$Kp < 14.2$')
 
-    pre = len(crop)
-    crop = crop[crop['giso_srad'] / crop['giso_srad_err1'] > 10]
-    post = len(crop)
-    if verbose:
-        print "R$_{\star}$ > 10 $\sigma$" % (pre - post)
-    plti = _bipanel(crop, nrow, ncol, plti, eloc=(12.0, 70), atxt='$R_{\star} < 10 \sigma$')
+    # pre = len(crop)
+    # crop = crop[crop['giso_srad'] / crop['giso_srad_err1'] > 10]
+    # post = len(crop)
+    # if verbose:
+    #     print "R$_{\star}$ > 10 $\sigma$" % (pre - post)
+    # plti = _bipanel(crop, nrow, ncol, plti, eloc=(12.0, 70), atxt='$R_{\star} < 10 \sigma$')
 
     pre = len(crop)
     crop = crop[~(crop['fur17_rcorr_avg'] > 1.05)]
@@ -112,12 +112,12 @@ def apply_filters(physmerge, mkplot=False, verbose=False, textable=False):
         print "b < 0.9 filter removes %d planets." % (pre - post)
     plti = _bipanel(crop, nrow, ncol, plti, eloc=(12.0, 60), atxt='$b < 0.9$')
 
-    pre = len(crop)
-    crop = crop[crop['giso_prad_err1']/crop['giso_prad'] <= 0.1]
-    post = len(crop)
-    if verbose:
-        print "R$_{p}$ precision < 10%" % (pre - post)
-    plti = _bipanel(crop, nrow, ncol, plti, eloc=(12.0, 60), atxt=r'$Rp_{\rm err} < 10%$')
+    # pre = len(crop)
+    # crop = crop[crop['giso_prad_err1']/crop['giso_prad'] <= 0.1]
+    # post = len(crop)
+    # if verbose:
+    #     print "R$_{p}$ precision < 10%" % (pre - post)
+    # plti = _bipanel(crop, nrow, ncol, plti, eloc=(12.0, 60), atxt=r'$Rp_{\rm err} < 10%$')
 
 
     # pre = len(crop)

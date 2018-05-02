@@ -1,4 +1,5 @@
 import os
+import cksgaia.io
 
 DATADIR = os.path.join(os.path.dirname(__file__),'../data/')
 
@@ -13,4 +14,4 @@ MERGED_TABLE_NAME = os.path.join('cksgaia-planets')
 ls, li = 0.00025, 0.20
 
 # Total number of stars in the search sample
-num_stars = 36103
+num_stars = len(cksgaia.io.load_table('kic-filtered'))
