@@ -347,7 +347,7 @@ def contour_masscuts():
         pl.grid(lw=2, alpha=0.5)
 
         if i < 2:
-
+            pass
 
 
 def period_contour_masscuts():
