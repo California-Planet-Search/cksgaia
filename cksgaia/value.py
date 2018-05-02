@@ -1,7 +1,7 @@
 from collections import OrderedDict
 import cksgaia.io
 import numpy as np
-
+import cksgaia.config
 def val_stat(return_dict=False):
     d = OrderedDict()
 
@@ -68,6 +68,13 @@ def val_stat(return_dict=False):
     df = cksgaia.io.load_table('cksgaia-planets-filtered',cache=1)
     d['num-planets-filtered'] = len(df)
 
+
+    df = cksgaia.io.load_table('cksgaia-planets')
+    d['planet-count'] = len(df)
+
+    df = cksgaia.io.load_table('kic-filtered')
+    d['star-filtered-count'] = len(df)
+    d['planet-filtered-count'] = len(cksgaia.io.load_table('cksgaia-planets-filtered'))
 
     lines = []
     for k, v in d.iteritems():
