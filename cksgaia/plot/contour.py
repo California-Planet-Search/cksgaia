@@ -12,7 +12,7 @@ from cksgaia.plot.config import *
 
 def contour_plot_kde(physmerge, xcol, ycol, xlim, ylim, ylog=True, pltxlim=None, pltylim=None, epos=[3000, 5],
                      cont=True, nodata=False, weighted=False, nstars=36075., eaoff=(0, -30), clabel=None,
-                     vlims=(0.0, 0.05), kwidth=None, single=False):
+                     vlims=(0.0, 0.05), kwidth=None, single=False, cbar=True):
     """Plot contour plots
 
     Make the contour plots associated with Figures 8-10 in Fulton et al. (2017)
@@ -36,6 +36,7 @@ def contour_plot_kde(physmerge, xcol, ycol, xlim, ylim, ylog=True, pltxlim=None,
         clabel (string): (optional) string to label color bar scale
         vlims (tuple): (optional) colorscale limits (default = (0.0, 0.05))
         kwidth (tuple): (optional) kernel width in units of (x,y)
+        cbar (bool): (optional) plot colorbar?
 
     Returns:
         tuple: (axes object, 10**(grid x values), 10**(grid y values), grid z values)
@@ -106,7 +107,7 @@ def contour_plot_kde(physmerge, xcol, ycol, xlim, ylim, ylog=True, pltxlim=None,
         cap.set_markeredgewidth(1)
     pl.annotate("typical\nuncert.", xy=(xe, ye), xytext=eaoff,
                 xycoords="data", textcoords="offset points",
-                horizontalalignment='center', fontsize=10)
+                horizontalalignment='center', fontsize=12)
 
     # pl.semilogx()
     if ylog:
@@ -133,24 +134,31 @@ def contour_plot_kde(physmerge, xcol, ycol, xlim, ylim, ylog=True, pltxlim=None,
     pl.xlim(pltxlim)
     pl.ylim(pltylim)
 
-    if clabel is not None:
-        clabel = clabel
-    elif weighted:
-        clabel = 'Relative Occurrence'
-    else:
-        clabel = 'Relative Density of Planets'
-    cmap = pl.colorbar(pad=0, label=clabel)
+    if cbar:
+        if clabel is not None:
+            clabel = clabel
+        elif weighted:
+            clabel = 'Relative Occurrence'
+        else:
+            clabel = 'Relative Density of Planets'
+
+        ct = [0.0, 0.005, 0.01, 0.015, 0.02, 0.025, 0.03, 0.035, 0.04]
+        cmap = pl.colorbar(pad=0, ticks=ct, label=clabel)
 
     ax.xaxis.grid(True)
+    pl.minorticks_off()
 
     return (ax, 10 ** xi, 10 ** yi, zi)
 
 
-def period_contour_cks(sample=None, kwidth=(0.40, 0.05), vlims=(0.0, 0.025),
-                       ylimits=(1.0, 4.0), clim=None, single=False, nodata=False):
+def period_contour_cks(sample=None, kwidth=(0.40, 0.05), vlims=(0.0, 0.04),
+                       ylimits=(1.0, 4.0), clim=None, single=False, nodata=False,
+                       cbar=True):
 
     if sample is None:
         physmerge = cksgaia.io.load_table(cksgaia.plot.config.filtered_sample)
+        # fig = pl.figure(figsize=(6,4))
+        pl.subplots_adjust(right=0.91, left=0.15)
     else:
         physmerge = sample
 
@@ -160,13 +168,15 @@ def period_contour_cks(sample=None, kwidth=(0.40, 0.05), vlims=(0.0, 0.025),
                                       ylim=[0.5, 20], ylog=True,
                                       pltxlim=[0.7, 100.0], pltylim=ylimits, epos=[1.2, 3.0],
                                       weighted=True, kwidth=kwidth, vlims=vlims, single=single,
-                                      nodata=nodata)
+                                      nodata=nodata, cbar=cbar, eaoff=(0, -35))
 
     if clim is not None:
         cx, cy = clim
     else:
-        cx, cy = np.loadtxt(os.path.join(DATADIR, 'sensitivity_p25.txt'), unpack=True)
-
+        # cx, cy = np.loadtxt(os.path.join(DATADIR, 'sensitivity_p25.txt'), unpack=True)
+        kicsample = cksgaia.io.load_table('kic-filtered')
+        kicsample = cksgaia.completeness.fit_cdpp(kicsample)
+        cx, cy = cksgaia.completeness.get_sensitivity_contour(kicsample, 0.25)
     pl.fill_between(cx, cy, y2=0.1, color='0.2', zorder=10, alpha=0.8, hatch='\\\\')
     # pl.annotate('      low\ncompleteness', xy=(30, 1.03),
     #             xycoords='data', color='0.2', fontsize=afs - 2)
@@ -242,32 +252,33 @@ def insol_contour_anno():
     pl.xlim(pl.xlim()[::-1])
 
 
-def insol_contour_data(sample=None, vlims=None, kwidth=(0.4, 0.05), clims=None):
+def insol_contour_data(sample=None, vlims=(0.0, 0.03), kwidth=(0.4, 0.05), clims=None,
+                       cbar=True):
     if sample is None:
         physmerge = cksgaia.io.load_table(cksgaia.plot.config.filtered_sample)
+        # fig = pl.figure(figsize=(5, 3.5))
+        pl.subplots_adjust(right=0.91, left=0.15)
     else:
         physmerge = sample
 
-    # cx, cy = np.loadtxt('/Users/bfulton/code/cksrad/data/detectability_p1.txt', unpack=True)
     if clims is None:
-        cx, cy = np.loadtxt(os.path.join(modpath, 'data/sensitivity_p25.txt'), unpack=True)
+        # cx, cy = np.loadtxt('/Users/bfulton/code/cksrad/data/detectability_p1.txt', unpack=True)
+        cx, cy = np.loadtxt('/Users/bfulton/code/cksrad/data/sensitivity_p25.txt', unpack=True)
+        # kicsample = cksgaia.io.load_table('kic-filtered')
+        # kicsample = cksgaia.completeness.fit_cdpp(kicsample)
+        # cx, cy = cksgaia.completeness.get_sensitivity_contour(kicsample, 0.25)
     else:
         cx, cy = clims
-    # cx, cy = np.loadtxt('/Users/bfulton/code/cksrad/data/sensitivity_p50.txt', unpack=True)
     a = (physmerge['giso_smass'].max() * (cx / 365.) ** 2) ** (1 / 3.)
     sx = (physmerge['cks_steff'].max() / 5778) ** 4.0 * (physmerge['giso_srad'].max() / a) ** 2.0
     sx = np.append(sx, 10)
     cy = np.append(cy, 6)
 
-    if vlims is None:
-        vlims = (0.0, 0.03)
-    else:
-        vlims = vlims
-
     ax, xi, yi, zi_iso = contour_plot_kde(physmerge, 'giso_insol', 'giso_prad', xlim=[3, 30000],
                                                           ylim=[0.5, 20], ylog=True,
                                                           pltxlim=[10, 3000], pltylim=[1, 4], epos=[1800, 3.0],
-                                                          weighted=True, vlims=vlims, kwidth=kwidth)
+                                                          weighted=True, vlims=vlims, kwidth=kwidth, cbar=cbar,
+                                                          eaoff=(5, -35))
 
     pl.fill_between(sx, cy, y2=0.1, color='0.2', zorder=10, alpha=0.8, hatch='\\\\')
     # pl.annotate('      low\ncompleteness', xy=(50, 1.03), xycoords='data', color='0.2', fontsize=afs - 2)
@@ -284,6 +295,8 @@ def insol_contour_data(sample=None, vlims=None, kwidth=(0.4, 0.05), clims=None):
     yt = [1.0, 1.5, 2.4, 3.5]
     pl.xticks(xt, xt)
     pl.yticks(yt, yt)
+
+    pl.grid(lw=1.0)
 
 
 def srad_contour():
@@ -316,17 +329,19 @@ def contour_masscuts():
     medium = physmerge.query('giso_smass <= @highcut & giso_smass >= @lowcut')
     low = physmerge.query('giso_smass < @lowcut')
 
-    fig = pl.figure(1, figsize=(13, 3))
+    fig = pl.figure(1, figsize=(10, 3))
+    cbar = False
 
     pl.subplot(1, 3, 1)
 
-    pl.subplots_adjust(left=0.05, right=0.95, wspace=0.35, bottom=0.2)
+    pl.subplots_adjust(left=0.07, right=0.9, wspace=0.15, bottom=0.25, top=0.9)
 
-    vlimits = [(0.0, 0.022), (0.0, 0.022), (0.0, 0.022)]
+    vlimits = [(0.0, 0.025), (0.0, 0.025), (0.0, 0.025)]
 
-    for i, sample in enumerate([high, medium, low]):
+    for i, sample in enumerate([low, medium, high]):
 
         pl.subplot(1, 3, i+1)
+
 
         if sample is high:
             kicsample = kicselect.query('m17_smass > @highcut')
@@ -342,12 +357,26 @@ def contour_masscuts():
         cx, cy = cksgaia.completeness.get_sensitivity_contour(kicsample, 0.25)
 
         pl.figure(1)
-        insol_contour_data(sample=sample, vlims=vlimits[i], kwidth=(0.75, 0.05))
+        insol_contour_data(sample=sample, vlims=vlimits[i], kwidth=(0.75, 0.05), cbar=cbar)
         pl.title(annotations[i])
         pl.grid(lw=2, alpha=0.5)
 
-        if i < 2:
-            pass
+        if i > 0:
+            pl.ylabel("")
+            yt = pl.yticks()[0]
+            ticklabels = ["" for t in yt]
+            pl.yticks(yt, ticklabels)
+
+        if i != 1:
+            pl.xlabel("")
+
+    caxheight = 0.65
+    caxcenter = 0.575
+    caxleft = 0.90
+    ct = [0.0, 0.005, 0.01, 0.015, 0.02]
+
+    cax = plt.axes([caxleft, caxcenter - 0.5*caxheight, .01, caxheight])
+    cax = pl.colorbar(cax=cax, ticks=ct, label='Relative Occurrence')
 
 
 def period_contour_masscuts():
@@ -362,18 +391,18 @@ def period_contour_masscuts():
     medium = physmerge.query('giso_smass <= @highcut & giso_smass >= @lowcut')
     low = physmerge.query('giso_smass < @lowcut')
 
-    fig = pl.figure(1, figsize=(13, 3))
+    fig = pl.figure(1, figsize=(10, 3))
 
     pl.subplot(1, 3, 1)
 
-    pl.subplots_adjust(left=0.05, right=0.95, wspace=0.35, bottom=0.2)
+    pl.subplots_adjust(left=0.07, right=0.9, wspace=0.15, bottom=0.25, top=0.9)
 
     fig2 = pl.figure(2)
 
     vlimits = [(0.0, 0.02), (0.0, 0.02), (0.0, 0.02)]
     hlines = [2.63, 2.46, 2.33]
 
-    for i, sample in enumerate([high, medium, low]):
+    for i, sample in enumerate([low, medium, high]):
 
         if sample is high:
             kicsample = kicselect.query('m17_smass > @highcut')
@@ -391,7 +420,27 @@ def period_contour_masscuts():
         pl.figure(1)
         pl.subplot(1, 3, i+1)
         period_contour_cks(sample=sample, vlims=vlimits[i],
-                           kwidth=(0.40, 0.05), ylimits=(1.0, 4.0), clim=(cx, cy))
+                           kwidth=(0.40, 0.05), ylimits=(1.0, 4.0),
+                           clim=(cx, cy), cbar=False)
         # pl.axhline(hlines[i], lw=3, color='r')
         pl.title(annotations[i])
         pl.grid(lw=2, alpha=0.5)
+
+        if i > 0:
+            pl.ylabel("")
+            yt = pl.yticks()[0]
+            ticklabels = ["" for t in yt]
+            pl.yticks(yt, ticklabels)
+
+        if i != 1:
+            pl.xlabel("")
+
+    caxheight = 0.65
+    caxcenter = 0.575
+    caxleft = 0.90
+    ct = [0.0, 0.005, 0.01, 0.015, 0.02]
+
+    cax = plt.axes([caxleft, caxcenter - 0.5 * caxheight, .01, caxheight])
+    cax = pl.colorbar(cax=cax, ticks=ct, label='Relative Occurrence')
+
+    pl.grid(lw=0.5)

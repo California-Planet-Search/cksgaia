@@ -4,7 +4,6 @@ from matplotlib import ticker
 import matplotlib.lines as mlines
 
 import os
-
 import pylab as pl
 import matplotlib
 import numpy as np
@@ -34,14 +33,12 @@ def get_mass_samples():
     return (highcut, lowcut, high, medium, low, annotations)
 
 def histfitplot(physmerge, bin_centers, N, e, mask, result, result2, completeness=False, plotmod=True,
-                eloc=[10.0, 0.06], alpha=1.0, unc=True):
+                eloc=[10.0, 0.08], alpha=1.0, unc=True):
     xmod = np.logspace(-2, 1, 1000)
 
     masklim = (np.min(bin_centers[mask]), np.max(bin_centers[mask]))
 
-    fig = pl.figure(figsize=(6, 4))
-
-    pl.subplots_adjust(left=0.15)
+    pl.subplots_adjust(left=0.2)
 
     pl.step(bin_centers, N, color='k', where='mid', lw=2, alpha=alpha)
     # pl.bar(bin_centers, N, color='k', lw=4, alpha=alpha)
@@ -61,16 +58,16 @@ def histfitplot(physmerge, bin_centers, N, e, mask, result, result2, completenes
                              lw=1, capsize=3, mew=0, ms=0.1)
     for cap in caps:
         cap.set_markeredgewidth(1)
-    pl.annotate("typical\nuncert.", xy=(xpos, ypos), xytext=(0, -50),
+    pl.annotate("typical\nuncert.", xy=(xpos, ypos), xytext=(0, -35),
                 xycoords="data", textcoords="offset points",
-                horizontalalignment='center', fontsize=14)
+                horizontalalignment='center', fontsize=12)
 
     if unc:
         _, caps, _ = pl.errorbar(
             bin_centers[mask],
             N[mask],
             yerr=e[mask],
-            marker='o',
+            marker='.',
             mew=0,
             drawstyle='steps-mid',
             linestyle='none',
@@ -139,7 +136,7 @@ def histfitplot(physmerge, bin_centers, N, e, mask, result, result2, completenes
     # pl.annotate("sub-\nNeptunes", xy=(0.45, 0.07), xycoords='axes fraction')
 
     pl.xlim(0.7, 20)
-    pl.ylim(0, 0.12)
+    pl.ylim(0, 0.125)
     if completeness:
         pl.ylabel('Number of Planets per Star\n(Orbital period < 100 days)')
     else:
@@ -297,7 +294,7 @@ def money_plot_plain():
     # pl.axvline(3.5, color=c2, linestyle='dashed', lw=2)
     # pl.axvspan(1.75, 3.5, color=c2, alpha=0.1)
 
-    pl.ylim(0, 0.08)
+    pl.ylim(0, 0.125)
 
 
 def mass_cuts():
@@ -583,7 +580,7 @@ def desert_edge_cum():
 
     colors = ['blue', 'green', 'red']
 
-    fig = pl.figure(figsize=(6, 4))
+    # fig = pl.figure(figsize=(6, 4))
     handles = []
     for i, sample in enumerate([high, medium, low]):
         sample = sample.query('giso_prad > 1.7 & giso_prad < 4 & giso_insol > 30 & giso_insol < 3000')
@@ -594,9 +591,9 @@ def desert_edge_cum():
 
     pl.legend(handles=handles, loc='best')
 
-    pl.annotate('$1.7 < R_p < 4 R_{\oplus}$', xy=(0.03, 0.7),
+    pl.annotate('$1.7 < R_p < 4 R_{\oplus}$', xy=(0.03, 0.6),
                 xycoords='axes fraction')
-    pl.annotate(r'$30 < S_{\rm inc} < 3000 S_{\oplus}$', xy=(0.03, 0.65),
+    pl.annotate(r'$30 < S_{\rm inc} < 3000 S_{\oplus}$', xy=(0.03, 0.50),
                 xycoords='axes fraction')
 
 
@@ -777,16 +774,25 @@ def plot_dist(real_sample, data=False):
 
 
 
-def mean_values():
+def mean_values(plot_met=False):
     real_sample = cksgaia.io.load_table(cksgaia.plot.config.filtered_sample)
     ikic = cksgaia.completeness.fit_cdpp(cksgaia.io.load_table('kic-filtered'))
 
     sn_corners = [(0.0, 1.7), (100, 4.0)]
     e_corners = [(0.0, 1.0), (30, 1.7)]
 
-    fig = pl.figure(figsize=(8, 9))
-    pl.subplots_adjust(wspace=0.3, hspace=0.32)
-    pl.subplot(2,3,1)
+    if plot_met:
+        nrows = 4
+        fig = pl.figure(figsize=(8, 12))
+        pl.subplots_adjust(wspace=0.3, hspace=0.32, bottom=0.1, left=0.15)
+        pl.subplot(nrows,2,1)
+    else:
+        nrows = 3
+        fig = pl.figure(figsize=(8, 9))
+        pl.subplots_adjust(wspace=0.3, hspace=0.32, bottom=0.1, left=0.15)
+        pl.subplot(nrows,2,1)
+
+    xt = [0.8, 0.9, 1.0, 1.1, 1.2, 1.3]
 
     colors = ['b', 'g', 'r']
 
@@ -795,15 +801,15 @@ def mean_values():
     lowcut = np.percentile(physmerge['giso_smass'], 33)
 
     high = physmerge.query('giso_smass > @highcut')
-    kicselect = ikic.copy().query('m17_smass > @highcut')
+    kicselect = ikic.copy().query('m17_smet > @highcut')
     high = cksgaia.completeness.get_weights(high, kicselect)
 
     medium = physmerge.query('giso_smass <= @highcut & giso_smass >= @lowcut')
-    kicselect = ikic.copy().query('m17_smass <= @highcut & m17_smass >= @lowcut')
+    kicselect = ikic.copy().query('m17_smet <= @highcut & m17_smet >= @lowcut')
     medium = cksgaia.completeness.get_weights(medium, kicselect)
 
     low = physmerge.query('giso_smass < @lowcut')
-    kicselect = ikic.copy().query('m17_smass < @lowcut')
+    kicselect = ikic.copy().query('m17_smet < @lowcut')
     low = cksgaia.completeness.get_weights(low, kicselect)
 
     sn_smasses = []
@@ -814,6 +820,8 @@ def mean_values():
     sn_fluxes = []
     se_periods = []
     sn_periods = []
+    sn_feh = []
+    se_feh = []
     for i, sample in enumerate([high, medium, low]):
         mean_sn = average_in_box(sample, sn_corners)
         mean_se = average_in_box(sample, e_corners)
@@ -821,6 +829,8 @@ def mean_values():
         mean_smass_se = average_in_box(sample, e_corners, col1='giso_smass')
         mean_sn_flux = average_in_box(sample, sn_corners, col1='giso_insol')
         mean_se_flux = average_in_box(sample, e_corners, col1='giso_insol')
+        mean_se_feh = average_in_box(sample, e_corners, col1='cks_smet', logparam=False)
+        mean_sn_feh = average_in_box(sample, sn_corners, col1='cks_smet', logparam=False)
 
         sn_smasses.append((mean_smass_sn[0][1], mean_smass_sn[1][1]))
         se_smasses.append((mean_smass_se[0][1], mean_smass_se[1][1]))
@@ -830,38 +840,42 @@ def mean_values():
         se_fluxes.append((mean_se_flux[0][1], mean_se_flux[1][1]))
         se_periods.append((mean_se[0][0], mean_se[1][0]))
         sn_periods.append((mean_sn[0][0], mean_sn[1][0]))
+        se_feh.append((mean_se_feh[0][1], mean_se_feh[1][1]))
+        sn_feh.append((mean_sn_feh[0][1], mean_sn_feh[1][1]))
 
     ### Average size
-    pl.subplot(3, 2, 1)
+    pl.subplot(nrows, 2, 1)
     for i, c in enumerate(colors):
         x = se_smasses[i][0]
         x_err = se_smasses[i][1]
         y = se_rads[i][0]
         y_err = se_rads[i][1]
         pl.errorbar(x, y, yerr=y_err,
-                    fmt='ko', ms=22, mfc='none', mew=2)
+                    fmt='ko', ms=8, mfc='none', mew=2)
 
-    pl.xlabel('average stellar mass [M$_{\odot}$]')
+    # pl.xlabel('average stellar mass [M$_{\odot}$]')
     pl.ylabel('average planet size [R$_{\oplus}$]')
     pl.xlim(0.8, 1.25)
+    pl.xticks(xt)
 
     pl.annotate("{} < P $\leq$ {} days".format(e_corners[0][0], e_corners[1][0]), xy=(0.15, 0.75),
                 xycoords='axes fraction')
     pl.annotate("%.1f < R$_P$ $\leq$ %.1f R$_{\oplus}$" % (e_corners[0][1], e_corners[1][1]),
                 xy=(0.15, 0.65), xycoords='axes fraction')
     # pl.show()
-    pl.subplot(3, 2, 2)
+    pl.subplot(nrows, 2, 2)
     for i, c in enumerate(colors):
         x = sn_smasses[i][0]
         x_err = sn_smasses[i][1]
         y = sn_rads[i][0]
         y_err = sn_rads[i][1]
         pl.errorbar(x, y, yerr=y_err,
-                    fmt='ko', ms=22, mfc='none', mew=2)
+                    fmt='ko', ms=8, mfc='none', mew=2)
 
-    pl.xlabel('average stellar mass [M$_{\odot}$]')
-    pl.ylabel('average planet size [R$_{\oplus}$]')
-    pl.xlim(0.8, 1.25)
+    # pl.xlabel('average stellar mass [M$_{\odot}$]')
+    # pl.ylabel('average planet size [R$_{\oplus}$]')
+    # pl.xlim(0.8, 1.25)
+    pl.xticks(xt)
 
     pl.annotate("{} < P $\leq$ {} days".format(sn_corners[0][0], sn_corners[1][0]), xy=(0.15, 0.75),
                 xycoords='axes fraction')
@@ -869,38 +883,40 @@ def mean_values():
                 xy=(0.15, 0.65), xycoords='axes fraction')
 
     ### Insolation flux
-    pl.subplot(3, 2, 4)
+    pl.subplot(nrows, 2, 4)
     for i, c in enumerate(colors):
         x = sn_smasses[i][0]
         x_err = sn_smasses[i][1]
         y = sn_fluxes[i][0]
         y_err = sn_fluxes[i][1]
         pl.errorbar(x, y, yerr=y_err,
-                    fmt='ko', ms=22, mfc='none', mew=2)
+                    fmt='ko', ms=8, mfc='none', mew=2)
 
-    pl.xlabel('average stellar mass [M$_{\odot}$]')
-    pl.ylabel('average insolation flux [S$_{\oplus}$]')
+    # pl.xlabel('average stellar mass [M$_{\odot}$]')
+    # pl.ylabel('average insolation flux [S$_{\oplus}$]')
     pl.xlim(0.8, 1.25)
     pl.ylim(10, 70)
+    pl.xticks(xt)
 
     pl.annotate("{} < P <= {} days".format(sn_corners[0][0], sn_corners[1][0]), xy=(0.15, 0.75),
                 xycoords='axes fraction')
     pl.annotate("%.1f < R$_P$ <= %.1f R$_{\oplus}$" % (sn_corners[0][1], sn_corners[1][1]),
                 xy=(0.15, 0.65), xycoords='axes fraction')
 
-    pl.subplot(3, 2, 3)
+    pl.subplot(nrows, 2, 3)
     for i, c in enumerate(colors):
         x = se_smasses[i][0]
         x_err = se_smasses[i][1]
         y = se_fluxes[i][0]
         y_err = se_fluxes[i][1]
         pl.errorbar(x, y, yerr=y_err,
-                    fmt='ko', ms=22, mfc='none', mew=2)
+                    fmt='ko', ms=8, mfc='none', mew=2)
 
-    pl.xlabel('average stellar mass [M$_{\odot}$]')
+    # pl.xlabel('average stellar mass [M$_{\odot}$]')
     pl.ylabel('average insolation flux [S$_{\oplus}$]')
     pl.xlim(0.8, 1.25)
     pl.ylim(80, 350)
+    pl.xticks(xt)
 
     pl.annotate("{} < P <= {} days".format(e_corners[0][0], e_corners[1][0]), xy=(0.15, 0.75),
                 xycoords='axes fraction')
@@ -908,39 +924,269 @@ def mean_values():
                 xy=(0.15, 0.65), xycoords='axes fraction')
 
     ### Orbital period
-    pl.subplot(3, 2, 6)
+    pl.subplot(nrows, 2, 6)
     for i, c in enumerate(colors):
         x = sn_smasses[i][0]
         x_err = sn_smasses[i][1]
         y = sn_periods[i][0]
         y_err = sn_periods[i][1]
         pl.errorbar(x, y, yerr=y_err,
-                    fmt='ko', ms=22, mfc='none', mew=2)
+                    fmt='ko', ms=8, mfc='none', mew=2)
 
-    pl.xlabel('average stellar mass [M$_{\odot}$]')
-    pl.ylabel('average orbital period [days]')
+    if not plot_met:
+        pl.xlabel('average stellar mass [M$_{\odot}$]')
+    # pl.ylabel('average orbital period [days]')
     pl.xlim(0.8, 1.25)
+    pl.xticks(xt)
 
-    pl.annotate("{} < P <= {} days".format(sn_corners[0][0], sn_corners[1][0]), xy=(0.15, 0.75),
+    pl.annotate("{} < P <= {} days".format(sn_corners[0][0], sn_corners[1][0]), xy=(0.15, 0.70),
                 xycoords='axes fraction')
     pl.annotate("%.1f < R$_P$ <= %.1f R$_{\oplus}$" % (sn_corners[0][1], sn_corners[1][1]),
-                xy=(0.15, 0.65), xycoords='axes fraction')
+                xy=(0.15, 0.60), xycoords='axes fraction')
 
-    pl.subplot(3, 2, 5)
+    pl.subplot(nrows, 2, 5)
     for i, c in enumerate(colors):
         x = se_smasses[i][0]
         x_err = se_smasses[i][1]
         y = se_periods[i][0]
         y_err = se_periods[i][1]
         pl.errorbar(x, y, yerr=y_err,
-                    fmt='ko', ms=22, mfc='none', mew=2)
+                    fmt='ko', ms=8, mfc='none', mew=2)
 
-    pl.xlabel('average stellar mass [M$_{\odot}$]')
+    if not plot_met:
+        pl.xlabel('average stellar mass [M$_{\odot}$]')
     pl.ylabel('average orbital period [days]')
     pl.xlim(0.8, 1.25)
+    pl.xticks(xt)
+
+    pl.annotate("{} < P <= {} days".format(e_corners[0][0], e_corners[1][0]), xy=(0.15, 0.70),
+                xycoords='axes fraction')
+    pl.annotate("%.1f < R$_P$ <= %.1f R$_{\oplus}$" % (e_corners[0][1], e_corners[1][1]),
+                xy=(0.15, 0.60), xycoords='axes fraction')
+
+
+    if plot_met:
+        ### Metallicity
+        pl.subplot(nrows, 2, 8)
+        for i, c in enumerate(colors):
+            x = sn_smasses[i][0]
+            x_err = sn_smasses[i][1]
+            y = sn_feh[i][0]
+            y_err = sn_feh[i][1]
+            pl.errorbar(x, y, yerr=y_err,
+                        fmt='ko', ms=8, mfc='none', mew=2)
+
+        pl.xlabel('average stellar mass [M$_{\odot}$]')
+        # pl.ylabel('average orbital period [days]')
+        pl.xlim(0.8, 1.25)
+        pl.xticks(xt)
+
+        pl.annotate("{} < P <= {} days".format(sn_corners[0][0], sn_corners[1][0]), xy=(0.15, 0.5),
+                    xycoords='axes fraction')
+        pl.annotate("%.1f < R$_P$ <= %.1f R$_{\oplus}$" % (sn_corners[0][1], sn_corners[1][1]),
+                    xy=(0.15, 0.4), xycoords='axes fraction')
+
+        pl.subplot(nrows, 2, 7)
+        for i, c in enumerate(colors):
+            x = se_smasses[i][0]
+            x_err = se_smasses[i][1]
+            y = se_feh[i][0]
+            y_err = se_feh[i][1]
+            pl.errorbar(x, y, yerr=y_err,
+                        fmt='ko', ms=8, mfc='none', mew=2)
+
+        pl.xlabel('average stellar mass [M$_{\odot}$]')
+        pl.ylabel('average stellar metallicity [Fe/H]')
+        pl.xlim(0.8, 1.25)
+        pl.xticks(xt)
+
+        pl.annotate("{} < P <= {} days".format(e_corners[0][0], e_corners[1][0]), xy=(0.15, 0.70),
+                    xycoords='axes fraction')
+        pl.annotate("%.1f < R$_P$ <= %.1f R$_{\oplus}$" % (e_corners[0][1], e_corners[1][1]),
+                    xy=(0.15, 0.60), xycoords='axes fraction')
+
+
+
+def mean_met():
+    real_sample = cksgaia.io.load_table(cksgaia.plot.config.filtered_sample)
+    ikic = cksgaia.completeness.fit_cdpp(cksgaia.io.load_table('kic-filtered'))
+
+    sn_corners = [(0.0, 1.7), (100, 4.0)]
+    e_corners = [(0.0, 1.0), (30, 1.7)]
+
+    nrows = 3
+    fig = pl.figure(figsize=(8, 9))
+    pl.subplots_adjust(wspace=0.3, hspace=0.32, bottom=0.1, left=0.15)
+    pl.subplot(nrows,2,1)
+
+    xt = [-0.3, -0.2, -0.1, 0.0, 0.1, 0.2, 0.3]
+    xlim = (-0.3, 0.3)
+
+    colors = ['b', 'g', 'r']
+
+    physmerge = real_sample.copy()
+    highcut = np.percentile(physmerge['cks_smet'], 67)
+    lowcut = np.percentile(physmerge['cks_smet'], 33)
+
+    high = physmerge.query('cks_smet > @highcut')
+    kicselect = ikic.copy()#.query('FEH > @highcut')
+    high = cksgaia.completeness.get_weights(high, kicselect)
+
+    medium = physmerge.query('cks_smet <= @highcut & cks_smet >= @lowcut')
+    kicselect = ikic.copy()#.query('FEH <= @highcut & FEH >= @lowcut')
+    medium = cksgaia.completeness.get_weights(medium, kicselect)
+
+    low = physmerge.query('cks_smet < @lowcut')
+    kicselect = ikic.copy()#.query('FEH < @lowcut')
+    low = cksgaia.completeness.get_weights(low, kicselect)
+
+    sn_smasses = []
+    se_smasses = []
+    se_rads = []
+    sn_rads = []
+    se_fluxes = []
+    sn_fluxes = []
+    se_periods = []
+    sn_periods = []
+    sn_feh = []
+    se_feh = []
+    for i, sample in enumerate([high, medium, low]):
+        mean_sn = average_in_box(sample, sn_corners)
+        mean_se = average_in_box(sample, e_corners)
+        mean_smass_sn = average_in_box(sample, sn_corners, col1='cks_smet', logparam=False)
+        mean_smass_se = average_in_box(sample, e_corners, col1='cks_smet', logparam=False)
+        mean_sn_flux = average_in_box(sample, sn_corners, col1='giso_insol')
+        mean_se_flux = average_in_box(sample, e_corners, col1='giso_insol')
+        mean_se_feh = average_in_box(sample, e_corners, col1='cks_smet', logparam=False)
+        mean_sn_feh = average_in_box(sample, sn_corners, col1='cks_smet', logparam=False)
+
+        sn_smasses.append((mean_smass_sn[0][1], mean_smass_sn[1][1]))
+        se_smasses.append((mean_smass_se[0][1], mean_smass_se[1][1]))
+        sn_rads.append((mean_sn[0][1], mean_sn[1][1]))
+        se_rads.append((mean_se[0][1], mean_se[1][1]))
+        sn_fluxes.append((mean_sn_flux[0][1], mean_sn_flux[1][1]))
+        se_fluxes.append((mean_se_flux[0][1], mean_se_flux[1][1]))
+        se_periods.append((mean_se[0][0], mean_se[1][0]))
+        sn_periods.append((mean_sn[0][0], mean_sn[1][0]))
+        se_feh.append((mean_se_feh[0][1], mean_se_feh[1][1]))
+        sn_feh.append((mean_sn_feh[0][1], mean_sn_feh[1][1]))
+
+    ### Average size
+    pl.subplot(nrows, 2, 1)
+    for i, c in enumerate(colors):
+        x = se_smasses[i][0]
+        x_err = se_smasses[i][1]
+        y = se_rads[i][0]
+        y_err = se_rads[i][1]
+        pl.errorbar(x, y, yerr=y_err,
+                    fmt='ko', ms=8, mfc='none', mew=2)
+
+    # pl.xlabel('average stellar mass [M$_{\odot}$]')
+    pl.ylabel('average planet size [R$_{\oplus}$]')
+    pl.xlim(xlim)
+    pl.xticks(xt)
+
+    pl.annotate("{} < P $\leq$ {} days".format(e_corners[0][0], e_corners[1][0]), xy=(0.15, 0.75),
+                xycoords='axes fraction')
+    pl.annotate("%.1f < R$_P$ $\leq$ %.1f R$_{\oplus}$" % (e_corners[0][1], e_corners[1][1]),
+                xy=(0.15, 0.65), xycoords='axes fraction')
+    # pl.show()
+    pl.subplot(nrows, 2, 2)
+    for i, c in enumerate(colors):
+        x = sn_smasses[i][0]
+        x_err = sn_smasses[i][1]
+        y = sn_rads[i][0]
+        y_err = sn_rads[i][1]
+        pl.errorbar(x, y, yerr=y_err,
+                    fmt='ko', ms=8, mfc='none', mew=2)
+
+    # pl.xlabel('average stellar mass [M$_{\odot}$]')
+    # pl.ylabel('average planet size [R$_{\oplus}$]')
+    # pl.xlim(0.8, 1.25)
+    pl.xticks(xt)
+
+    pl.annotate("{} < P $\leq$ {} days".format(sn_corners[0][0], sn_corners[1][0]), xy=(0.15, 0.75),
+                xycoords='axes fraction')
+    pl.annotate("%.1f < R$_P$ $\leq$ %.1f R$_{\oplus}$" % (sn_corners[0][1], sn_corners[1][1]),
+                xy=(0.15, 0.65), xycoords='axes fraction')
+
+    ### Insolation flux
+    pl.subplot(nrows, 2, 4)
+    for i, c in enumerate(colors):
+        x = sn_smasses[i][0]
+        x_err = sn_smasses[i][1]
+        y = sn_fluxes[i][0]
+        y_err = sn_fluxes[i][1]
+        pl.errorbar(x, y, yerr=y_err,
+                    fmt='ko', ms=8, mfc='none', mew=2)
+
+    # pl.xlabel('average stellar mass [M$_{\odot}$]')
+    # pl.ylabel('average insolation flux [S$_{\oplus}$]')
+    pl.xlim(xlim)
+    pl.ylim(10, 70)
+    pl.xticks(xt)
+
+    pl.annotate("{} < P <= {} days".format(sn_corners[0][0], sn_corners[1][0]), xy=(0.15, 0.75),
+                xycoords='axes fraction')
+    pl.annotate("%.1f < R$_P$ <= %.1f R$_{\oplus}$" % (sn_corners[0][1], sn_corners[1][1]),
+                xy=(0.15, 0.65), xycoords='axes fraction')
+
+    pl.subplot(nrows, 2, 3)
+    for i, c in enumerate(colors):
+        x = se_smasses[i][0]
+        x_err = se_smasses[i][1]
+        y = se_fluxes[i][0]
+        y_err = se_fluxes[i][1]
+        pl.errorbar(x, y, yerr=y_err,
+                    fmt='ko', ms=8, mfc='none', mew=2)
+
+    # pl.xlabel('average stellar mass [M$_{\odot}$]')
+    pl.ylabel('average insolation flux [S$_{\oplus}$]')
+    pl.xlim(xlim)
+    pl.ylim(80, 350)
+    pl.xticks(xt)
 
     pl.annotate("{} < P <= {} days".format(e_corners[0][0], e_corners[1][0]), xy=(0.15, 0.75),
                 xycoords='axes fraction')
     pl.annotate("%.1f < R$_P$ <= %.1f R$_{\oplus}$" % (e_corners[0][1], e_corners[1][1]),
                 xy=(0.15, 0.65), xycoords='axes fraction')
+
+    ### Orbital period
+    pl.subplot(nrows, 2, 6)
+    for i, c in enumerate(colors):
+        x = sn_smasses[i][0]
+        x_err = sn_smasses[i][1]
+        y = sn_periods[i][0]
+        y_err = sn_periods[i][1]
+        pl.errorbar(x, y, yerr=y_err,
+                    fmt='ko', ms=8, mfc='none', mew=2)
+
+    pl.xlabel('average stellar metallicity [Fe/H]')
+    # pl.ylabel('average orbital period [days]')
+    pl.xlim(xlim)
+    pl.xticks(xt)
+
+    pl.annotate("{} < P <= {} days".format(sn_corners[0][0], sn_corners[1][0]), xy=(0.15, 0.70),
+                xycoords='axes fraction')
+    pl.annotate("%.1f < R$_P$ <= %.1f R$_{\oplus}$" % (sn_corners[0][1], sn_corners[1][1]),
+                xy=(0.15, 0.60), xycoords='axes fraction')
+
+    pl.subplot(nrows, 2, 5)
+    for i, c in enumerate(colors):
+        x = se_smasses[i][0]
+        x_err = se_smasses[i][1]
+        y = se_periods[i][0]
+        y_err = se_periods[i][1]
+        pl.errorbar(x, y, yerr=y_err,
+                    fmt='ko', ms=8, mfc='none', mew=2)
+
+    pl.xlabel('average stellar metallicity [Fe/H]')
+    pl.ylabel('average orbital period [days]')
+    pl.xlim(xlim)
+    pl.xticks(xt)
+
+    pl.annotate("{} < P <= {} days".format(e_corners[0][0], e_corners[1][0]), xy=(0.15, 0.70),
+                xycoords='axes fraction')
+    pl.annotate("%.1f < R$_P$ <= %.1f R$_{\oplus}$" % (e_corners[0][1], e_corners[1][1]),
+                xy=(0.15, 0.60), xycoords='axes fraction')
 

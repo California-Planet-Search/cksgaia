@@ -55,10 +55,12 @@ def plot_dist(real_sample):
     plot_box(gap_corners, 'g-', lw=2)
 
     xt = [0.3, 1, 3, 10, 30, 100]
-    yt = [0.7, 1, 1.5, 2, 4, 6]
+    yt = [0.7, 1, 1.5, 2, 3, 4, 6]
     pl.xticks(xt, xt)
     pl.yticks(yt, yt)
 
+    pl.minorticks_off()
+    pl.grid(False)
 
 
 def planets_in_boxes(sample, box1, box2, box3):
@@ -109,17 +111,26 @@ def wid_sim_plot():
     mock_bad = make_mock_sample(real_sample, e_cen, sn_cen, wid_bad)
     mock_good = make_mock_sample(real_sample, e_cen, sn_cen, wid_best)
 
-    fig = pl.figure(figsize=(13, 3))
-    pl.subplots_adjust(bottom=0.2, wspace=0.3, left=0.07, right=0.95)
+    fig = pl.figure(figsize=(10, 3.5))
+    pl.subplots_adjust(bottom=0.2, wspace=0.2, left=0.07,
+                       right=0.95, top=0.9)
 
     pl.subplot(1, 3, 1)
     plot_dist(real_sample)
     pl.title("Real detections")
+    pl.xlabel('')
 
     pl.subplot(1, 3, 2)
     plot_dist(mock_good)
     pl.title("Simulation (width={}%)".format(wid_best*100))
+    ax = pl.gca()
+    ax.yaxis.set_ticklabels([""])
+    pl.ylabel('')
 
     pl.subplot(1, 3, 3)
     plot_dist(mock_bad)
     pl.title("Simulation (width={}%)".format(wid_bad*100))
+    ax = pl.gca()
+    ax.yaxis.set_ticklabels([""])
+    pl.ylabel('')
+    pl.xlabel('')

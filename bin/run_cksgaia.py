@@ -232,20 +232,18 @@ class Workflow(object):
         d['period-contour-masscuts'] = cksgaia.plot.contour.period_contour_masscuts
         # d['extinction'] = cksgaia.plot.extinction.fig_extinction
         # d['sample'] = cksgaia.plot.sample.hrplot
-        d['filters'] = cksgaia.plot.sample.filter_plot
+        # d['filters'] = cksgaia.plot.sample.filter_plot
         # d['mag-hist'] = cksgaia.plot.sample.magcuts
         # d['depth-hist'] = cksgaia.plot.sample.depth_hist
-        d['srad-h13'] = lambda : CR('srad-h13').plot_comparison()
-        d['srad-s15'] = lambda : CR('srad-s15').plot_comparison()
-        d['srad-j17'] = lambda : CR('srad-j17').plot_comparison()
-        d['srad-gaia2'] = lambda : CR('srad-gaia2').plot_comparison()
+        d['srad-h13'] = lambda: CR('srad-h13').plot_comparison()
+        d['srad-s15'] = lambda: CR('srad-s15').plot_comparison()
+        d['srad-j17'] = lambda: CR('srad-j17').plot_comparison()
+        d['srad-gaia2'] = lambda: CR('srad-gaia2').plot_comparison()
         # d['smass-h13'] = lambda : CR('smass-h13').plot_comparison()
         # d['sage-s15'] = lambda : CR('sage-s15').plot_comparison()
         # d['srad-hist'] = cksgaia.plot.sample.srad_hist
         d['srad-err-hist'] = cksgaia.plot.sample.srad_err_hist
         d['prad-err-hist'] = cksgaia.plot.sample.prad_err_hist
-        d['per-prad'] = cksgaia.plot.sample.fig_per_prad
-        d['insol-prad'] = cksgaia.plot.sample.fig_insol_prad
         # d['parallax-err-hist'] = cksgaia.plot.sample.parallax_err_hist
         # d['insol-hist'] = cksgaia.plot.occur.insol_hist
         # d['radius-hist-fit'] = cksgaia.plot.occur.money_plot_fit
@@ -260,6 +258,9 @@ class Workflow(object):
         d['desert-edge-cum'] = cksgaia.plot.occur.desert_edge_cum
         d['mean-values'] = cksgaia.plot.occur.mean_values
         d['width-sim-plot'] = cksgaia.plot.sim.wid_sim_plot
+        d['per-prad'] = cksgaia.plot.sample.fig_per_prad
+        d['insol-prad'] = cksgaia.plot.sample.fig_insol_prad
+        d['mean-met'] = cksgaia.plot.occur.mean_met
 
         self.plot_dict = d
 
@@ -314,6 +315,7 @@ class Workflow(object):
                 fn = self.key2fn(key, 'plot')
                 pl.gcf().savefig(fn)
                 pl.clf()
+                fig = pl.figure()
 
             elif kind=='table' or kind == 'csv':
                 if name=='all':

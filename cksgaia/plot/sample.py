@@ -21,12 +21,13 @@ def fig_per_prad():
     pl.yticks(yt,yt)
     xt = [0.1,0.3,1,3,10,30,100,300,1000]
     _xt, _xtl =     pl.xticks(xt,xt)
-    pl.setp(_xtl, rotation=45)
+    pl.setp(_xtl, rotation=0)
     pl.xlim(0.1,1000)
     pl.ylim(0.25,20)
-    pl.xlabel('Period (days)')
-    pl.ylabel('Planet Size (Earth-Radii)')
+    pl.xlabel('Period [days]')
+    pl.ylabel('Planet Size [Earth radii]')
     pl.tight_layout(True)
+    pl.minorticks_off()
 
 def fig_insol_prad():
     fig = pl.figure(figsize=(4,3.5))
@@ -45,10 +46,10 @@ def fig_insol_prad():
     
     pl.xlim(10000,1)
     pl.ylim(0.25,20)
-    pl.xlabel('Incident Stetllar Flux (Earth-Units)')
-    pl.ylabel('Planet Size (Earth-radii)')
+    pl.xlabel('Stellar light intensity relative to Earth')
+    pl.ylabel('Planet Size [Earth radii]')
     pl.tight_layout(True)
-
+    pl.minorticks_off()
 
 def hrplot():
     physmerge = cksgaia.io.load_table(full_sample)
@@ -357,7 +358,6 @@ def srad_err_hist():
 
     print len(old), len(new)
 
-    fig = pl.figure(figsize=(6, 4))
     old['iso_srad_frac_err'] *= 100
     new['giso_srad_frac_err'] *= 100
 
@@ -372,9 +372,9 @@ def srad_err_hist():
     pl.axvline(med_new, color='k', linestyle='dashed', lw=1)
 
     pl.annotate("median = {:.0f}%".format(np.round(med_old)), xy=(med_old, 160), xycoords='data',
-                xytext=(-15, 0), textcoords='offset points', rotation=90, verticalalignment='left')
+                xytext=(-13, 0), textcoords='offset points', rotation=90, verticalalignment='left')
     pl.annotate("median = {:.0f}%".format(np.round(med_new)), xy=(med_new, 120), xycoords='data',
-                xytext=(-15, 0), textcoords='offset points', rotation=90, verticalalignment='left')
+                xytext=(-13, -5), textcoords='offset points', rotation=90, verticalalignment='left')
 
     pl.xlim(0.5, 30.0)
     # pl.ylim(0, 130)
@@ -395,8 +395,6 @@ def srad_err_hist():
 def prad_err_hist():
     old = cksgaia.io.load_table('j17')
     new = cksgaia.io.load_table(full_sample)
-
-    fig = pl.figure(figsize=(6, 4))
 
     old['iso_prad_frac_err'] = cksgaia.errors.frac_err(old['iso_prad'], old['iso_prad_err1'], old['iso_prad_err2'])
     new['giso_prad_frac_err'] = cksgaia.errors.frac_err(new['giso_prad'], new['giso_prad_err1'], new['giso_prad_err2'])

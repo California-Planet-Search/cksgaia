@@ -167,7 +167,7 @@ def weighted_avg_and_std(values, weights):
     return (average, np.sqrt(variance / len(values)))
 
 
-def average_in_box(sample, box, col1='giso_prad', col2='koi_period'):
+def average_in_box(sample, box, col1='giso_prad', col2='koi_period', logparam=True):
     radlim_low = box[0][1]
     radlim_high = box[1][1]
     plim_low = box[0][0]
@@ -175,10 +175,17 @@ def average_in_box(sample, box, col1='giso_prad', col2='koi_period'):
     q = sample.query('@radlim_low <= giso_prad < @radlim_high & @plim_low < koi_period <= @plim_high')
     n = len(q)
 
-    logcol1 = np.log10(q[col1])
-    logcol2 = np.log10(q[col2])
+    q = q[np.isfinite(q[col1]) & np.isfinite(q[col2]) & np.isfinite(q['weight'])]
 
-    avg_rad, err_rad = weighted_avg_and_std(logcol1, q['weight'])
-    avg_per, err_per = weighted_avg_and_std(logcol2, q['weight'])
+    if logparam:
+        logcol1 = np.log10(q[col1])
+        logcol2 = np.log10(q[col2])
+        avg_rad, err_rad = weighted_avg_and_std(logcol1, q['weight'])
+        avg_per, err_per = weighted_avg_and_std(logcol2, q['weight'])
+        return [(10 ** avg_per, 10 ** avg_rad), (err_per * (10 ** avg_per), err_rad * (10 ** avg_rad))]
+    else:
+        avg_rad, err_rad = weighted_avg_and_std(q[col1], q['weight'])
+        avg_per, err_per = weighted_avg_and_std(q[col2], q['weight'])
+        return [(avg_per, avg_rad), (err_per, err_rad)]
 
-    return [(10 ** avg_per, 10 ** avg_rad), (err_per * (10 ** avg_per), err_rad * (10 ** avg_rad))]
+

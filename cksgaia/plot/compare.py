@@ -228,19 +228,19 @@ class ComparisonRadius(Comparison):
 def subplots_compare(x1, x2, x3, fig, axL, x1err=None, x2err=None, x3err=None, **kwargs):
     mfc = 'RoyalBlue'
     fig.set_tight_layout(False)
-    fig.subplots_adjust(hspace=0.001,left=0.17,top=0.95,right=0.90,bottom=0.12)
+    fig.subplots_adjust(hspace=0.001,left=0.20,top=0.95,right=0.90,bottom=0.13)
     plt.sca(axL[0])
     plt.plot(x1, x2, 'o',markersize=5,color='k')
     plt.errorbar(
         x1, x2, xerr=x1err, yerr=x2err, fmt='o',markersize=3.5,elinewidth=1,
-        ecolor='DarkGray',color=mfc
+        ecolor='DarkGray',color=mfc, capsize=0
     )
 
     plt.sca(axL[1])
     plt.plot(x1, x3, 'o',markersize=5,color='k')
     plt.errorbar(
         x1, x3, xerr=x1err, yerr=x3err, fmt='o',markersize=3.5,elinewidth=1,
-        ecolor='DarkGray',color=mfc
+        ecolor='DarkGray',color=mfc, capsize=0
     )
     return fig,axL
 
@@ -254,4 +254,4 @@ def one2one(**kwargs):
     plt.plot(xl,xl,**kwargs)
 
 figsize = (4,4.5)
-
+# figsize = (5,3.5)
