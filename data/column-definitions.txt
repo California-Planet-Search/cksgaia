@@ -1,16 +1,18 @@
 # List of column names and description. Values with uncertainties are
 # given as val + val_err1 - val_err2
+#
+# Identifiers
+#
 id_starname           Unique identifier for star [str]
 id_kic                Kepler Input Catalog Name [int]
 id_koi                Kepler Object of Interest [int]		
 id_koicand            Planet Candidate name K?????.?? [str]
 id_tycho2             Tycho-2 identifier [int]
 id_kepler_name        Kepler name [str]
-tgas_parallax         Tycho-Gaia astrometric solution parallax [mas]
-tgas_parallax_err1    
-tgas_parallax_err2    
 koi_disposition       Exoplanet Archive Disposition [str] 
+#
 # Columns from Q16 KOI catalog (Mullally et al. 2015)
+#
 koi_period            Orbital Period [days] 
 koi_period_err1       Orbital Period Upper Unc. [days]
 koi_period_err2       Orbital Period Lower Unc. [days]
@@ -77,7 +79,9 @@ kic_kepmag            Kepler-band [mag]
 kic_jmag              J-band [mag]
 kic_hmag              H-band [mag]
 kic_kmag              K-band [mag]
+#
 # Columns from CKS-I
+#
 cks_fpsys	      CKS False positive designation for star/system
 cks_fp                CKS False positive designation for candidate
 cks_steff             CKS Effective Temperature [K]
@@ -92,53 +96,48 @@ cks_smet_err2
 cks_svsini            CKS Projected Stellar Rotational Velocity [km/s]
 cks_svsini_err1       
 cks_svsini_err2       
+#
 # Columns from CKS-II
-iso_steff             CKS+Isochrone-constrained Effective Temperature [K]
+#
+iso_steff              Effective Temperature [K]
 iso_steff_err1 	      
 iso_steff_err2 	      
-iso_slogg             CKS+Isochrone-constrained Stellar Surface Gravity [log10(cm/s**2)]
+iso_slogg              Stellar Surface Gravity [log10(cm/s**2)]
 iso_slogg_err1 	      
 iso_slogg_err2 	      
-iso_smet              CKS+Isochrone-constrained Stellar Metallicity [dex]
+iso_smet               Stellar Metallicity [dex]
 iso_smet_err1 	      
 iso_smet_err2 	      
-iso_srad              CKS+Isochrone-constrained Stellar Radius [Solar radii]
+iso_srad               Stellar Radius [Solar radii]
 iso_srad_err1 	      
 iso_srad_err2 	      
-iso_smass             CKS+Isochrone-constrained Stellar Mass [Solar mass]
+iso_smass              Stellar Mass [Solar mass]
 iso_smass_err1 	      
 iso_smass_err2	      
-iso_sage              CKS+Isochrone-constrained Stellar Age [Gyr]
+iso_sage               Stellar Age [Gyr]
 iso_sage_err1
 iso_sage_err2	      
-iso_slogage           CKS+Isochrone-constrained Stellar Age [log10(yrs)]
+iso_slogage            Stellar Age [log10(yrs)]
 iso_slogage_err1	      
 iso_slogage_err2	      
-iso_sparallax         CKS+Isochrone-constrained Stellar parallax [mas]
+iso_sparallax          Stellar parallax [mas]
 iso_sparallax_err1    
 iso_sparallax_err2    
-iso_prad              CKS+Isochrone-constrained Planet Radius [Earth radii]
+iso_prad               Planet Radius [Earth radii]
 iso_prad_err1	      
 iso_prad_err2	      
-iso_sma               CKS+Isochrone-constrained semi-major axis [AU]
+iso_sma                semi-major axis [AU]
 iso_sma_err1
 iso_sma_err2
-iso_insol             CKS+Isochrone-constrained Incident flux [Earth units]
+iso_insol              Incident flux [Earth units]
 iso_insol_err1	      
 iso_insol_err2	      
-iso_teq               CKS+Isochrone-constrained Planet equilibrium temperature (bond albedo = 0.3)
+iso_teq                Planet equilibrium temperature (bond albedo = 0.3)
 iso_teq_err1	      
 iso_teq_err2	      
-# Gaia DR1 columns
-gaia1_angdist         Distance between KIC position and Gaia position [arcsec]
-gaia1_ra              Right ascension [deg]
-gaia1_dec             Declination [deg]
-gaia1_sparallax       Parallax in [mas]
-gaia1_sparallax_err   
-gaia1_gflux           Mean flux in Gaia bandpass [e-/s]
-gaia1_gflux_err       
-gaia1_gmag            Mean magnitude in Gaia bandpass [mag]
-# Gaia DR2 columns
+#
+# Columns from Gaia DR2
+#
 gaia2_angdist         Distance between KIC position and Gaia position [arcsec]
 gaia2_ra              Right ascension [deg]
 gaia2_dec             Declination [deg]
@@ -153,5 +152,60 @@ gaia2_srad_err2
 gaia2_steff           Stellar effective temperature [Kelvin] 
 gaia2_steff_err1       
 gaia2_steff_err2
-
+#
+# Columns from CKS VII
+# Properties from extinction analysis
+#
+ext_ak               K-band extinction from Green 2018 dustmap
+ext_ak_err           Error combined error from map and uncertainty on R_K
+ext_ak_err_map       Error in G18 map
+ext_ebv              G18 reddening (see paper)
+ext_ebv_err          Error in G18 reddening map
+# Properties from isoclassify analysis
+giso_smass           CKS+Gaia Stellar Mass
+giso_smass_err2
+giso_smass_err1
+giso_smet            CKS+Gaia Stellar Metallicity
+giso_smet_err1
+giso_smet_err2
+giso_sage            CKS+Gaia Stellar Age [Gyr]
+giso_sage_err1
+giso_sage_err2
+giso_slogage         CKS+Gaia Stellar Age [lgo10(yrs)]
+giso_slogage_err1    
+giso_slogage_err2
+giso_slogg           CKS+Gaia Stellar Surface Gravity [log10(cm/s**2)]
+giso_slogg_err1
+giso_slogg_err2
+giso_steff           CKS+Gaia Effective Temperature [K]
+giso_steff_err1
+giso_steff_err2
+giso_srad            CKS+Gaia Stellar radius [Solar Radii]
+giso_srad_err1
+giso_srad_err2
+giso_sparallax       CKS+Gaia parallax [mas]
+giso_sparallax_err1
+giso_sparallax_err2
+giso_nmodels         Number of models in the 4 sigma isoclassify search
+#
+# Rederived planet properties
+#
+giso_prad           Planet Radius [Earth radii]
+giso_prad_err1 
+giso_prad_err2
+giso_insol          Incident flux [Earth units]
+giso_insol_err1
+giso_insol_err2
+giso_teq            Planet equilibrium temperature (bond albedo = 0.3)
+giso_teq_err1
+giso_teq_err2
+giso_sma            Semi-major axis [AU]
+giso_sma_err1
+giso_sma_err2
+#
+# Properties from Furlan (2017)
+#
+fur17_ao_obs        Which telescopes observed the KOI?
+fur17_rcorr_avg     Radius correction factor
+fur17_rcorr_avg_err 
 

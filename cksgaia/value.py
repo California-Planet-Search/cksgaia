@@ -74,7 +74,11 @@ def val_stat(return_dict=False):
 
     df = cksgaia.io.load_table('kic-filtered')
     d['star-filtered-count'] = len(df)
-    d['planet-filtered-count'] = len(cksgaia.io.load_table('cksgaia-planets-filtered'))
+
+    df = cksgaia.io.load_table('cksgaia-planets-filtered')
+    d['planet-filtered-count'] = len(df)
+    cut = df.query('1.5 < giso_prad < 2.0 and 1 <  koi_period < 100')
+    d['planet-filtered-gap-count'] = len(cut)
 
     lines = []
     for k, v in d.iteritems():
