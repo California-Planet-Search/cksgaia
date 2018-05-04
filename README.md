@@ -48,13 +48,14 @@ $ run_cksgaia.py create-iso-table isoclassify isocla-j17-fakegaia isocla-j17-fak
 $ run_cksgaia.py create-iso-table isochrones isocla+isochr-dsep data/isochrones.csv
 ```
 
-
 ```
 $ run_cksgaia.py simulate-surveys
-
 ```
-$ run_cksgaia.py tex-tables # LaTeX tables
-$ run_cksgaia.py tex-stats # Summary statistics
+
+
+# Full cookbook
+```
 $ run_cksgaia.py create-table all -d ./ # Make Tables
+$ run_cksgaia.py create-val all -d ./   # Make values for latex
 $ run_cksgaia.py create-plots all -d ./ # Make figures
 ```
