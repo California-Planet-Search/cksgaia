@@ -277,6 +277,8 @@ class Workflow(object):
         d = OrderedDict()
         # register machine-readable tables here
         d['weight-machine'] = lambda: cksgaia.table.weight_table_machine()
+        d['star-machine'] = lambda: cksgaia.table.star_machine()
+        d['planet-machine'] = lambda: cksgaia.table.planet_machine()
         self.csv_dict = d
 
         d = OrderedDict()

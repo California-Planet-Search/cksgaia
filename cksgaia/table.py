@@ -22,6 +22,7 @@ def weight_table(lines='all'):
 
     return outstr.split('\n')[2:-3]
 
+
 def weight_table_machine():
     physmerge = cksgaia.io.load_table('cksgaia-planets-weights')
 
@@ -40,6 +41,7 @@ def weight_table_machine():
         lines.append(row_str)
 
     return lines
+
 
 def bins_table():
     lines = []
@@ -85,6 +87,7 @@ def star():
 
     return lines
 
+
 def planet():
     df = cksgaia.io.load_table('cksgaia-planets',cache=1)
     df = df.sort_values(by='id_koicand')
@@ -115,4 +118,70 @@ def planet():
         s = s.format(**row)
         s = s.replace('nan','\\nodata')
         lines.append(s)
+
+    return lines
+
+
+def star_machine():
+    df = cksgaia.io.load_table('cksgaia-planets', cache=1)
+    df = df.groupby('id_starname', as_index=False).nth(0)
+    df = df.sort_values(by='id_starname')
+
+    cols = ['id_starname',
+            'cks_steff', 'cks_steff_err1', 'cks_steff_err2',
+            'cks_smet', 'cks_smet_err1', 'cks_smet_err2',
+            'm17_kmag', 'm17_kmag_err',
+            'gaia2_sparallax', 'gaia2_sparallax_err',
+            'ext_ak', 'ext_ak_err',
+            'giso_srad', 'giso_srad_err1', 'giso_srad_err2',
+            'giso_smass', 'giso_smass_err1', 'giso_smass_err2',
+            'giso_slogage', 'giso_slogage_err1', 'giso_slogage_err2',
+            'gaia2_gflux_ratio', 'fur17_rcorr_avg']
+
+    df = df[cols]
+
+    lines = []
+    head = ",".join(cols)
+    lines.append(head)
+    for i, row in df.iterrows():
+        l = "{id_starname:s},\
+{cks_steff:.0f}, {cks_steff_err1:.0f}, {cks_steff_err2:.0f},\
+{cks_smet:.2f},{cks_smet_err1:.2f},{cks_smet_err2:.2f},\
+{m17_kmag:.3f},{m17_kmag_err:.3f},\
+{gaia2_sparallax:.3f},{gaia2_sparallax_err:.3f},\
+{ext_ak:.3f},{ext_ak_err:.3f},\
+{giso_srad:.3f},{giso_srad_err1:.3f},{giso_srad_err2:.3f},\
+{giso_smass:.3f},{giso_smass_err1:.3f},{giso_smass_err2:.3f},\
+{giso_slogage:.2f},{giso_slogage_err1:.2f},{giso_slogage_err2:.2f},\
+{gaia2_gflux_ratio:.3f},{fur17_rcorr_avg:.4f}".format(**row)
+
+        lines.append(l)
+
+    return lines
+
+
+def planet_machine():
+    df = cksgaia.io.load_table('cksgaia-planets', cache=1)
+    df = df.sort_values(by='id_koicand')
+
+    cols = ['id_koicand',
+            'koi_period', 'koi_period_err1', 'koi_period_err2',
+            'koi_ror', 'koi_ror_err1', 'koi_ror_err2',
+            'giso_prad', 'giso_prad_err1', 'giso_prad_err2',
+            'giso_sma', 'giso_sma_err1', 'giso_sma_err2',
+            'giso_insol', 'giso_insol_err1', 'giso_insol_err2']
+
+    lines = []
+    head = ",".join(cols)
+    lines.append(head)
+    for i, row in df.iterrows():
+        l = "{id_koicand:s},\
+{koi_period:.9f}, {koi_period_err1:.9f}, {koi_period_err2:.9f},\
+{koi_ror:.6f}, {koi_ror_err1:.6f}, {koi_ror_err2:.6f},\
+{giso_prad:.3f},{giso_prad_err1:.3f},{giso_prad_err2:.3f},\
+{giso_sma:.5f},{giso_sma_err1:.5f},{giso_sma_err2:.5f},\
+{giso_insol:.1f},{giso_insol_err1:.1f},{giso_insol_err2:.1f}".format(**row)
+
+        lines.append(l)
+
     return lines
