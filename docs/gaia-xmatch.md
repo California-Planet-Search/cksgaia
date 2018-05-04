@@ -5,7 +5,7 @@ We have two methods for cross-matching Gaia catalogs
 
 ## Method 1: ADQL at Gaia Archive
 
-## CKS
+### CKS
 
 1. Generate VOTables and upload to Gaia Archive
 2. Log into Gaia archive as `epetigur`
@@ -26,7 +26,7 @@ WHERE 1=CONTAINS(
 )
 ```
 
-## Mathur17
+### Mathur17
 
 Same as CKS, but with this query
 
