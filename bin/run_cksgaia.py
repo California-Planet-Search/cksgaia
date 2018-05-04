@@ -135,10 +135,11 @@ def create_iso_jobs(args):
     for i, row in df.iterrows():
         id_starname = row.id_starname
         outdir = "{}/{}".format(args.baseoutdir, id_starname)
-        print "mkdir -p {}; run_cksgaia.py run-iso {} {} {} &> {}/run-iso.log".format(outdir,
-                                                                                      args.driver,
-                                                                                      id_starname,
-                                                                                      outdir, outdir)
+        s = ""
+        s+="mkdir -p {};"
+        s+="run_cksgaia.py run-iso {} {} {} &> {}/run-iso.log"
+        s = s.format(outdir, args.driver,id_starname, outdir, outdir)
+        print s 
 
 def sim_surveys(args):
     cksgaia.sim.simulations.run(args)
@@ -186,17 +187,13 @@ def create_iso_table(args):
     df.to_csv(args.outfile, index=False)
     print "created {}".format(args.outfile)
 
-
 def create_merged_table(args):
     df = cksgaia.io.load_table('j17+m17+gaia2+iso', verbose=True, cache=0)
-
     csvfn = os.path.join(cksgaia.io.DATADIR, 'cks_iso_gaia2_merged.csv')
     df.to_csv(csvfn)
 
-
 def tex_stats(args):
     cksgaia.calc.table_statistics()
-
 
 def create_table(args):
     w = Workflow(outputdir=args.outputdir)
@@ -210,16 +207,13 @@ def create_plot(args):
     w = Workflow(outputdir=args.outputdir)
     w.create_file('plot', args.name)
 
-
 def create_val(args):
     w = Workflow(outputdir=args.outputdir)
     w.create_file('val', args.name)
 
-
 def update_paper(args):
     w = Workflow(outputdir=args.outputdir)
     w.update_paper() 
-
 
 class Workflow(object):
     def __init__(self, outputdir='./'):
@@ -276,9 +270,9 @@ class Workflow(object):
 
         d = OrderedDict()
         # register machine-readable tables here
-        d['weight-machine'] = lambda: cksgaia.table.weight_table_machine()
-        d['star-machine'] = lambda: cksgaia.table.star_machine()
-        d['planet-machine'] = lambda: cksgaia.table.planet_machine()
+        d['weight-machine'] = cksgaia.table.weight_table_machine
+        d['star-machine'] = cksgaia.table.star_machine
+        d['planet-machine'] = cksgaia.table.planet_machine
         self.csv_dict = d
 
         d = OrderedDict()
@@ -304,7 +298,6 @@ class Workflow(object):
             
     def create_file(self, kind, name):
         i = 0
-
         for key, func in self.all_dict[kind].iteritems():
             if kind=='plot':
                 if name=='all':
