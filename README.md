@@ -19,7 +19,7 @@ Follow instructions [here](docs/gaia-xmatch.md)
 
 This part of the code follows the CKS-Physical codebase
 
-## 1 Isochrone analysis
+## Isochrone analysis
 
 Create jobs that convert the spectroscopic parameters from Petigura et
 al. (2017) to physical stellar parameters. Generate a list of shell scripts
