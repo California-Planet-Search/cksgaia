@@ -40,11 +40,11 @@ Scrape through the output director to create stellar parameters table.
 
 ```
 $ run_cksgaia.py create-iso-table isoclassify <outputdir> <outfile>
-
+```
 e.g.
-
+```
 $ run_cksgaia.py create-iso-table isoclassify isocla-j17-gaia isocla-j17-gaia.csv
-
+```
 
 
 # Updating plots tables and values in paper
