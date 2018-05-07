@@ -26,34 +26,28 @@ al. (2017) to physical stellar parameters. Generate a list of shell scripts
 for isoclassify.
 
 ```
-python bin/run_cksgaia.py create-iso-jobs isoclassify cks isocla-j17-fakegaia | grep mkdir > isocla-j17-fakegaia.tot # for fake gaia data
+python bin/run_cksgaia.py create-iso-jobs isoclassify cks+gaia2 <outputdir> | grep mkdir > <outputdir>/isoclassify-cksgaia.tot
 ```
 
 Then run in parallel
 
 ```
+$ cd <outputdir>
 $ parallel :::: isoclassify-cks.tot
 ```
 
 Scrape through the output director to create stellar parameters table.
 
 ```
-$ run_cksgaia.py create-iso-table <mode> <baseoutdir> <outfile>
+$ run_cksgaia.py create-iso-table isoclassify <outputdir> <outfile>
 
 e.g.
 
-$ run_cksgaia.py create-iso-table isoclassify isocla-j17-fakegaia isocla-j17-fakegaia.csv
-
-# This will put it in the right place for the table generation
-$ run_cksgaia.py create-iso-table isochrones isocla+isochr-dsep data/isochrones.csv
-```
-
-```
-$ run_cksgaia.py simulate-surveys
-```
+$ run_cksgaia.py create-iso-table isoclassify isocla-j17-gaia isocla-j17-gaia.csv
 
 
-# Full cookbook
+
+# Updating plots tables and values in paper
 ```
 $ run_cksgaia.py create-table all -d ./ # Make Tables
 $ run_cksgaia.py create-val all -d ./   # Make values for latex
