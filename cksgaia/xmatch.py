@@ -113,10 +113,18 @@ def read_xmatch_gaia2(fn):
         'phot_g_mean_flux':'gflux',
         'phot_g_mean_flux_error':'gflux_err',
         'phot_g_mean_mag':'gmag',
+
+        'phot_bp_mean_flux':'bpflux',
+        'phot_bp_mean_flux_error':'bpflux_err',
+        'phot_bp_mean_mag':'bpmag',
+        'phot_rp_mean_flux':'rpflux',
+        'phot_rp_mean_flux_error':'rpflux_err',
+        'phot_rp_mean_mag':'rpmag',
         'parallax_over_error':'sparallax_over_err',
         'id_kic':'id_kic',
         'dist':'angdist',
     }
+    
     df['steff'] = df['teff_val']
     df['steff_err1'] = df.eval('teff_percentile_upper - teff_val')
     df['steff_err2'] = df.eval('teff_percentile_lower - teff_val')

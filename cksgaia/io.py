@@ -183,6 +183,7 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
         df1 = load_table('m17+gaia2+j17+iso')
         df2 = load_table('fur17')
         df = pd.merge(df1,df2 ,how='left')
+        df = order_columns(df)
 
     elif table == "cksgaia-planets":
         df2 = load_table('m17+gaia2+j17+iso+fur17')
@@ -198,6 +199,9 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
 
     else:
         assert False, "table {} not valid table name".format(table)
+
+
+    
     return df
 
 def read_silva15(fn):
@@ -260,6 +264,7 @@ def read_silva15(fn):
     df['fe_err2'] = -1.0 * df['fe_err1']
     df = add_prefix(df,'s15_')
     return df
+
 def read_huber13(fn, readme):
     df = astropy.io.ascii.read(fn, readme=readme)
     df = df.to_pandas()
