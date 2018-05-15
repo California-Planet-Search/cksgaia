@@ -145,6 +145,9 @@ gaia2_sparallax       Parallax in [mas]
 gaia2_sparallax_err   
 gaia2_gflux           Mean flux in Gaia bandpass [e-/s]
 gaia2_gflux_err       
+gaia2_n_1arcsec       Number of sources within 1 arcsec
+gaia2_n_8arcsec       Number of sources within 8 arcsec
+gaia2_gflux_ratio     Total G-band flux within 8 arcsec of target divided by target G-band flux
 gaia2_gmag            Mean magnitude in Gaia bandpass [mag]
 gaia2_srad            Stellar radius [Solar-radii] 
 gaia2_srad_err1       
