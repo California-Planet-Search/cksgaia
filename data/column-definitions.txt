@@ -141,7 +141,7 @@ iso_teq_err2
 gaia2_angdist         Distance between KIC position and Gaia position [arcsec]
 gaia2_ra              Right ascension [deg]
 gaia2_dec             Declination [deg]
-gaia2_sparallax       Parallax in [mas]
+gaia2_sparallax       Parallax in [mas]; correction of +0.053 mas applied, recommended by Zinn+18
 gaia2_sparallax_err   
 gaia2_gflux           Mean flux in Gaia bandpass [e-/s]
 gaia2_gflux_err       

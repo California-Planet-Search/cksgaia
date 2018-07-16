@@ -36,6 +36,9 @@ def main():
     psr2.add_argument('baseoutdir',help='absolute path to output directory')
     psr2.set_defaults(func=create_iso_jobs)
 
+    psr2 = subpsr.add_parser('create-iso-batch', parents=[psr_parent],)
+    psr2.set_defaults(func=create_iso_batch)
+
     psr2 = subpsr.add_parser(
         'run-iso', parents=[psr_parent], 
         description="Run isochrones"
@@ -140,6 +143,47 @@ def create_iso_jobs(args):
         s+="run_cksgaia.py run-iso {} {} {} &> {}/run-iso.log"
         s = s.format(outdir, args.driver,id_starname, outdir, outdir)
         print s 
+
+
+def create_iso_batch(args):
+    df = cksgaia.io.load_table('m17+gaia2+j17').groupby('id_kic').nth(0)
+    df = df.sort_values(by='id_starname')
+    # Direct method
+    df = df.rename(
+        columns={
+            'id_name':'id_starname',
+            'parallax_error':'parallax_err',
+            'ks_m':'kmag',
+            'ks_msigcom':'kmag_err',
+            'cks_steff':'teff',
+            'cks_steff_err1':'teff_err',
+            'cks_slogg':'logg',
+            'cks_slogg_err1':'logg_err',
+            'cks_smet':'met',
+            'cks_smet_err1':'met_err',
+            'm17_kmag':'kmag',
+            'm17_kmag_err':'kmag_err',
+            'gaia2_sparallax':'parallax',
+            'gaia2_sparallax_err':'parallax_err',
+        }
+    )
+
+    df['teff_err'] = 60
+    df['parallax'] /= 1e3
+    df['parallax_err'] /= 1e3
+    df['met_err'] = 0.04
+    df.id_starname = df.id_starname.str.replace(' ','_')
+    fn = 'data/isoclassify-direct.csv'
+    df.to_csv(fn)
+    print "created {}".format(fn)
+
+    # Grid method. Don't set parallax so we can compare later
+    df['parallax'] = -99
+    df['parallax_err'] = 0
+    fn = 'data/isoclassify-grid.csv'
+    df.to_csv(fn)
+    print "created {}".format(fn)
+
 
 def sim_surveys(args):
     cksgaia.sim.simulations.run(args)
