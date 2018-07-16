@@ -2,18 +2,17 @@
 from argparse import ArgumentParser
 import os
 from collections import OrderedDict
-
-import pylab as pl
-
-import pandas as pd
 import glob
 
-import cksgaia.io     # module for reading and writing datasets
-import cksgaia.value  # module for computing scalar values for table
-import cksgaia.table  # module for computing scalar values for table
-import cksgaia.plot.sample   # submodule for including plots
-import cksgaia.plot.contour   # submodule for including plots
-import cksgaia.plot.occur   # submodule for including plots
+import pylab as pl
+import pandas as pd
+
+import cksgaia.io # module for reading and writing datasets
+import cksgaia.value # module for computing scalar values for table
+import cksgaia.table # module for computing scalar values for table
+import cksgaia.plot.sample 
+import cksgaia.plot.contour
+import cksgaia.plot.occur
 import cksgaia.plot.sim
 import cksgaia.errors
 import cksgaia.calc
@@ -27,45 +26,8 @@ def main():
     psr_parent = ArgumentParser(add_help=False)
     psr_parent.add_argument('-d', dest='outputdir', type=str, help="put files in this directory")
 
-    psr2 = subpsr.add_parser(
-        'create-iso-jobs', parents=[psr_parent], 
-        description="Create isochrone processing batch jobs for all KOIs"
-    )
-    psr2.add_argument('driver')
-    psr2.add_argument('sample')
-    psr2.add_argument('baseoutdir',help='absolute path to output directory')
-    psr2.set_defaults(func=create_iso_jobs)
-
     psr2 = subpsr.add_parser('create-iso-batch', parents=[psr_parent],)
     psr2.set_defaults(func=create_iso_batch)
-
-    psr2 = subpsr.add_parser(
-        'run-iso', parents=[psr_parent], 
-        description="Run isochrones"
-    )
-
-    drivers = [
-        'isoclassify','isochrones','isocla+isochr-dsep','isocla+isochr-mist',
-        'isocla+isochr-dsep-jk','isocla+isochr-mist-jk'
-    ]
-    psr2.add_argument('driver', help='isochrone interp code',choices=drivers)
-    psr2.add_argument('id_starname', help='name of star')
-    psr2.add_argument('outdir')
-    psr2.add_argument('--debug',action='store_true')
-    psr2.set_defaults(func=run_iso)
-
-    psr2 = subpsr.add_parser(
-        'create-iso-table', parents=[psr_parent], 
-        description="Scrape the isochrones.csv files to make isochrones table"
-    )
-
-    modes = [
-        'isoclassify', 'isochrones'
-    ]
-    psr2.add_argument('mode',choices=modes)
-    psr2.add_argument('baseoutdir')
-    psr2.add_argument('outfile')
-    psr2.set_defaults(func=create_iso_table)
 
     psr2 = subpsr.add_parser('create-xmatch-table', parents=[psr_parent])
     psr2.set_defaults(func=create_xmatch_table)
@@ -120,34 +82,29 @@ def main():
     args = psr.parse_args()
     args.func(args)
 
-def run_iso(args):
-    import cksgaia.iso
-    cksgaia.iso.run(args.driver, args.id_starname, args.outdir, debug=args.debug)
 
 def create_xmatch_table(args):
     cksgaia.xmatch.create_xmatch_table()
 
-def create_iso_jobs(args):
-    if args.sample=='cks':
-        df = cksgaia.io.load_table('j17+m17')
-    elif args.sample == 'cks+gaia2':
-        df = cksgaia.io.load_table('m17+gaia2+j17').groupby('id_kic').nth(0)
-    else:
-        print("Invalid sample: {}".format(args.sample))
-
-    for i, row in df.iterrows():
-        id_starname = row.id_starname
-        outdir = "{}/{}".format(args.baseoutdir, id_starname)
-        s = ""
-        s+="mkdir -p {};"
-        s+="run_cksgaia.py run-iso {} {} {} &> {}/run-iso.log"
-        s = s.format(outdir, args.driver,id_starname, outdir, outdir)
-        print s 
-
-
 def create_iso_batch(args):
+    """Create Isoclassify Batch Jobs
+
+    Creates input parameters for two runs
+    
+       1. The direct method with the following constraints
+          - teff, logg, fe, parallax, kmag
+       2. The grid method with the following constraints
+          - teff, logg, met, kmag [no parallax]
+
+    We default to the direct method. But if the parallax method from
+    the grid based method is significantly different than the gaia
+    parallax, there is additional flux in the aperture which indicates
+    dilution.
+
+    """
     df = cksgaia.io.load_table('m17+gaia2+j17').groupby('id_kic').nth(0)
     df = df.sort_values(by='id_starname')
+
     # Direct method
     df = df.rename(
         columns={
@@ -159,19 +116,21 @@ def create_iso_batch(args):
             'cks_steff_err1':'teff_err',
             'cks_slogg':'logg',
             'cks_slogg_err1':'logg_err',
-            'cks_smet':'met',
-            'cks_smet_err1':'met_err',
+            'cks_smet':'feh',
+            'cks_smet_err1':'feh_err',
             'm17_kmag':'kmag',
             'm17_kmag_err':'kmag_err',
             'gaia2_sparallax':'parallax',
             'gaia2_sparallax_err':'parallax_err',
+            'gaia2_ra':'ra',
+            'gaia2_dec':'dec',
         }
     )
-
+    df['band'] = 'kmag'
     df['teff_err'] = 60
     df['parallax'] /= 1e3
     df['parallax_err'] /= 1e3
-    df['met_err'] = 0.04
+    df['feh_err'] = 0.04
     df.id_starname = df.id_starname.str.replace(' ','_')
     fn = 'data/isoclassify-direct.csv'
     df.to_csv(fn)

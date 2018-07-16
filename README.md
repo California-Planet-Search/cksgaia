@@ -10,30 +10,32 @@ Download data tables
 2. kic_q0_q17.hdf # Table of noise properties
 3. kepler_stellar17.csv.gz # Mathur 2017 stellar properties tables
 
-
 ## Cross-match the CKS stars with Gaia IDs.
 
 Follow instructions [here](docs/gaia-xmatch.md)
 
-## Physical parameters
-
-This part of the code follows the CKS-Physical codebase
-
 ## Isochrone analysis
 
-Create jobs that convert the spectroscopic parameters from Petigura et
-al. (2017) to physical stellar parameters. Generate a list of shell scripts
-for isoclassify.
+Creates `data/isoclassify-grid.csv` and `data/isoclassify-direct.csv` input files
 
 ```
-python bin/run_cksgaia.py create-iso-jobs isoclassify cks+gaia2 <outputdir> | grep mkdir > <outputdir>/isoclassify-cksgaia.tot
+bin/run_cksgaia.py create-iso-batch 
+```
+
+Then create batch files
+
+```
+isoclassify batch direct data/isoclassify-direct.csv -o isoclassify/direct/ > isoclassify-direct.tot
+isoclassify batch grid data/isoclassify-grid.csv -o isoclassify/grid/ > isoclassify-grid.tot
 ```
 
 Then run in parallel
 
 ```
-$ cd <outputdir>
-$ parallel :::: isoclassify-cks.tot
+# head isoclassify-direct.tot | parallel # useful for testing
+# head isoclassify-grid.tot | parallel # useful for testing
+parallel :::: isoclassify-direct.tot
+parallel :::: isoclassify-grid.tot
 ```
 
 Scrape through the output director to create stellar parameters table.
@@ -52,4 +54,18 @@ $ run_cksgaia.py create-iso-table isoclassify isocla-j17-gaia isocla-j17-gaia.cs
 $ run_cksgaia.py create-table all -d ./ # Make Tables
 $ run_cksgaia.py create-val all -d ./   # Make values for latex
 $ run_cksgaia.py create-plots all -d ./ # Make figures
+```
+
+###
+
+
+```
+run_cksgaia.py create-iso-batch 
+isoclassify batch direct data/isoclassify-direct.csv -o isoclassify/direct/ > isoclassify-direct.tot
+isoclassify batch grid data/isoclassify-grid.csv -o isoclassify/grid/ > isoclassify-grid.tot
+mkdir -p isoclassify/direct//K00001;isoclassify run direct K00001 --outdir isoclassify/direct//K00001 --csv data/isoclassify-direct.csv 
+head isoclassify-direct.tot | parallel # useful for testing
+head isoclassify-grid.tot | parallel # useful for testing
+parallel :::: isoclassify-direct.tot # Takes about XX min on Erik's laptop to run
+parallel :::: isoclassify-grid.tot # Takes about XX min on Erik's laptop to run
 ```
