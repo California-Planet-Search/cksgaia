@@ -97,6 +97,45 @@ cks_svsini            CKS Projected Stellar Rotational Velocity [km/s]
 cks_svsini_err1       
 cks_svsini_err2       
 #
+# Columns from CKS-II
+#
+iso_steff              Effective Temperature [K]
+iso_steff_err1        
+iso_steff_err2        
+iso_slogg              Stellar Surface Gravity [log10(cm/s**2)]
+iso_slogg_err1        
+iso_slogg_err2        
+iso_smet               Stellar Metallicity [dex]
+iso_smet_err1         
+iso_smet_err2         
+iso_srad               Stellar Radius [Solar radii]
+iso_srad_err1         
+iso_srad_err2         
+iso_smass              Stellar Mass [Solar mass]
+iso_smass_err1        
+iso_smass_err2        
+iso_sage               Stellar Age [Gyr]
+iso_sage_err1
+iso_sage_err2         
+iso_slogage            Stellar Age [log10(yrs)]
+iso_slogage_err1              
+iso_slogage_err2              
+iso_sparallax          Stellar parallax [mas]
+iso_sparallax_err1    
+iso_sparallax_err2    
+iso_prad               Planet Radius [Earth radii]
+iso_prad_err1         
+iso_prad_err2         
+iso_sma                semi-major axis [AU]
+iso_sma_err1
+iso_sma_err2
+iso_insol              Incident flux [Earth units]
+iso_insol_err1        
+iso_insol_err2        
+iso_teq                Planet equilibrium temperature (bond albedo = 0.3)
+iso_teq_err1          
+iso_teq_err2          
+#
 # Columns from Gaia DR2
 #
 gaia2_angdist         Distance between KIC position and Gaia position [arcsec]
