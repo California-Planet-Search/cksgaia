@@ -20,28 +20,44 @@ def val_stat(return_dict=False):
     stars = df.groupby('id_kic',as_index=False).nth(0)
     cut = stars
     d['cks-gaia-star-count'] = len(cut)
-    d['cks-gaia-sparallax-ferr-median'] = "{:.1f}".format(cut.eval('gaia2_sparallax_err / gaia2_sparallax').median() * 100)
-    d['cks-gaia-distmod-err-median'] = "{:.2f}".format(cut.eval('gaia2_sparallax_err / gaia2_sparallax').median())
+
+    d['cks-gaia-sparallax-med'] = "{:.1f}".format(cut.eval('gaia2_sparallax').median())
+    d['cks-gaia-sparallax-ferr-med'] = "{:.1f}".format(cut.eval('gaia2_sparallax_err / gaia2_sparallax').median() * 100)
+
+    d['cks-gaia-distmod-err-med'] = "{:.2f}".format(cut.eval('gaia2_sparallax_err / gaia2_sparallax').median())
+
+    dist = 1 / (1e-3  * df.gaia2_sparallax)
+    mu = 5 * np.log10(dist) - 5 
+    d['cks-gaia-distmod-med'] = "{:.2f}".format(mu.median())
 
 
     df = cksgaia.io.load_table('m17+gaia2+j17+ext',cache=0)
-    d['ak-median'] = "{:.03f}".format(df.ext_ak.median())
+    d['ak-med'] = "{:.03f}".format(df.ext_ak.median())
     d['ak-min'] = "{:.03f}".format(df.ext_ak.min())
     d['ak-max'] = "{:.03f}".format(df.ext_ak.max())
-    d['ak-median-err'] = "{:.03f}".format(df.ext_ak_err.median())
-    d['ebv-median'] = "{:.03f}".format(df.ext_ebv.median())
-    d['ebv-median-err'] = "{:.03f}".format(df.ext_ebv_err.median())
-    d['mk-err-median'] = "{:.03f}".format(df.m17_kmag_err.median())
+    d['ak-med-err'] = "{:.03f}".format(df.ext_ak_err.median())
+    d['ebv-med'] = "{:.03f}".format(df.ext_ebv.median())
+    d['ebv-med-err'] = "{:.03f}".format(df.ext_ebv_err.median())
+
+    d['mk-med'] = "{:.02f}".format(df.m17_kmag.median())
+    d['mk-err-med'] = "{:.02f}".format(df.m17_kmag_err.median())
+
+    d['steff-med'] = "{:.0f}".format(df.cks_steff.median())
+
+
 
     # Properties of cks+gaia2 table
     df = cksgaia.io.load_table('cksgaia-planets',cache=1)
     cut = df
     ferr = cut.eval('0.5*(koi_ror_err1 - koi_ror_err2) / koi_ror')
-    d['ror-ferr-median'] = "{:.1f}".format(100*ferr.median())
+    d['ror-med'] = "{:.1f}".format(100*cut.koi_ror.median())
+    d['ror-ferr-med'] = "{:.1f}".format(100*ferr.median())
     ferr = cut.eval('0.5*(gdir_srad_err1 - gdir_srad_err2) / gdir_srad')
-    d['srad-ferr-median'] = "{:.1f}".format(100*ferr.median())
+    d['srad-med'] = "{:.1f}".format(cut.gdir_srad.median())
+    d['srad-ferr-med'] = "{:.1f}".format(100*ferr.median())
     ferr= cut.eval('0.5*(gdir_prad_err1 - gdir_prad_err2) / gdir_prad')
-    d['prad-ferr-median'] = "{:.1f}".format(100*ferr.median())
+    d['prad-ferr-med'] = "{:.1f}".format(100*ferr.median())
+    d['prad-med'] = "{:.1f}".format(cut.gdir_prad.median())
 
 
     # Comparison with Silva15

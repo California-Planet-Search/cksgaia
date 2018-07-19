@@ -26,7 +26,8 @@ Then create batch files
 
 ```
 isoclassify batch direct data/isoclassify-direct.csv green18 -o isoclassify/direct/ > isoclassify-direct.tot
-isoclassify batch grid data/isoclassify-grid.csv green18 -o isoclassify/grid/ > isoclassify-grid.tot
+isoclassify batch grid data/isoclassify-grid-parallax-yes.csv green18 -o isoclassify/grid-parallax-yes/ > isoclassify-grid-parallax-yes.tot
+isoclassify batch grid data/isoclassify-grid-parallax-no.csv green18 -o isoclassify/grid-parallax-no/ > isoclassify-grid-parallax-no.tot
 ```
 
 Then run in parallel
@@ -38,14 +39,18 @@ parallel :::: isoclassify-direct.tot
 parallel :::: isoclassify-grid.tot
 ```
 
+Sometimes there is an issue communicating with the Bayestar server executing the following code in serial quickly gathers the last problematic stars
+
+```
+for i in `grep "Response" isoclassify/direct/*/output.log | awk -F'/' '{print $3}' ` ;do eval `grep $i isoclassify-direct.tot` ;done 
+for i in `grep "Response" isoclassify/grid-parallax-no/*/output.log | awk -F'/' '{print $3}' ` ;do eval `grep $i isoclassify-grid-parallax-no.tot` ;done
+for i in `grep "Response" isoclassify/grid-parallax-yes/*/output.log | awk -F'/' '{print $3}' ` ;do eval `grep $i isoclassify-grid-parallax-yes.tot` ;done
+```
+
 Scrape through the output director to create stellar parameters table.
 
 ```
-$ run_cksgaia.py create-iso-table isoclassify <outputdir> <outfile>
-```
-e.g.
-```
-$ run_cksgaia.py create-iso-table isoclassify isocla-j17-gaia isocla-j17-gaia.csv
+run_cksgaia.py create-iso-table
 ```
 
 
@@ -56,7 +61,8 @@ $ run_cksgaia.py create-val all -d ./   # Make values for latex
 $ run_cksgaia.py create-plots all -d ./ # Make figures
 ```
 
-###
+# BJ please update
+
 
 ```
 run_cksgaia.py create-iso-batch 
@@ -64,8 +70,6 @@ isoclassify batch direct data/isoclassify-direct.csv green18 -o isoclassify/dire
 isoclassify batch grid data/isoclassify-grid-parallax-yes.csv green18 -o isoclassify/grid-parallax-yes/ > isoclassify-grid-parallax-yes.tot
 isoclassify batch grid data/isoclassify-grid-parallax-no.csv green18 -o isoclassify/grid-parallax-no/ > isoclassify-grid-parallax-no.tot
 
-
-# Test
 # mkdir -p isoclassify/grid-parallax-yes//K00001;isoclassify run grid K00001 --outdir isoclassify/grid-parallax-yes//K00001 --csv data/isoclassify-grid-parallax-yes.csv --dust green18 &> isoclassify/grid-parallax-yes//K00001/output.log
 
 head isoclassify-direct.tot | parallel # useful for testing
@@ -78,10 +82,10 @@ cat isoclassify-grid-parallax-yes.tot | parallel # takes about 20min on Erik's l
 
 parallel :::: isoclassify-direct.tot # Takes about XX min on Erik's laptop to run
 parallel :::: isoclassify-grid.tot # Takes about XX min on Erik's laptop to run
+
+# check for missing stars
+run_cksgaia.py create-iso-table
+
 ```
 
 
-# sometimes there is a problem communicating with the server
-for i in `grep "Response" isoclassify/direct/*/output.log | awk -F'/' '{print $3}' ` ;do eval `grep $i isoclassify-direct.tot` ;done 
-for i in `grep "Response" isoclassify/grid-parallax-no/*/output.log | awk -F'/' '{print $3}' ` ;do eval `grep $i isoclassify-grid-parallax-no.tot` ;done
-for i in `grep "Response" isoclassify/grid-parallax-yes/*/output.log | awk -F'/' '{print $3}' ` ;do eval `grep $i isoclassify-grid-parallax-yes.tot` ;done

@@ -75,10 +75,14 @@ def star():
         s+="{cks_smet:0.2f} & "
         s+="{m17_kmag:0.1f} & "
         s+="{gaia2_sparallax:0.2f} & "
-        s+="{ext_ak:0.3f} & "
         s+="{gdir_srad:0.2f} & "
+
         s+="{giso_smass:0.2f} & "
+        s+="{giso_srad:0.2f} & "
+        s+="{giso_srho:0.2f} & "
         s+="{giso_slogage:0.2f} & "
+
+        s+="{giso2_sparallax:0.2f} & "
         s+=r"{gaia2_gflux_ratio:0.2f} & " 
         s+=r"{fur17_rcorr_avg:.3f} \\"
         s = s.format(**row)

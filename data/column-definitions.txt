@@ -155,6 +155,8 @@ gaia2_srad_err2
 gaia2_steff           Stellar effective temperature [Kelvin] 
 gaia2_steff_err1       
 gaia2_steff_err2
+m17_kmag              2MASS Kmag 
+m17_kmag_err          2MASS Kmag
 #
 # Columns from CKS VII
 #
@@ -172,6 +174,9 @@ giso_smass_err1
 giso_srad            CKS+Gaia Stellar radius [Solar Radii]
 giso_srad_err1
 giso_srad_err2
+giso_srho            CKS+Gaia Stellar Density [g/cc]
+giso_srho_err1
+giso_srho_err2
 giso_sage            CKS+Gaia Stellar Age [Gyr]
 giso_sage_err1
 giso_sage_err2

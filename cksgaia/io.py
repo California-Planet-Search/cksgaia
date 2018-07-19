@@ -95,6 +95,18 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
         fn = MERGED_TABLE_OLD
         df = pd.read_csv(fn, index_col=0)
 
+    elif table=="iso":
+        fn = os.path.join(DATADIR, 'isoclassify_gaia2.csv')
+        df = pd.read_csv(fn)
+
+        # Add in logage columns
+        logage = np.log10(df.giso_sage*1e9)
+        logage_upper = np.log10(df.giso_sage*1e9 + df.giso_sage_err1*1e9) - logage
+        logage_lower = np.log10(df.giso_sage*1e9 + df.giso_sage_err2*1e9) - logage
+        df['giso_slogage'] = logage
+        df['giso_slogage_err1'] = logage_upper
+        df['giso_slogage_err2'] = logage_lower
+
     # Silva 2015
     elif table=='silva15':
         fn = os.path.join(DATADIR,'silva15/silva-aguirre15.tex')
@@ -176,9 +188,11 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
         df = cksgaia.extinction.add_extinction(df,'bayestar2017')
         df = df.drop('distance ra dec'.split(),axis=1)
 
+
+
     elif table=='m17+gaia2+j17+iso':
         df1 = load_table('m17+gaia2+j17+ext')
-        df2 = pd.read_csv(os.path.join(DATADIR, 'isoclassify_gaia2.csv'))
+        df2 = load_table('iso')
         df = pd.merge(df1, df2, on='id_starname')
         g = df.groupby('id_starname')
         print "number of stars with gaia parallax: {}".format(len(g.nth(0)))
@@ -187,8 +201,6 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
         g = df.groupby('id_starname')
         print "requiring {}: {}".format(query,len(g.nth(0)))
         
-        
-
     elif table=='m17+gaia2+j17+iso+fur17':
         df1 = load_table('m17+gaia2+j17+iso')
         df2 = load_table('fur17')
