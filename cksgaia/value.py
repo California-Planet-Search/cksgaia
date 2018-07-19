@@ -14,10 +14,15 @@ def val_stat(return_dict=False):
     df = cksgaia.io.load_table('m17+gaia2+j17',cache=1)
     stars = df.groupby('id_kic',as_index=False).nth(0)
     cut = stars
+    d['cks-gaia-star-xmatch-count'] = len(cut)
+
+    df = cksgaia.io.load_table('m17+gaia2+j17+iso',cache=1)
+    stars = df.groupby('id_kic',as_index=False).nth(0)
+    cut = stars
     d['cks-gaia-star-count'] = len(cut)
     d['cks-gaia-sparallax-ferr-median'] = "{:.1f}".format(cut.eval('gaia2_sparallax_err / gaia2_sparallax').median() * 100)
-
     d['cks-gaia-distmod-err-median'] = "{:.2f}".format(cut.eval('gaia2_sparallax_err / gaia2_sparallax').median())
+
 
     df = cksgaia.io.load_table('m17+gaia2+j17+ext',cache=0)
     d['ak-median'] = "{:.03f}".format(df.ext_ak.median())
@@ -27,7 +32,7 @@ def val_stat(return_dict=False):
     d['ebv-median'] = "{:.03f}".format(df.ext_ebv.median())
     d['ebv-median-err'] = "{:.03f}".format(df.ext_ebv_err.median())
     d['mk-err-median'] = "{:.03f}".format(df.m17_kmag_err.median())
-    
+
     # Properties of cks+gaia2 table
     df = cksgaia.io.load_table('cksgaia-planets',cache=1)
     cut = df

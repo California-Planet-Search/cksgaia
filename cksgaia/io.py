@@ -87,7 +87,8 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
     elif table=='gaia2':
         fn = os.path.join(DATADIR, 'xmatch_m17_gaiadr2-result.csv')
         df = cksgaia.xmatch.read_xmatch_gaia2(fn)
-        df['gaia2_sparallax'] += 0.053
+        # Systematic offset from Zinn et al. (2018)
+        df['gaia2_sparallax'] += 0.053 
 
     # Johnson 2017
     elif table=='j17':
@@ -177,8 +178,16 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
 
     elif table=='m17+gaia2+j17+iso':
         df1 = load_table('m17+gaia2+j17+ext')
-        df2 = pd.read_csv(os.path.join(DATADIR, 'isochrones_gaia2.csv'))
+        df2 = pd.read_csv(os.path.join(DATADIR, 'isoclassify_gaia2.csv'))
         df = pd.merge(df1, df2, on='id_starname')
+        g = df.groupby('id_starname')
+        print "number of stars with gaia parallax: {}".format(len(g.nth(0)))
+        query = 'gaia2_sparallax_over_err > 10'
+        df = df.query(query)
+        g = df.groupby('id_starname')
+        print "requiring {}: {}".format(query,len(g.nth(0)))
+        
+        
 
     elif table=='m17+gaia2+j17+iso+fur17':
         df1 = load_table('m17+gaia2+j17+iso')
@@ -330,7 +339,7 @@ def sub_prefix(df, prefix,ignore=['id']):
 
 def order_columns(df, verbose=False, drop=True):
     columns = list(df.columns)
-    coldefs = load_table('coldefs')
+    coldefs = load_table('coldefs',cache=0)
     cols = []
     for col in coldefs.column:
         if columns.count(col) == 1:

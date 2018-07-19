@@ -26,19 +26,14 @@ def main():
     psr_parent = ArgumentParser(add_help=False)
     psr_parent.add_argument('-d', dest='outputdir', type=str, help="put files in this directory")
 
-    psr2 = subpsr.add_parser('create-iso-batch', parents=[psr_parent],)
-    psr2.set_defaults(func=create_iso_batch)
-
     psr2 = subpsr.add_parser('create-xmatch-table', parents=[psr_parent])
     psr2.set_defaults(func=create_xmatch_table)
 
-    psr2 = subpsr.add_parser('create-extinction-jobs', parents=[psr_parent])
-    psr2.set_defaults(func=create_extinction_jobs)
+    psr2 = subpsr.add_parser('create-iso-batch', parents=[psr_parent],)
+    psr2.set_defaults(func=create_iso_batch)
 
-    psr2 = subpsr.add_parser('compute-extinction', parents=[psr_parent])
-    psr2.add_argument('table', help='name of star')
-    psr2.add_argument('key')
-    psr2.set_defaults(func=compute_extinction)
+    psr2 = subpsr.add_parser('create-iso-table', parents=[psr_parent],)
+    psr2.set_defaults(func=create_iso_table)
 
     psr2 = subpsr.add_parser('simulate-surveys', parents=[psr_parent])
     psr2.set_defaults(func=sim_surveys)
@@ -74,7 +69,6 @@ def main():
     psr2 = subpsr.add_parser('create-csv', parents=[psr_parent], )
     psr2.add_argument('name',type=str)
     psr2.set_defaults(func=create_csv)
-
 
     psr2 = subpsr.add_parser('update-paper', parents=[psr_parent])
     psr2.set_defaults(func=update_paper)
@@ -126,20 +120,37 @@ def create_iso_batch(args):
             'gaia2_dec':'dec',
         }
     )
+
+    df['kmag_err'] = df['kmag_err'].fillna(0.02)
     df['band'] = 'kmag'
     df['teff_err'] = 60
     df['parallax'] /= 1e3
     df['parallax_err'] /= 1e3
     df['feh_err'] = 0.04
     df.id_starname = df.id_starname.str.replace(' ','_')
+    df0 = df.copy() 
+
+    # Direct method. Don't use spectroscopic logg values so as to not
+    # pollute the parallax radii
+    df = df0.copy()
+    df['logg_err'] = 1 # use large uncertainties
     fn = 'data/isoclassify-direct.csv'
     df.to_csv(fn)
     print "created {}".format(fn)
 
+    # Grid method with parallax. This will return model-dependent
+    # values of Mstar, Rstar, age, density, luminosity
+    df = df0.copy()
+    df['logg_err'] = 1 # use large uncertainties
+    fn = 'data/isoclassify-grid-parallax-yes.csv'
+    df.to_csv(fn)
+    print "created {}".format(fn)
+
     # Grid method. Don't set parallax so we can compare later
+    df = df0.copy()
     df['parallax'] = -99
     df['parallax_err'] = 0
-    fn = 'data/isoclassify-grid.csv'
+    fn = 'data/isoclassify-grid-parallax-no.csv'
     df.to_csv(fn)
     print "created {}".format(fn)
 
@@ -147,48 +158,70 @@ def create_iso_batch(args):
 def sim_surveys(args):
     cksgaia.sim.simulations.run(args)
 
-def create_extinction_jobs(args):
-    for table in cksgaia.extinction.TABLES:
-        for key in cksgaia.extinction.KEYS:
-            print "run_cksgaia.py compute-extinction {} {}".format(table,key)
-
-def compute_extinction(args):
-    outdir = os.path.join(cksgaia.io.DATADIR,'extinction/')
-    cmd = 'mkdir -p {}'.format(outdir)
-    print cmd
-    os.system(cmd)
-    cksgaia.extinction.compute(args.table,args.key,outdir=outdir)
-
 def create_iso_table(args):
     """
     Read in isochrones csvfiles 
     Args:
         outdir (str): where to look for isochrones.csv files
     """
-    fL = glob.glob("{}/*/*.csv".format(args.baseoutdir))
-    df = []
+    import isoclassify
+    dfd = isoclassify.scrape_csv('isoclassify/direct/*/*.csv')
+    func = lambda x : x.split('.')[0]
+    dfd['id_starname'] = dfd.id_starname.astype(str).apply(func)
+    namemap = {
+        'id_starname':'id_starname',
+        'dir_rad':'gdir_srad',
+        'dir_rad_err1':'gdir_srad_err1',
+        'dir_rad_err2':'gdir_srad_err2',
+    }
+    dfd = dfd.rename(columns=namemap)[namemap.values()]
+    
+    fn = 'isoclassify/grid-parallax-yes/*/*.csv'
+    dfg = isoclassify.scrape_csv(fn)
+    namemap = {
+        'id_starname':'id_starname',
+        'iso_mass':'giso_smass',
+        'iso_mass_err1':'giso_smass_err1',
+        'iso_mass_err2':'giso_smass_err2',
+        'iso_rad':'giso_srad',
+        'iso_rad_err1':'giso_srad_err1',
+        'iso_rad_err2':'giso_srad_err2',
+        'iso_age':'giso_sage',
+        'iso_age_err1':'giso_sage_err1',
+        'iso_age_err2':'giso_sage_err2',
+    }
+    dfg = dfg.rename(columns=namemap)[namemap.values()]
+    dfg['id_starname'] = dfg.id_starname.astype(str).apply(func)
 
-    import cksgaia._isoclassify
-        
-    if args.mode=='isoclassify':
-        _csv_reader = cksgaia._isoclassify._csv_reader
-    elif args.mode=='isochrones':
-        _csv_reader = cksgaia._isochrones._csv_reader
-    else:
-        assert False, "invalid mode"
 
-    for i, f in enumerate(fL):
-        if i%100==0:
-            print i
-            
-        try:
-            df.append(_csv_reader(f))
-        except ValueError:
-            print "{} failed".format(f)
+    fn = 'isoclassify/grid-parallax-no/*/*.csv'
+    dfg2 = isoclassify.scrape_csv(fn)
+    temp = dfg2['id_starname'].copy()
+    dfg2 = dfg2.drop(['id_starname'],axis=1)
+    dfg2 = dfg2.convert_objects(convert_numeric=True)
+    dfg2['id_starname'] = temp.astype(str)
 
-    df = pd.concat(df)
-    df.to_csv(args.outfile, index=False)
-    print "created {}".format(args.outfile)
+    
+    dfg2['giso2_sparallax'] = 1 / dfg2.iso_dis * 1e3
+    dfg2['giso2_sparallax_err1'] = - dfg2['giso2_sparallax'] * dfg2['iso_dis_err2'] / dfg2['iso_dis']
+    dfg2['giso2_sparallax_err2'] = - dfg2['giso2_sparallax'] * dfg2['iso_dis_err1'] / dfg2['iso_dis']
+    columns = ['id_starname','giso2_sparallax','giso2_sparallax_err1', 'giso2_sparallax_err2',]
+    dfg2 = dfg2[columns]
+ 
+
+    
+    dfm = pd.merge(dfd,dfg,on='id_starname')
+    dfm = pd.merge(dfm,dfg2,on='id_starname')
+    temp = dfm['id_starname'].copy()
+    dfm = dfm.drop(['id_starname'],axis=1)
+    dfm = dfm.convert_objects(convert_numeric=True)
+    dfm['id_starname'] = temp.astype(str)
+    dfm = cksgaia.io.order_columns(dfm)
+    
+    fn = 'data/isoclassify_gaia2.csv'
+    dfm.to_csv(fn)
+    print "created {}".format(fn)
+
 
 def create_merged_table(args):
     df = cksgaia.io.load_table('j17+m17+gaia2+iso', verbose=True, cache=0)

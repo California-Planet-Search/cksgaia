@@ -97,45 +97,6 @@ cks_svsini            CKS Projected Stellar Rotational Velocity [km/s]
 cks_svsini_err1       
 cks_svsini_err2       
 #
-# Columns from CKS-II
-#
-iso_steff              Effective Temperature [K]
-iso_steff_err1 	      
-iso_steff_err2 	      
-iso_slogg              Stellar Surface Gravity [log10(cm/s**2)]
-iso_slogg_err1 	      
-iso_slogg_err2 	      
-iso_smet               Stellar Metallicity [dex]
-iso_smet_err1 	      
-iso_smet_err2 	      
-iso_srad               Stellar Radius [Solar radii]
-iso_srad_err1 	      
-iso_srad_err2 	      
-iso_smass              Stellar Mass [Solar mass]
-iso_smass_err1 	      
-iso_smass_err2	      
-iso_sage               Stellar Age [Gyr]
-iso_sage_err1
-iso_sage_err2	      
-iso_slogage            Stellar Age [log10(yrs)]
-iso_slogage_err1	      
-iso_slogage_err2	      
-iso_sparallax          Stellar parallax [mas]
-iso_sparallax_err1    
-iso_sparallax_err2    
-iso_prad               Planet Radius [Earth radii]
-iso_prad_err1	      
-iso_prad_err2	      
-iso_sma                semi-major axis [AU]
-iso_sma_err1
-iso_sma_err2
-iso_insol              Incident flux [Earth units]
-iso_insol_err1	      
-iso_insol_err2	      
-iso_teq                Planet equilibrium temperature (bond albedo = 0.3)
-iso_teq_err1	      
-iso_teq_err2	      
-#
 # Columns from Gaia DR2
 #
 gaia2_angdist         Distance between KIC position and Gaia position [arcsec]
@@ -157,39 +118,34 @@ gaia2_steff_err1
 gaia2_steff_err2
 #
 # Columns from CKS VII
-# Properties from extinction analysis
 #
-ext_ak               K-band extinction from Green 2018 dustmap
-ext_ak_err           Error combined error from map and uncertainty on R_K
-ext_ak_err_map       Error in G18 map
-ext_ebv              G18 reddening (see paper)
-ext_ebv_err          Error in G18 reddening map
-# Properties from isoclassify analysis
+# Properties from isoclassify analysis (direct mode)
+#
+gdir_srad            CKS+Gaia Stellar radius [Solar Radii]
+gdir_srad_err1
+gdir_srad_err2
+#
+# Properties from isoclassify analysis (grid mode)
+#
 giso_smass           CKS+Gaia Stellar Mass
 giso_smass_err2
 giso_smass_err1
-giso_smet            CKS+Gaia Stellar Metallicity
-giso_smet_err1
-giso_smet_err2
+giso_srad            CKS+Gaia Stellar radius [Solar Radii]
+giso_srad_err1
+giso_srad_err2
 giso_sage            CKS+Gaia Stellar Age [Gyr]
 giso_sage_err1
 giso_sage_err2
 giso_slogage         CKS+Gaia Stellar Age [lgo10(yrs)]
 giso_slogage_err1    
 giso_slogage_err2
-giso_slogg           CKS+Gaia Stellar Surface Gravity [log10(cm/s**2)]
-giso_slogg_err1
-giso_slogg_err2
-giso_steff           CKS+Gaia Effective Temperature [K]
-giso_steff_err1
-giso_steff_err2
-giso_srad            CKS+Gaia Stellar radius [Solar Radii]
-giso_srad_err1
-giso_srad_err2
-giso_sparallax       CKS+Gaia parallax [mas]
-giso_sparallax_err1
-giso_sparallax_err2
-giso_nmodels         Number of models in the 4 sigma isoclassify search
+#
+# Properties from isoclassify analysis, grid mode, no parallax
+#
+giso2_sparallax         
+giso2_sparallax_err1    
+giso2_sparallax_err2
+#
 #
 # Rederived planet properties
 #

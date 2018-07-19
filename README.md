@@ -25,8 +25,8 @@ bin/run_cksgaia.py create-iso-batch
 Then create batch files
 
 ```
-isoclassify batch direct data/isoclassify-direct.csv -o isoclassify/direct/ > isoclassify-direct.tot
-isoclassify batch grid data/isoclassify-grid.csv -o isoclassify/grid/ > isoclassify-grid.tot
+isoclassify batch direct data/isoclassify-direct.csv green18 -o isoclassify/direct/ > isoclassify-direct.tot
+isoclassify batch grid data/isoclassify-grid.csv green18 -o isoclassify/grid/ > isoclassify-grid.tot
 ```
 
 Then run in parallel
@@ -58,14 +58,30 @@ $ run_cksgaia.py create-plots all -d ./ # Make figures
 
 ###
 
-
 ```
 run_cksgaia.py create-iso-batch 
-isoclassify batch direct data/isoclassify-direct.csv -o isoclassify/direct/ > isoclassify-direct.tot
-isoclassify batch grid data/isoclassify-grid.csv -o isoclassify/grid/ > isoclassify-grid.tot
-mkdir -p isoclassify/direct//K00001;isoclassify run direct K00001 --outdir isoclassify/direct//K00001 --csv data/isoclassify-direct.csv 
+isoclassify batch direct data/isoclassify-direct.csv green18 -o isoclassify/direct/ > isoclassify-direct.tot
+isoclassify batch grid data/isoclassify-grid-parallax-yes.csv green18 -o isoclassify/grid-parallax-yes/ > isoclassify-grid-parallax-yes.tot
+isoclassify batch grid data/isoclassify-grid-parallax-no.csv green18 -o isoclassify/grid-parallax-no/ > isoclassify-grid-parallax-no.tot
+
+
+# Test
+# mkdir -p isoclassify/grid-parallax-yes//K00001;isoclassify run grid K00001 --outdir isoclassify/grid-parallax-yes//K00001 --csv data/isoclassify-grid-parallax-yes.csv --dust green18 &> isoclassify/grid-parallax-yes//K00001/output.log
+
 head isoclassify-direct.tot | parallel # useful for testing
-head isoclassify-grid.tot | parallel # useful for testing
+head isoclassify-grid-parallax-no.tot | parallel # useful for testing
+head isoclassify-grid-parallax-yes.tot | parallel # useful for testing
+
+cat isoclassify-direct.tot | parallel # useful for testing
+cat isoclassify-grid-parallax-no.tot | parallel # takes about 20min on Erik's laptop
+cat isoclassify-grid-parallax-yes.tot | parallel # takes about 20min on Erik's laptop
+
 parallel :::: isoclassify-direct.tot # Takes about XX min on Erik's laptop to run
 parallel :::: isoclassify-grid.tot # Takes about XX min on Erik's laptop to run
 ```
+
+
+# sometimes there is a problem communicating with the server
+for i in `grep "Response" isoclassify/direct/*/output.log | awk -F'/' '{print $3}' ` ;do eval `grep $i isoclassify-direct.tot` ;done 
+for i in `grep "Response" isoclassify/grid-parallax-no/*/output.log | awk -F'/' '{print $3}' ` ;do eval `grep $i isoclassify-grid-parallax-no.tot` ;done
+for i in `grep "Response" isoclassify/grid-parallax-yes/*/output.log | awk -F'/' '{print $3}' ` ;do eval `grep $i isoclassify-grid-parallax-yes.tot` ;done

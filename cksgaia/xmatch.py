@@ -121,6 +121,8 @@ def read_xmatch_gaia2(fn):
         'phot_rp_mean_flux_error':'rpflux_err',
         'phot_rp_mean_mag':'rpmag',
         'parallax_over_error':'sparallax_over_err',
+        'astrometric_excess_noise':'astrometric_excess_noise',
+        'astrometric_excess_noise_sig':'astrometric_excess_noise_sig',
         'id_kic':'id_kic',
         'dist':'angdist',
     }
