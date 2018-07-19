@@ -28,18 +28,18 @@ def plot_box(corners, *args, **kwargs):
 
 
 def plot_dist(real_sample):
-    alphascale = 1/real_sample['giso_prad_err1']
+    alphascale = 1/real_sample['gdir_prad_err1']
     alphascale /= np.max(alphascale)
     real_sample['alpha'] = alphascale
 
     for i, row in real_sample.iterrows():
         p = row['koi_period']
-        r = row['giso_prad']
-        e = row['giso_prad_err1']
+        r = row['gdir_prad']
+        e = row['gdir_prad_err1']
         a = row['alpha']
         pl.errorbar(p, r, yerr=e, alpha=a, fmt='k.')
-    # pl.errorbar(real_sample['koi_period'], real_sample['giso_prad'],
-    #             yerr=real_sample['giso_prad_err1'], fmt='k.')
+    # pl.errorbar(real_sample['koi_period'], real_sample['gdir_prad'],
+    #             yerr=real_sample['gdir_prad_err1'], fmt='k.')
     pl.loglog()
     cksgaia.plot.config.logscale_rad(axis='y')
 
@@ -70,7 +70,7 @@ def planets_in_boxes(sample, box1, box2, box3):
         radlim_high = box[1][1]
         plim_low = box[0][0]
         plim_high = box[1][0]
-        q = sample.query('@radlim_low <= giso_prad < @radlim_high & @plim_low < koi_period <= @plim_high')
+        q = sample.query('@radlim_low <= gdir_prad < @radlim_high & @plim_low < koi_period <= @plim_high')
         n = len(q)
 
         num_in_boxes.append(n)
@@ -80,14 +80,14 @@ def planets_in_boxes(sample, box1, box2, box3):
 
 def make_mock_sample(real_sample, e_cen, sn_cen, wid):
     mock_sample = real_sample.copy()
-    subnep = mock_sample.query('1.75 < giso_prad <= 4.0')
-    earths = mock_sample.query('1.0 <= giso_prad <= 1.75')
+    subnep = mock_sample.query('1.75 < gdir_prad <= 4.0')
+    earths = mock_sample.query('1.0 <= gdir_prad <= 1.75')
 
-    subnep['giso_prad'] = sn_cen + np.random.normal(loc=0, scale=subnep['giso_prad_err1'],
+    subnep['gdir_prad'] = sn_cen + np.random.normal(loc=0, scale=subnep['gdir_prad_err1'],
                                                     size=len(subnep)) \
                           + np.random.uniform(sn_cen * (-wid / 2), sn_cen * (wid / 2), size=len(subnep))
 
-    earths['giso_prad'] = e_cen + np.random.normal(loc=0, scale=earths['giso_prad_err1'],
+    earths['gdir_prad'] = e_cen + np.random.normal(loc=0, scale=earths['gdir_prad_err1'],
                                                    size=len(earths)) \
                           + np.random.uniform(e_cen * (-wid / 2), e_cen * (wid / 2), size=len(earths))
 

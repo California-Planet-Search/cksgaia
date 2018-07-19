@@ -146,21 +146,20 @@ giso2_sparallax
 giso2_sparallax_err1    
 giso2_sparallax_err2
 #
-#
 # Rederived planet properties
 #
-giso_prad           Planet Radius [Earth radii]
-giso_prad_err1 
-giso_prad_err2
+gdir_prad           Planet Radius [Earth radii]
+gdir_prad_err1 
+gdir_prad_err2
+giso_sma            Semi-major axis [AU], incorporates giso_smass
+giso_sma_err1
+giso_sma_err2
 giso_insol          Incident flux [Earth units]
 giso_insol_err1
 giso_insol_err2
 giso_teq            Planet equilibrium temperature (bond albedo = 0.3)
 giso_teq_err1
 giso_teq_err2
-giso_sma            Semi-major axis [AU]
-giso_sma_err1
-giso_sma_err2
 #
 # Properties from Furlan (2017)
 #

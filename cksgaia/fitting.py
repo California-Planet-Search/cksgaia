@@ -246,12 +246,12 @@ def twogauss(x, amp1, mu1, sig1, amp2, mu2, sig2):
 #
 #     hist_stack = []
 #     for i in range(nsamp):
-#         prad_noise = np.random.normal(0, pm['giso_prad_err'].values, size=len(pm))
-#         pm['giso_prad'] += prad_noise
+#         prad_noise = np.random.normal(0, pm['gdir_prad_err'].values, size=len(pm))
+#         pm['gdir_prad'] += prad_noise
 #
 #         pm = cksrad.completeness.get_weights(pm, kicselect)
 #
-#         wdetections,_,_ = np.histogram2d(pm['koi_period'], pm['giso_prad'], bins=[Pedges,Redges], weights=pm['weight'])
+#         wdetections,_,_ = np.histogram2d(pm['koi_period'], pm['gdir_prad'], bins=[Pedges,Redges], weights=pm['weight'])
 #
 #         hist_stack.append(wdetections)
 #
@@ -268,8 +268,8 @@ def histfit(physmerge, verbose=True, completeness=True, boot_errors=False):
         bin_centers = 10**(np.log10(Redges[:-1]) + Rbinsize/2)
         Pcen = 10**(np.log10(Pedges[:-1]) + np.diff(np.log10(Pedges)).mean()/2)
 
-        detections,_,_ = np.histogram2d(physmerge['koi_period'], physmerge['giso_prad'], bins=[Pedges,Redges])
-        wdetections,_,_ = np.histogram2d(physmerge['koi_period'], physmerge['giso_prad'], bins=[Pedges,Redges], weights=physmerge['weight'])
+        detections,_,_ = np.histogram2d(physmerge['koi_period'], physmerge['gdir_prad'], bins=[Pedges,Redges])
+        wdetections,_,_ = np.histogram2d(physmerge['koi_period'], physmerge['gdir_prad'], bins=[Pedges,Redges], weights=physmerge['weight'])
 
         if boot_errors:
                 err_hist = comp_unc(physmerge)
@@ -289,7 +289,7 @@ def histfit(physmerge, verbose=True, completeness=True, boot_errors=False):
         N = whistn
         e = werr
     else:
-        N, bin_edges = np.histogram(physmerge['giso_prad'], bins=xbins)
+        N, bin_edges = np.histogram(physmerge['gdir_prad'], bins=xbins)
         bin_centers = 0.5*(bin_edges[1:] + bin_edges[:-1])
         e = np.sqrt(N)
 

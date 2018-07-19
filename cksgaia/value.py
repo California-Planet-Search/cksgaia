@@ -38,9 +38,9 @@ def val_stat(return_dict=False):
     cut = df
     ferr = cut.eval('0.5*(koi_ror_err1 - koi_ror_err2) / koi_ror')
     d['ror-ferr-median'] = "{:.1f}".format(100*ferr.median())
-    ferr = cut.eval('0.5*(giso_srad_err1 - giso_srad_err2) / giso_srad')
+    ferr = cut.eval('0.5*(gdir_srad_err1 - gdir_srad_err2) / gdir_srad')
     d['srad-ferr-median'] = "{:.1f}".format(100*ferr.median())
-    ferr= cut.eval('0.5*(giso_prad_err1 - giso_prad_err2) / giso_prad')
+    ferr= cut.eval('0.5*(gdir_prad_err1 - gdir_prad_err2) / gdir_prad')
     d['prad-ferr-median'] = "{:.1f}".format(100*ferr.median())
 
 
@@ -82,7 +82,7 @@ def val_stat(return_dict=False):
 
     df = cksgaia.io.load_table('cksgaia-planets-filtered')
     d['planet-filtered-count'] = len(df)
-    cut = df.query('1.5 < giso_prad < 2.0 and 1 <  koi_period < 100')
+    cut = df.query('1.5 < gdir_prad < 2.0 and 1 <  koi_period < 100')
     d['planet-filtered-gap-count'] = len(cut)
 
     lines = []

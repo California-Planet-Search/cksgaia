@@ -27,11 +27,11 @@ def update_planet_parameters(df):
     for i, row in physmerge.iterrows():
 
         # stellar radius
-        unc_rad = np.mean([row['giso_srad_err1'], -row['giso_srad_err2']])
+        unc_rad = np.mean([row['gdir_srad_err1'], -row['gdir_srad_err2']])
         # 8% floor on stellar radius uncertainty
-        # if unc_rad / row['giso_srad'] < 0.08:
-        #     unc_rad = 0.08 * row['giso_srad']
-        e_rad = rand.normal(row['giso_srad'], unc_rad, size=10000)
+        # if unc_rad / row['gdir_srad'] < 0.08:
+        #     unc_rad = 0.08 * row['gdir_srad']
+        e_rad = rand.normal(row['gdir_srad'], unc_rad, size=10000)
 
         # stellar mass
         unc_mstar = np.mean([row['giso_smass_err1'], -row['giso_smass_err2']])
@@ -77,9 +77,9 @@ def update_planet_parameters(df):
         sinc_iso.append(np.median(sinc))
         sinc_giso_err.append(np.std(sinc))
 
-    physmerge['giso_prad'] = prad_iso
-    physmerge['giso_prad_err1'] = np.array(prad_giso_err)
-    physmerge['giso_prad_err2'] = -np.array(prad_giso_err)
+    physmerge['gdir_prad'] = prad_iso
+    physmerge['gdir_prad_err1'] = np.array(prad_giso_err)
+    physmerge['gdir_prad_err2'] = -np.array(prad_giso_err)
 
     physmerge['giso_insol'] = sinc_iso
     physmerge['giso_insol_err1'] = np.array(sinc_giso_err)
@@ -128,7 +128,7 @@ def table_statistics():
 
     df = cksgaia.io.load_table('cks+nea+iso-floor', cache=cache)
     d['cks-rp-frac-err-median'] = "{:.0f}\%".format(
-        (df['giso_prad_err1'] / df['giso_prad']).median() * 100)
+        (df['gdir_prad_err1'] / df['gdir_prad']).median() * 100)
     d['cks-sinc-frac-err-median'] = "{:.0f}\%".format(
         (df['giso_insol_err1'] / df['giso_insol']).median() * 100)
     d['cks-sma-frac-err-median'] = "{:.1f}\%".format(
@@ -167,12 +167,12 @@ def weighted_avg_and_std(values, weights):
     return (average, np.sqrt(variance / len(values)))
 
 
-def average_in_box(sample, box, col1='giso_prad', col2='koi_period', logparam=True):
+def average_in_box(sample, box, col1='gdir_prad', col2='koi_period', logparam=True):
     radlim_low = box[0][1]
     radlim_high = box[1][1]
     plim_low = box[0][0]
     plim_high = box[1][0]
-    q = sample.query('@radlim_low <= giso_prad < @radlim_high & @plim_low < koi_period <= @plim_high')
+    q = sample.query('@radlim_low <= gdir_prad < @radlim_high & @plim_low < koi_period <= @plim_high')
     n = len(q)
 
     q = q[np.isfinite(q[col1]) & np.isfinite(q[col2]) & np.isfinite(q['weight'])]

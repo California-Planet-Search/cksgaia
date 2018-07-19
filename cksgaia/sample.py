@@ -74,7 +74,7 @@ def apply_filters(physmerge, mkplot=False, verbose=False, textable=False):
     plti = _bipanel(crop, nrow, ncol, plti, eloc=(12.0, 70), atxt='$Kp < 14.2$')
 
     # pre = len(crop)
-    # crop = crop[crop['giso_srad'] / crop['giso_srad_err1'] > 10]
+    # crop = crop[crop['gdir_srad'] / crop['gdir_srad_err1'] > 10]
     # post = len(crop)
     # if verbose:
     #     print "R$_{\star}$ > 10 $\sigma$" % (pre - post)
@@ -113,7 +113,7 @@ def apply_filters(physmerge, mkplot=False, verbose=False, textable=False):
     plti = _bipanel(crop, nrow, ncol, plti, eloc=(12.0, 60), atxt='$b < 0.9$')
 
     # pre = len(crop)
-    # crop = crop[crop['giso_prad_err1']/crop['giso_prad'] <= 0.1]
+    # crop = crop[crop['gdir_prad_err1']/crop['gdir_prad'] <= 0.1]
     # post = len(crop)
     # if verbose:
     #     print "R$_{p}$ precision < 10%" % (pre - post)
@@ -129,7 +129,7 @@ def apply_filters(physmerge, mkplot=False, verbose=False, textable=False):
     # print "v-shaped >= 0.3 filter removes %d planets." % (pre-post)
 
     # pre = len(crop)
-    # crop = crop[crop['giso_prad_err1']/crop['giso_prad'] <= 0.12]
+    # crop = crop[crop['gdir_prad_err1']/crop['gdir_prad'] <= 0.12]
     # if mkplot:
     #     pl.subplot(nrow,ncol,plti)
     #     v = cksrad.plotting.simplehist(crop, annotate='$\sigma(R_p)/R_p \leq 12$%% (%d)' % len(crop), stacked=True, va_anno=True)
@@ -146,7 +146,7 @@ def apply_filters(physmerge, mkplot=False, verbose=False, textable=False):
     # plti = _bipanel(crop, nrow, ncol, plti, eloc=(12.0, 60), atxt='$P < 100$ d')
 
     pre = len(crop)
-    crop = crop[crop['giso_srad'] <= 10 ** (ls * (crop['cks_steff'] - 5500) + li)]
+    crop = crop[crop['gdir_srad'] <= 10 ** (ls * (crop['cks_steff'] - 5500) + li)]
     post = len(crop)
     if verbose:
         print "Subgiant filter removes %d planets." % (pre - post)
