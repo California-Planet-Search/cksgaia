@@ -75,10 +75,14 @@ def star():
         s+="{cks_smet:0.2f} & "
         s+="{m17_kmag:0.1f} & "
         s+="{gaia2_sparallax:0.2f} & "
-        s+="{ext_ak:0.3f} & "
-        s+="{giso_srad:0.2f} & "
+        s+="{gdir_srad:0.2f} & "
+
         s+="{giso_smass:0.2f} & "
+        s+="{giso_srad:0.2f} & "
+        s+="{giso_srho:0.2f} & "
         s+="{giso_slogage:0.2f} & "
+
+        s+="{giso2_sparallax:0.2f} & "
         s+=r"{gaia2_gflux_ratio:0.2f} & " 
         s+=r"{fur17_rcorr_avg:.3f} \\"
         s = s.format(**row)
@@ -100,7 +104,7 @@ def planet():
         s+=r"{id_koicand:s} & "
         s+=r"{koi_period:0.1f} & "
         s+=r"{koi_ror:.5f}_{{ {koi_ror_err2:.5f} }}^{{ +{koi_ror_err1:.5f} }} & "  
-        s+=r"{giso_prad:.2f}_{{ {giso_prad_err2:.2f} }}^{{ +{giso_prad_err1:.2f} }} & "  
+        s+=r"{gdir_prad:.2f}_{{ {gdir_prad_err2:.2f} }}^{{ +{gdir_prad_err1:.2f} }} & "  
         s+=r"{giso_sma:.5f}_{{ {giso_sma_err2:.5f} }}^{{ +{giso_sma_err1:.5f} }} & "  
         s+=r"{giso_insol:.0f}_{{ {giso_insol_err2:.0f} }}^{{ +{giso_insol_err1:.0f} }} \\  "
         '''
@@ -110,7 +114,7 @@ def planet():
         s+=r"{id_koicand:s} & "
         s+=r"{koi_period:0.1f} & "
         s+=r"{koi_ror:.5f}  & "  
-        s+=r"{giso_prad:.2f} & "  
+        s+=r"{gdir_prad:.2f} & "  
         s+=r"{giso_sma:.5f} & "  
         s+=r"{giso_insol:.0f} \\  "
 
@@ -133,7 +137,7 @@ def star_machine():
             'm17_kmag', 'm17_kmag_err',
             'gaia2_sparallax', 'gaia2_sparallax_err',
             'ext_ak', 'ext_ak_err',
-            'giso_srad', 'giso_srad_err1', 'giso_srad_err2',
+            'gdir_srad', 'gdir_srad_err1', 'gdir_srad_err2',
             'giso_smass', 'giso_smass_err1', 'giso_smass_err2',
             'giso_slogage', 'giso_slogage_err1', 'giso_slogage_err2',
             'gaia2_gflux_ratio', 'fur17_rcorr_avg']
@@ -150,7 +154,7 @@ def star_machine():
 {m17_kmag:.3f},{m17_kmag_err:.3f},\
 {gaia2_sparallax:.3f},{gaia2_sparallax_err:.3f},\
 {ext_ak:.3f},{ext_ak_err:.3f},\
-{giso_srad:.3f},{giso_srad_err1:.3f},{giso_srad_err2:.3f},\
+{gdir_srad:.3f},{gdir_srad_err1:.3f},{gdir_srad_err2:.3f},\
 {giso_smass:.3f},{giso_smass_err1:.3f},{giso_smass_err2:.3f},\
 {giso_slogage:.2f},{giso_slogage_err1:.2f},{giso_slogage_err2:.2f},\
 {gaia2_gflux_ratio:.3f},{fur17_rcorr_avg:.4f}".format(**row)
@@ -167,7 +171,7 @@ def planet_machine():
     cols = ['id_koicand',
             'koi_period', 'koi_period_err1', 'koi_period_err2',
             'koi_ror', 'koi_ror_err1', 'koi_ror_err2',
-            'giso_prad', 'giso_prad_err1', 'giso_prad_err2',
+            'gdir_prad', 'gdir_prad_err1', 'gdir_prad_err2',
             'giso_sma', 'giso_sma_err1', 'giso_sma_err2',
             'giso_insol', 'giso_insol_err1', 'giso_insol_err2']
 
@@ -178,7 +182,7 @@ def planet_machine():
         l = "{id_koicand:s},\
 {koi_period:.9f}, {koi_period_err1:.9f}, {koi_period_err2:.9f},\
 {koi_ror:.6f}, {koi_ror_err1:.6f}, {koi_ror_err2:.6f},\
-{giso_prad:.3f},{giso_prad_err1:.3f},{giso_prad_err2:.3f},\
+{gdir_prad:.3f},{gdir_prad_err1:.3f},{gdir_prad_err2:.3f},\
 {giso_sma:.5f},{giso_sma_err1:.5f},{giso_sma_err2:.5f},\
 {giso_insol:.1f},{giso_insol_err1:.1f},{giso_insol_err2:.1f}".format(**row)
 

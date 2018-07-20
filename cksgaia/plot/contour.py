@@ -66,7 +66,7 @@ def contour_plot_kde(physmerge, xcol, ycol, xlim, ylim, ylog=True, pltxlim=None,
                                        xerr1, yerr1,
                                        weights, xlim=xlim, ylim=ylim, nstars=nstars)
 
-    print nplanets, (crop['giso_prad_err1'] / crop['giso_prad']).median()
+    print nplanets, (crop['gdir_prad_err1'] / crop['gdir_prad']).median()
 
     # cmap = plt.cm.inferno_r
     # cmap = plt.cm.gray_r
@@ -164,7 +164,7 @@ def period_contour_cks(sample=None, kwidth=(0.40, 0.05), vlims=(0.0, 0.04),
 
     wper, wsens = np.genfromtxt(os.path.join(modpath, 'data/detectability_p1.txt'), unpack=True)
 
-    ax, xi, yi, zi = contour_plot_kde(physmerge, 'koi_period', 'giso_prad', xlim=[0.4, 1000.0],
+    ax, xi, yi, zi = contour_plot_kde(physmerge, 'koi_period', 'gdir_prad', xlim=[0.4, 1000.0],
                                       ylim=[0.5, 20], ylog=True,
                                       pltxlim=[0.7, 100.0], pltylim=ylimits, epos=[1.2, 3.0],
                                       weighted=True, kwidth=kwidth, vlims=vlims, single=single,
@@ -204,7 +204,7 @@ def period_contour_cks(sample=None, kwidth=(0.40, 0.05), vlims=(0.0, 0.04),
 def insol_contour_anno():
     physmerge = cksgaia.io.load_table(cksgaia.plot.config.filtered_sample)
 
-    ax, xi, yi, zi_iso = contour_plot_kde(physmerge, 'giso_insol', 'giso_prad', xlim=[3, 30000],
+    ax, xi, yi, zi_iso = contour_plot_kde(physmerge, 'giso_insol', 'gdir_prad', xlim=[3, 30000],
                                                           ylim=[0.5, 10], ylog=True,
                                                           pltxlim=[10, 3000], pltylim=[1, 4], epos=[2000, 1.3],
                                                           nodata=True, weighted=True)
@@ -227,7 +227,7 @@ def insol_contour_anno():
     cx, cy = np.loadtxt(os.path.join(modpath, 'data/sensitivity_p25.txt'), unpack=True)
     # cx, cy = np.loadtxt('/Users/bfulton/code/cksrad/data/sensitivity_p50.txt', unpack=True)
     a = (physmerge['giso_smass'].max() * (cx / 365.) ** 2) ** (1 / 3.)
-    sx = (physmerge['cks_steff'].max() / 5778) ** 4.0 * (physmerge['giso_srad'].max() / a) ** 2.0
+    sx = (physmerge['cks_steff'].max() / 5778) ** 4.0 * (physmerge['gdir_srad'].max() / a) ** 2.0
     sx = np.append(sx, 10)
     cy = np.append(cy, 6)
 
@@ -270,11 +270,11 @@ def insol_contour_data(sample=None, vlims=(0.0, 0.03), kwidth=(0.4, 0.05), clims
     else:
         cx, cy = clims
     a = (physmerge['giso_smass'].max() * (cx / 365.) ** 2) ** (1 / 3.)
-    sx = (physmerge['cks_steff'].max() / 5778) ** 4.0 * (physmerge['giso_srad'].max() / a) ** 2.0
+    sx = (physmerge['cks_steff'].max() / 5778) ** 4.0 * (physmerge['gdir_srad'].max() / a) ** 2.0
     sx = np.append(sx, 10)
     cy = np.append(cy, 6)
 
-    ax, xi, yi, zi_iso = contour_plot_kde(physmerge, 'giso_insol', 'giso_prad', xlim=[3, 30000],
+    ax, xi, yi, zi_iso = contour_plot_kde(physmerge, 'giso_insol', 'gdir_prad', xlim=[3, 30000],
                                                           ylim=[0.5, 20], ylog=True,
                                                           pltxlim=[10, 3000], pltylim=[1, 4], epos=[1800, 3.0],
                                                           weighted=True, vlims=vlims, kwidth=kwidth, cbar=cbar,
@@ -302,7 +302,7 @@ def insol_contour_data(sample=None, vlims=(0.0, 0.03), kwidth=(0.4, 0.05), clims
 def srad_contour():
     physmerge = cksgaia.io.load_table(cksgaia.plot.config.filtered_sample)
 
-    ax, xi, yi, zi = contour_plot_kde(physmerge, 'giso_srad', 'giso_prad', xlim=[0.4, 3.0],
+    ax, xi, yi, zi = contour_plot_kde(physmerge, 'gdir_srad', 'gdir_prad', xlim=[0.4, 3.0],
                                                       ylim=[0.5, 20], ylog=True,
                                                       pltxlim=[0.6, 2.3], pltylim=[1.0, 5], epos=[0.7, 4.0],# nbins=30,
                                                       weighted=False,

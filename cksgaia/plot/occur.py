@@ -17,7 +17,7 @@ from cksgaia.plot.config import *
 
 
 def get_mass_samples():
-    physmerge = cksgaia.io.load_table(cksgaia.plot.config.filtered_sample).query('giso_prad > 1.75 & giso_prad < 4')
+    physmerge = cksgaia.io.load_table(cksgaia.plot.config.filtered_sample).query('gdir_prad > 1.75 & gdir_prad < 4')
 
     highcut = np.percentile(physmerge['giso_smass'], 67)
     lowcut = np.percentile(physmerge['giso_smass'], 33)
@@ -51,7 +51,7 @@ def histfitplot(physmerge, bin_centers, N, e, mask, result, result2, completenes
 
     xpos = eloc[0]
     ypos = eloc[1]
-    err1, err2 = cksgaia.misc.frac_err(physmerge, xpos, 'giso_prad')
+    err1, err2 = cksgaia.misc.frac_err(physmerge, xpos, 'gdir_prad')
     print "err+, err- = ", err1, err2
 
     _, caps, _ = pl.errorbar([xpos], [ypos], fmt='k.', xerr=[[err1], [err2]],
@@ -160,7 +160,7 @@ def insol_hist():
     cx, cy = np.loadtxt(os.path.join(modpath, 'data/sensitivity_p25.txt'), unpack=True)
     # cx, cy = np.loadtxt('/Users/bfulton/code/cksrad/data/sensitivity_p50.txt', unpack=True)
     a = (physmerge['giso_smass'].max() * (cx / 365.) ** 2) ** (1 / 3.)
-    sx = (physmerge['cks_steff'].max() / 5778) ** 4.0 * (physmerge['giso_srad'].max() / a) ** 2.0
+    sx = (physmerge['cks_steff'].max() / 5778) ** 4.0 * (physmerge['gdir_srad'].max() / a) ** 2.0
     sx = np.append(sx, 10)
     cy = np.append(cy, 6)
 
@@ -269,7 +269,7 @@ def money_plot_fit():
 def money_plot_plain():
     physmerge = cksgaia.io.load_table(cksgaia.plot.config.filtered_sample)
 
-    print len(physmerge), (physmerge.giso_srad_err1 / physmerge.giso_srad).median()
+    print len(physmerge), (physmerge.gdir_srad_err1 / physmerge.gdir_srad).median()
 
     rmask, rbin_centers, rN, re, result1, result2 = cksgaia.fitting.histfit(physmerge,
                                                                            completeness=False,
@@ -304,7 +304,7 @@ def mass_cuts():
     cx, cy = np.loadtxt(os.path.join(modpath, 'data/sensitivity_p25.txt'), unpack=True)
     # cx, cy = np.loadtxt('/Users/bfulton/code/cksrad/data/sensitivity_p50.txt', unpack=True)
     a = (physmerge['giso_smass'].max() * (cx / 365.) ** 2) ** (1 / 3.)
-    sx = (physmerge['cks_steff'].max() / 5778) ** 4.0 * (physmerge['giso_srad'].max() / a) ** 2.0
+    sx = (physmerge['cks_steff'].max() / 5778) ** 4.0 * (physmerge['gdir_srad'].max() / a) ** 2.0
     sx = np.append(sx, 10)
     cy = np.append(cy, 6)
 
@@ -392,7 +392,7 @@ def mass_cuts():
     pl.xticks(xticks)
 
 def desert_edge():
-    physmerge = cksgaia.io.load_table(cksgaia.plot.config.filtered_sample).query('giso_prad > 1.75 & giso_prad < 4')
+    physmerge = cksgaia.io.load_table(cksgaia.plot.config.filtered_sample).query('gdir_prad > 1.75 & gdir_prad < 4')
 
     aloc = (0.1, 0.85)
 
@@ -400,7 +400,7 @@ def desert_edge():
     cx, cy = np.loadtxt(os.path.join(modpath, 'data/sensitivity_p25.txt'), unpack=True)
     # cx, cy = np.loadtxt('/Users/bfulton/code/cksrad/data/sensitivity_p50.txt', unpack=True)
     a = (physmerge['giso_smass'].max() * (cx / 365.) ** 2) ** (1 / 3.)
-    sx = (physmerge['cks_steff'].max() / 5778) ** 4.0 * (physmerge['giso_srad'].max() / a) ** 2.0
+    sx = (physmerge['cks_steff'].max() / 5778) ** 4.0 * (physmerge['gdir_srad'].max() / a) ** 2.0
     sx = np.append(sx, 10)
     cy = np.append(cy, 6)
 
@@ -583,7 +583,7 @@ def desert_edge_cum():
     # fig = pl.figure(figsize=(6, 4))
     handles = []
     for i, sample in enumerate([high, medium, low]):
-        sample = sample.query('giso_prad > 1.7 & giso_prad < 4 & giso_insol > 30 & giso_insol < 3000')
+        sample = sample.query('gdir_prad > 1.7 & gdir_prad < 4 & giso_insol > 30 & giso_insol < 3000')
 
         _cumdist(sample, color=colors[i])
         handles.append(mlines.Line2D([], [], color=colors[i], lw=3,
@@ -598,7 +598,7 @@ def desert_edge_cum():
 
 
 def rocky_cores():
-    physmerge = cksgaia.io.load_table(cksgaia.plot.config.filtered_sample).query('giso_prad > 1.0 & koi_period <= 10')
+    physmerge = cksgaia.io.load_table(cksgaia.plot.config.filtered_sample).query('gdir_prad > 1.0 & koi_period <= 10')
 
     aloc = (0.1, 0.85)
 
@@ -624,8 +624,8 @@ def rocky_cores():
     # print lim
 
     cut = high
-    N, edges = np.histogram(cut['giso_prad'].dropna().values, bins=insolbins, weights=cut['weight'])
-    Nd, edges = np.histogram(cut['giso_prad'].dropna().values, bins=insolbins)
+    N, edges = np.histogram(cut['gdir_prad'].dropna().values, bins=insolbins, weights=cut['weight'])
+    Nd, edges = np.histogram(cut['gdir_prad'].dropna().values, bins=insolbins)
     centers = 0.5 * (edges[1:] + edges[:-1])
     pl.step(centers, N / num_stars, lw=3, color='k', where='mid')
     pl.annotate('$M_{\\star} > %3.2f M_{\odot}$' %highcut, xy=aloc, xycoords='axes fraction', fontsize=20,
@@ -666,8 +666,8 @@ def rocky_cores():
     pl.subplot(nrow, ncol, plti)
 
     cut = medium
-    N, edges = np.histogram(cut['giso_prad'].dropna().values, bins=insolbins, weights=cut['weight'])
-    Nd, edges = np.histogram(cut['giso_prad'].dropna().values, bins=insolbins)
+    N, edges = np.histogram(cut['gdir_prad'].dropna().values, bins=insolbins, weights=cut['weight'])
+    Nd, edges = np.histogram(cut['gdir_prad'].dropna().values, bins=insolbins)
     centers = 0.5 * (edges[1:] + edges[:-1])
     pl.step(centers, N / num_stars, lw=3, color='k', where='mid')
     pl.annotate('$%3.2f M_{\odot} \leq M_{\\star} \leq %3.2f M_{\odot}$' % (highcut, lowcut), xy=aloc, xycoords='axes fraction', fontsize=20,
@@ -709,8 +709,8 @@ def rocky_cores():
     pl.subplot(nrow, ncol, plti)
 
     cut = low
-    N, edges = np.histogram(cut['giso_prad'].dropna().values, bins=insolbins, weights=cut['weight'])
-    Nd, edges = np.histogram(cut['giso_prad'].dropna().values, bins=insolbins)
+    N, edges = np.histogram(cut['gdir_prad'].dropna().values, bins=insolbins, weights=cut['weight'])
+    Nd, edges = np.histogram(cut['gdir_prad'].dropna().values, bins=insolbins)
     centers = 0.5 * (edges[1:] + edges[:-1])
     pl.step(centers, N / num_stars, lw=3, color='k', where='mid')
     pl.annotate('$M_{\star} < %3.2f M_{\odot}$' % lowcut, xy=aloc, xycoords='axes fraction', fontsize=20,
@@ -756,8 +756,8 @@ def plot_box(corners, *args, **kwargs):
 
 def plot_dist(real_sample, data=False):
     if data:
-        pl.errorbar(real_sample['koi_period'], real_sample['giso_prad'],
-                    yerr=real_sample['giso_prad_err1'], fmt='k.')
+        pl.errorbar(real_sample['koi_period'], real_sample['gdir_prad'],
+                    yerr=real_sample['gdir_prad_err1'], fmt='k.')
     pl.loglog()
     cksgaia.plot.config.logscale_rad(axis='y')
 

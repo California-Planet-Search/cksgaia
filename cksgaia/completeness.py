@@ -97,7 +97,7 @@ def get_weights(kois, kicselect):
     nkic = kicselect['id_kic'].count()
 
     pers = kois['koi_period'].values
-    prads = kois['giso_prad'].values
+    prads = kois['gdir_prad'].values
 
     for i in range(len(pers)):
         per = pers[i]
@@ -116,7 +116,7 @@ def get_weights(kois, kicselect):
 
     a_cm = (C.G * mstar_g * (per_s / (2 * np.pi)) ** 2) ** (1 / 3.)
     # a = (num/(2*np.pi)**2)**(1/3.) * C.aupercm
-    R_cm = kois['giso_srad'].values * C.Rs
+    R_cm = kois['gdir_srad'].values * C.Rs
     tr_prob = 0.9 * R_cm / a_cm
 
     weights = 1 / (det_prob * tr_prob)

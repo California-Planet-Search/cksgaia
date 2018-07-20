@@ -31,14 +31,14 @@ def comparison(key):
 
     if key=='srad-h13':
         df = cksgaia.io.load_table('cks+gaia2+h13')
-        df = df.query('gaia2_gflux_ratio < 1.1 and giso_srad_err1/giso_srad < 0.1')
+        df = df.query('gaia2_gflux_ratio < 1.1 and gdir_srad_err1/gdir_srad < 0.1')
 
         x1 = df.h13_srad
-        x2 = df.giso_srad
+        x2 = df.gdir_srad
         x3 = x2 / x1 
         x1err = np.vstack([df.h13_srad_err,df.h13_srad_err]) 
-        x2err = np.vstack([-df.giso_srad_err2,df.giso_srad_err1])
-        x3err = x2err / np.array(df.giso_srad)
+        x2err = np.vstack([-df.gdir_srad_err2,df.gdir_srad_err1])
+        x3err = x2err / np.array(df.gdir_srad)
         fig, axL = subplots_compare(
             x1,x2,x3, x1err=x1err, x2err=x2err, x3err=x3err, **errorbar_kw
         )
@@ -123,26 +123,26 @@ class ComparisonRadius(Comparison):
     def __init__(self, key):
         if key=='srad-h13':
             df = cksgaia.io.load_table('cks+gaia2+h13')
-            df = df.query('gaia2_gflux_ratio < 1.1 and giso_srad_err1/giso_srad < 0.1')
+            df = df.query('gaia2_gflux_ratio < 1.1 and gdir_srad_err1/gdir_srad < 0.1')
             
             x1 = df.h13_srad
-            x2 = df.giso_srad
+            x2 = df.gdir_srad
             x3 = x2 / x1 
             x1err = np.vstack([df.h13_srad_err,df.h13_srad_err]) 
-            x2err = np.vstack([-df.giso_srad_err2,df.giso_srad_err1])
-            x3err = x2err / np.array(df.giso_srad)
+            x2err = np.vstack([-df.gdir_srad_err2,df.gdir_srad_err1])
+            x3err = x2err / np.array(df.gdir_srad)
             xlabel0 = '$R_\star$ [H13] (Solar-radii)'
             ylabel0 = '$R_\star$ [CKS+Gaia] (Solar-radii)'
 
         if key=='srad-s15':
             df = cksgaia.io.load_table('cks+gaia2+s15')
-            df = df.query('gaia2_gflux_ratio < 1.1 and giso_srad_err1/giso_srad < 0.1')
+            df = df.query('gaia2_gflux_ratio < 1.1 and gdir_srad_err1/gdir_srad < 0.1')
             x1 = df.s15_srad
-            x2 = df.giso_srad
+            x2 = df.gdir_srad
             x3 = x2 / x1 
             x1err = np.vstack([-df.s15_srad_err2,df.s15_srad_err1]) 
-            x2err = np.vstack([-df.giso_srad_err2,df.giso_srad_err1])
-            x3err = x2err / np.array(df.giso_srad)
+            x2err = np.vstack([-df.gdir_srad_err2,df.gdir_srad_err1])
+            x3err = x2err / np.array(df.gdir_srad)
             xlabel0 = '$R_\star$ [S15] (Solar-radii)'
             ylabel0 = '$R_\star$ [CKS+Gaia] (Solar-radii)'
 
@@ -156,29 +156,29 @@ class ComparisonRadius(Comparison):
             df2 = cksgaia.io.load_table('m17+gaia2+j17+iso+fur17')
             df2 = df2.groupby('id_kic',as_index=False).nth(0)
             df = pd.merge(df1,df2)
-            df = df.query('gaia2_gflux_ratio < 1.1 and giso_srad_err1/giso_srad < 0.1 and ~(fur17_rcorr_avg > 1.05) and abs(gaia2_gmag - kic_kepmag) < 0.2')
-#            df = df.query('gaia2_gflux_ratio < 1.1 and giso_srad_err1/giso_srad < 0.1 and ~(fur17_rcorr_avg > 1.05)')
+            df = df.query('gaia2_gflux_ratio < 1.1 and gdir_srad_err1/gdir_srad < 0.1 and ~(fur17_rcorr_avg > 1.05) and abs(gaia2_gmag - kic_kepmag) < 0.2')
+#            df = df.query('gaia2_gflux_ratio < 1.1 and gdir_srad_err1/gdir_srad < 0.1 and ~(fur17_rcorr_avg > 1.05)')
 
-            x1 = df.giso_srad
+            x1 = df.gdir_srad
             x2 = df.j17_srad
             x3 = x2 / x1 
-            x1err = np.vstack([-df.giso_srad_err2,df.giso_srad_err1]) 
+            x1err = np.vstack([-df.gdir_srad_err2,df.gdir_srad_err1]) 
             x2err = np.vstack([-df.j17_srad_err2,df.j17_srad_err1])
-            x3err = x2err / np.array(df.giso_srad)
+            x3err = x2err / np.array(df.gdir_srad)
             xlabel0 = '$R_\star$ [CKS+Gaia] (Solar-radii)'
             ylabel0 = '$R_\star$ [CKS-II] (Solar-radii)'
 
         if key=='srad-gaia2':
             df = cksgaia.io.load_table('m17+gaia2+j17+iso+fur17')
-            df = df.query('gaia2_gflux_ratio < 1.1 and giso_srad_err1/giso_srad < 0.1 and ~(fur17_rcorr_avg > 1.05)')
+            df = df.query('gaia2_gflux_ratio < 1.1 and gdir_srad_err1/gdir_srad < 0.1 and ~(fur17_rcorr_avg > 1.05)')
             df = df.groupby('id_kic',as_index=False).nth(0)
 
-            x1 = df.giso_srad
+            x1 = df.gdir_srad
             x2 = df.gaia2_srad
             x3 = x2 / x1 
-            x1err = np.vstack([-df.giso_srad_err2,df.giso_srad_err1]) 
+            x1err = np.vstack([-df.gdir_srad_err2,df.gdir_srad_err1]) 
             x2err = np.vstack([-df.gaia2_srad_err2,df.gaia2_srad_err1])
-            x3err = x2err / np.array(df.giso_srad)
+            x3err = x2err / np.array(df.gdir_srad)
             xlabel0 = '$R_\star$ [CKS+Gaia] (Solar-radii)'
             ylabel0 = '$R_\star$ [GaiaDR2] (Solar-radii)'
 
