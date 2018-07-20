@@ -188,8 +188,6 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
         df = cksgaia.extinction.add_extinction(df,'bayestar2017')
         df = df.drop('distance ra dec'.split(),axis=1)
 
-
-
     elif table=='m17+gaia2+j17+iso':
         df1 = load_table('m17+gaia2+j17+ext')
         df2 = load_table('iso')
@@ -204,7 +202,7 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
     elif table=='m17+gaia2+j17+iso+fur17':
         df1 = load_table('m17+gaia2+j17+iso')
         df2 = load_table('fur17')
-        df = pd.merge(df1,df2 ,how='left')
+        df = pd.merge(df1, df2,how='left')
         df = order_columns(df)
 
     elif table == "cksgaia-planets":

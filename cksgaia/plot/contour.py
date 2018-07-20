@@ -263,7 +263,7 @@ def insol_contour_data(sample=None, vlims=(0.0, 0.03), kwidth=(0.4, 0.05), clims
 
     if clims is None:
         # cx, cy = np.loadtxt('/Users/bfulton/code/cksrad/data/detectability_p1.txt', unpack=True)
-        cx, cy = np.loadtxt('/Users/bfulton/code/cksrad/data/sensitivity_p25.txt', unpack=True)
+        cx, cy = np.loadtxt(os.path.join(os.environ['HOME'],'code/cksrad/data/sensitivity_p25.txt'), unpack=True)
         # kicsample = cksgaia.io.load_table('kic-filtered')
         # kicsample = cksgaia.completeness.fit_cdpp(kicsample)
         # cx, cy = cksgaia.completeness.get_sensitivity_contour(kicsample, 0.25)

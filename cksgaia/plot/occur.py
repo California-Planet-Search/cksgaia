@@ -27,7 +27,7 @@ def get_mass_samples():
     low = physmerge.query('giso_smass < @lowcut')
 
     annotations = ['$M_{\star} > %3.2f M_{\odot}$' % highcut,
-                   '$%3.2f M_{\odot} \leq M_{\star} \leq %3.2f M_{\odot}$' % (highcut, lowcut),
+                   '$%3.2f M_{\odot} \leq M_{\star} \leq %3.2f M_{\odot}$' % (lowcut, highcut),
                    '$M_{\star} < %3.2f M_{\odot}$' % lowcut]
 
     return (highcut, lowcut, high, medium, low, annotations)
