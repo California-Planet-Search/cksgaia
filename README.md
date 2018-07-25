@@ -6,9 +6,9 @@ A re-analysis of the CKS dataset using Gaia constrained parallaxes.
 
 Download data tables
 
-1. xmatch_m17_gaiadr2-result.csv # CKS-Gaia crossmatch
-2. kic_q0_q17.hdf # Table of noise properties
-3. kepler_stellar17.csv.gz # Mathur 2017 stellar properties tables
+1. [xmatch_m17_gaiadr2-result.csv](https://www.dropbox.com/s/ctjmp1tfp3l6nuz/xmatch_m17_gaiadr2-result.csv?dl=0) # CKS-Gaia crossmatch
+2. [kic_q0_q17.hdf](https://www.dropbox.com/s/54vz099idveo6mp/kic_q0_q17.hdf?dl=0) # Table of noise properties
+3. [kepler_stellar17.csv.gz](https://www.dropbox.com/s/w8gwk0a2ieoju7b/kepler_stellar17.csv.gz?dl=0) # Mathur 2017 stellar properties tables
 
 ## Cross-match the CKS stars with Gaia IDs.
 
