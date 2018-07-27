@@ -801,15 +801,15 @@ def mean_values(plot_met=False):
     lowcut = np.percentile(physmerge['giso_smass'], 33)
 
     high = physmerge.query('giso_smass > @highcut')
-    kicselect = ikic.copy().query('m17_smet > @highcut')
+    kicselect = ikic.copy().query('m17_smass > @highcut')
     high = cksgaia.completeness.get_weights(high, kicselect)
 
     medium = physmerge.query('giso_smass <= @highcut & giso_smass >= @lowcut')
-    kicselect = ikic.copy().query('m17_smet <= @highcut & m17_smet >= @lowcut')
+    kicselect = ikic.copy().query('m17_smass <= @highcut & m17_smass >= @lowcut')
     medium = cksgaia.completeness.get_weights(medium, kicselect)
 
     low = physmerge.query('giso_smass < @lowcut')
-    kicselect = ikic.copy().query('m17_smet < @lowcut')
+    kicselect = ikic.copy().query('m17_smass < @lowcut')
     low = cksgaia.completeness.get_weights(low, kicselect)
 
     sn_smasses = []
@@ -895,7 +895,7 @@ def mean_values(plot_met=False):
     # pl.xlabel('average stellar mass [M$_{\odot}$]')
     # pl.ylabel('average insolation flux [S$_{\oplus}$]')
     pl.xlim(0.8, 1.25)
-    pl.ylim(10, 70)
+    # pl.ylim(10, 70)
     pl.xticks(xt)
 
     pl.annotate("{} < P <= {} days".format(sn_corners[0][0], sn_corners[1][0]), xy=(0.15, 0.75),
@@ -915,7 +915,7 @@ def mean_values(plot_met=False):
     # pl.xlabel('average stellar mass [M$_{\odot}$]')
     pl.ylabel('average insolation flux [S$_{\oplus}$]')
     pl.xlim(0.8, 1.25)
-    pl.ylim(80, 350)
+    # pl.ylim(80, 350)
     pl.xticks(xt)
 
     pl.annotate("{} < P <= {} days".format(e_corners[0][0], e_corners[1][0]), xy=(0.15, 0.75),

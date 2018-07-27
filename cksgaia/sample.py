@@ -1,4 +1,6 @@
 import pylab as pl
+import numpy as np
+
 import cksgaia.plot.sample
 
 def apply_filters(physmerge, mkplot=False, verbose=False, textable=False):
@@ -46,7 +48,7 @@ def apply_filters(physmerge, mkplot=False, verbose=False, textable=False):
 
             return left + 1
 
-    nrow = 10
+    nrow = 11
     ncol = 1
     plti = 1
 
@@ -158,6 +160,16 @@ def apply_filters(physmerge, mkplot=False, verbose=False, textable=False):
     if verbose:
         print "Teff filter removes %d planets." % (pre - post)
     plti = _bipanel(crop, nrow, ncol, plti, eloc=(12.0, 60), aloc=(0.95, 0.85), atxt='4700 K < $T_{\\rm eff}$ < 6500 K')
+
+    diff = crop['iso_sparallax'] - crop['gaia2_sparallax']
+    diff_err = np.sqrt(crop['gaia2_sparallax_err'] ** 2 + crop['iso_sparallax_err1'] ** 2)
+    pre = len(crop)
+    crop = crop[(np.abs(diff / diff_err) < 4)]
+    post = len(crop)
+    if verbose:
+        print "Parallax filter removes %d planets." % (pre - post)
+    plti = _bipanel(crop, nrow, ncol, plti, eloc=(12.0, 60), aloc=(0.95, 0.85), atxt='$\pi_{\rm iso} \approx \pi_{\rm dir}')
+
 
     # pre = len(crop)
     # crop = crop[(crop['koi_snr'] >= 12)]
