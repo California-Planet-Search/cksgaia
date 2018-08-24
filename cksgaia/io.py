@@ -217,12 +217,25 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
         df = load_table('cksgaia-planets-filtered')
         df = cksgaia.completeness.weight_merge(df)
 
+    elif table == "cks3":
+        df = pd.read_csv(os.path.join(DATADIR, 'cks3-planet-parameters.csv'))
+        dfw = pd.read_csv(os.path.join(DATADIR, 'cks3-planet-weights.csv'))
+        df['gdir_prad'] = df['iso_prad']
+        df['gdir_prad_err1'] = df['iso_prad_err1']
+        df['gdir_prad_err2'] = df['iso_prad_err2']
+        df['gdir_srad'] = df['iso_srad']
+        df['gdir_srad_err1'] = df['iso_srad_err1']
+        df['gdir_srad_err2'] = df['iso_srad_err2']
+
+        m = pd.merge(df, dfw, on='id_koicand', suffixes=['', '_w'])
+        print m.columns
+        df = m
+
     else:
         assert False, "table {} not valid table name".format(table)
 
-
-    
     return df
+
 
 def read_silva15(fn):
     with open(fn,'r') as f:

@@ -266,7 +266,7 @@ class Workflow(object):
         d['period-contour-masscuts'] = cksgaia.plot.contour.period_contour_masscuts
         # d['extinction'] = cksgaia.plot.extinction.fig_extinction
         # d['sample'] = cksgaia.plot.sample.hrplot
-        d['filters'] = cksgaia.plot.sample.filter_plot
+        # d['filters'] = cksgaia.plot.sample.filter_plot
         # d['mag-hist'] = cksgaia.plot.sample.magcuts
         # d['depth-hist'] = cksgaia.plot.sample.depth_hist
         d['srad-h13'] = lambda: CR('srad-h13').plot_comparison()
@@ -282,6 +282,7 @@ class Workflow(object):
         # d['insol-hist'] = cksgaia.plot.occur.insol_hist
         # d['radius-hist-fit'] = cksgaia.plot.occur.money_plot_fit
         d['radius-hist-plain'] = cksgaia.plot.occur.money_plot_plain
+        d['radius-hist-old'] = cksgaia.plot.occur.radius_dist_old
         # d['period-contour-q16'] = cksgaia.plot.contour.period_contour_q16
         d['period-contour-cks'] = cksgaia.plot.contour.period_contour_cks
         # d['insol-contour-anno'] = cksgaia.plot.contour.insol_contour_anno
@@ -294,7 +295,7 @@ class Workflow(object):
         d['width-sim-plot'] = cksgaia.plot.sim.wid_sim_plot
         d['per-prad'] = cksgaia.plot.sample.fig_per_prad
         d['insol-prad'] = cksgaia.plot.sample.fig_insol_prad
-        d['mean-met'] = cksgaia.plot.occur.mean_met
+        # d['mean-met'] = cksgaia.plot.occur.mean_met
 
         self.plot_dict = d
 
