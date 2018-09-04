@@ -263,7 +263,7 @@ def insol_contour_data(sample=None, vlims=(0.0, 0.03), kwidth=(0.4, 0.05), clims
 
     if clims is None:
         # cx, cy = np.loadtxt('/Users/bfulton/code/cksrad/data/detectability_p1.txt', unpack=True)
-        cx, cy = np.loadtxt('/Users/bfulton/code/cksrad/data/sensitivity_p25.txt', unpack=True)
+        cx, cy = np.loadtxt(os.path.join(os.environ['HOME'],'code/cksrad/data/sensitivity_p25.txt'), unpack=True)
         # kicsample = cksgaia.io.load_table('kic-filtered')
         # kicsample = cksgaia.completeness.fit_cdpp(kicsample)
         # cx, cy = cksgaia.completeness.get_sensitivity_contour(kicsample, 0.25)
@@ -301,17 +301,53 @@ def insol_contour_data(sample=None, vlims=(0.0, 0.03), kwidth=(0.4, 0.05), clims
 
 def srad_contour():
     physmerge = cksgaia.io.load_table(cksgaia.plot.config.filtered_sample)
+    physmerge['weight'] = np.median(physmerge['weight'])
 
     ax, xi, yi, zi = contour_plot_kde(physmerge, 'gdir_srad', 'gdir_prad', xlim=[0.4, 3.0],
                                                       ylim=[0.5, 20], ylog=True,
                                                       pltxlim=[0.6, 2.3], pltylim=[1.0, 5], epos=[0.7, 4.0],# nbins=30,
-                                                      weighted=False,
-                                                      clabel="Relative Density of Planets", vlims=(0.0, 0.0035))
+                                                      weighted=True, kwidth=(0.08, 0.08),
+                                                      vlims=(0.0, 0.025), cbar=False)
+
+    ct = [0.0, 0.01, 0.02, 0.03]
+    cmap = pl.colorbar(pad=0, ticks=ct, label="Relative Density of Planets")
+
     pl.xlabel('Stellar Radius [Solar radii]')
     pl.ylabel('Planet Size [Earth radii]')
 
-    pl.xticks([0.6, 0.8, 1.0, 1.2, 1.5, 2.0])
-    pl.yticks([1, 2, 3, 4])
+    xt = [0.6, 0.8, 1.0, 1.2, 1.5, 2.0]
+    yt = [1.0, 1.5, 2.4, 3.5]
+    pl.xticks(xt, xt)
+    pl.yticks(yt, yt)
+
+
+    ax.xaxis.set_major_formatter(matplotlib.ticker.ScalarFormatter())
+    ax.xaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('%.1f'))
+
+
+def smass_contour():
+    physmerge = cksgaia.io.load_table(cksgaia.plot.config.filtered_sample)
+    physmerge['weight'] = np.median(physmerge['weight'])
+
+    # physmerge = physmerge.query('10 <= koi_period < 30')
+
+    ax, xi, yi, zi = contour_plot_kde(physmerge, 'giso_smass', 'gdir_prad', xlim=[0.4, 2.0],
+                                                      ylim=[0.5, 20], ylog=True,
+                                                      pltxlim=[0.7, 1.5], pltylim=[1.0, 5], epos=[0.8, 4.0],# nbins=30,
+                                                      weighted=True, kwidth=(0.08, 0.08),
+                                                      vlims=(0.0, 0.045), cbar=False)
+
+    ct = [0.0, 0.01, 0.02, 0.03, 0.04]
+    cmap = pl.colorbar(pad=0, ticks=ct, label="Relative Density of Planets")
+
+    pl.xlabel('Stellar Mass [Solar masses]')
+    pl.ylabel('Planet Size [Earth radii]')
+
+    xt = [0.8, 1.0, 1.2, 1.5]
+    yt = [1.0, 1.5, 2.4, 3.5]
+    pl.xticks(xt, xt)
+    pl.yticks(yt, yt)
+
 
     ax.xaxis.set_major_formatter(matplotlib.ticker.ScalarFormatter())
     ax.xaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('%.1f'))

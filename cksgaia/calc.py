@@ -38,6 +38,10 @@ def update_planet_parameters(df):
         # 5% floor on stellar mass uncertainty
         # if unc_mstar / row['giso_smass'] < 0.05:
         #     unc_mstar = 0.05 * row['giso_smass']
+        if unc_mstar <= 0:
+            print(row)
+            print(unc_mstar)
+            unc_mstar = 0.05
         e_mstar = rand.normal(row['giso_smass'], unc_mstar, size=10000)
 
         # period
@@ -167,7 +171,7 @@ def weighted_avg_and_std(values, weights):
     return (average, np.sqrt(variance / len(values)))
 
 
-def average_in_box(sample, box, col1='gdir_prad', col2='koi_period', logparam=True):
+def average_in_box(sample, box, col1='gdir_prad', col2='koi_period', logparam=True, weighted=True):
     radlim_low = box[0][1]
     radlim_high = box[1][1]
     plim_low = box[0][0]
@@ -177,15 +181,20 @@ def average_in_box(sample, box, col1='gdir_prad', col2='koi_period', logparam=Tr
 
     q = q[np.isfinite(q[col1]) & np.isfinite(q[col2]) & np.isfinite(q['weight'])]
 
+    if not weighted:
+        w = np.ones(n)
+    else:
+        w = q['weight']
+
     if logparam:
         logcol1 = np.log10(q[col1])
         logcol2 = np.log10(q[col2])
-        avg_rad, err_rad = weighted_avg_and_std(logcol1, q['weight'])
-        avg_per, err_per = weighted_avg_and_std(logcol2, q['weight'])
+        avg_rad, err_rad = weighted_avg_and_std(logcol1, w)
+        avg_per, err_per = weighted_avg_and_std(logcol2, w)
         return [(10 ** avg_per, 10 ** avg_rad), (err_per * (10 ** avg_per), err_rad * (10 ** avg_rad))]
     else:
-        avg_rad, err_rad = weighted_avg_and_std(q[col1], q['weight'])
-        avg_per, err_per = weighted_avg_and_std(q[col2], q['weight'])
+        avg_rad, err_rad = weighted_avg_and_std(q[col1], w)
+        avg_per, err_per = weighted_avg_and_std(q[col2], w)
         return [(avg_per, avg_rad), (err_per, err_rad)]
 
 

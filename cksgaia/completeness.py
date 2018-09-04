@@ -1,5 +1,6 @@
 import numpy as np
-import astropysics.constants as C
+# import astropy.constants as C
+from astropysics import constants as C
 import pandas as pd
 import pylab as pl
 

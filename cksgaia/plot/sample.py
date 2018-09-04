@@ -373,8 +373,8 @@ def srad_err_hist():
 
     pl.annotate("median = {:.0f}%".format(np.round(med_old)), xy=(med_old, 160), xycoords='data',
                 xytext=(-13, 0), textcoords='offset points', rotation=90, verticalalignment='left')
-    pl.annotate("median = {:.0f}%".format(np.round(med_new)), xy=(med_new, 120), xycoords='data',
-                xytext=(-13, -5), textcoords='offset points', rotation=90, verticalalignment='left')
+    pl.annotate("median = {:.0f}%".format(np.round(med_new)), xy=(med_new, 280), xycoords='data',
+                xytext=(5, 0), textcoords='offset points', rotation=90, verticalalignment='left')
 
     pl.xlim(0.5, 30.0)
     # pl.ylim(0, 130)

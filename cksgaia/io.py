@@ -188,8 +188,6 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
         df = cksgaia.extinction.add_extinction(df,'bayestar2017')
         df = df.drop('distance ra dec'.split(),axis=1)
 
-
-
     elif table=='m17+gaia2+j17+iso':
         df1 = load_table('m17+gaia2+j17+ext')
         df2 = load_table('iso')
@@ -204,7 +202,7 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
     elif table=='m17+gaia2+j17+iso+fur17':
         df1 = load_table('m17+gaia2+j17+iso')
         df2 = load_table('fur17')
-        df = pd.merge(df1,df2 ,how='left')
+        df = pd.merge(df1, df2,how='left')
         df = order_columns(df)
 
     elif table == "cksgaia-planets":
@@ -219,12 +217,25 @@ def load_table(table, cache=1, cachefn='load_table_cache.hdf', verbose=False):
         df = load_table('cksgaia-planets-filtered')
         df = cksgaia.completeness.weight_merge(df)
 
+    elif table == "cks3":
+        df = pd.read_csv(os.path.join(DATADIR, 'cks3-planet-parameters.csv'))
+        dfw = pd.read_csv(os.path.join(DATADIR, 'cks3-planet-weights.csv'))
+        df['gdir_prad'] = df['iso_prad']
+        df['gdir_prad_err1'] = df['iso_prad_err1']
+        df['gdir_prad_err2'] = df['iso_prad_err2']
+        df['gdir_srad'] = df['iso_srad']
+        df['gdir_srad_err1'] = df['iso_srad_err1']
+        df['gdir_srad_err2'] = df['iso_srad_err2']
+
+        m = pd.merge(df, dfw, on='id_koicand', suffixes=['', '_w'])
+        print m.columns
+        df = m
+
     else:
         assert False, "table {} not valid table name".format(table)
 
-
-    
     return df
+
 
 def read_silva15(fn):
     with open(fn,'r') as f:

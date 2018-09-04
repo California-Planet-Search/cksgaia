@@ -227,7 +227,8 @@ def create_iso_table(args):
 
 
 def create_merged_table(args):
-    df = cksgaia.io.load_table('j17+m17+gaia2+iso', verbose=True, cache=0)
+    # df = cksgaia.io.load_table('j17+m17+gaia2+iso', verbose=True, cache=0)
+    df = cksgaia.io.load_table('cksgaia-planets', verbose=True, cache=0)
     csvfn = os.path.join(cksgaia.io.DATADIR, 'cks_iso_gaia2_merged.csv')
     df.to_csv(csvfn)
 
@@ -281,11 +282,13 @@ class Workflow(object):
         # d['insol-hist'] = cksgaia.plot.occur.insol_hist
         # d['radius-hist-fit'] = cksgaia.plot.occur.money_plot_fit
         d['radius-hist-plain'] = cksgaia.plot.occur.money_plot_plain
+        d['radius-hist-old'] = cksgaia.plot.occur.radius_dist_old
         # d['period-contour-q16'] = cksgaia.plot.contour.period_contour_q16
         d['period-contour-cks'] = cksgaia.plot.contour.period_contour_cks
         # d['insol-contour-anno'] = cksgaia.plot.contour.insol_contour_anno
         d['insol-contour-data'] = cksgaia.plot.contour.insol_contour_data
-        # d['srad-contour'] = cksgaia.plot.contour.srad_contour
+        d['srad-contour'] = cksgaia.plot.contour.srad_contour
+        d['smass-contour'] = cksgaia.plot.contour.smass_contour
         # d['smass-cuts'] = cksgaia.plot.occur.mass_cuts
         # d['desert-edge'] = cksgaia.plot.occur.desert_edge
         d['desert-edge-cum'] = cksgaia.plot.occur.desert_edge_cum
@@ -293,7 +296,7 @@ class Workflow(object):
         d['width-sim-plot'] = cksgaia.plot.sim.wid_sim_plot
         d['per-prad'] = cksgaia.plot.sample.fig_per_prad
         d['insol-prad'] = cksgaia.plot.sample.fig_insol_prad
-        d['mean-met'] = cksgaia.plot.occur.mean_met
+        # d['mean-met'] = cksgaia.plot.occur.mean_met
 
         self.plot_dict = d
 

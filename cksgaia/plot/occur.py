@@ -27,7 +27,7 @@ def get_mass_samples():
     low = physmerge.query('giso_smass < @lowcut')
 
     annotations = ['$M_{\star} > %3.2f M_{\odot}$' % highcut,
-                   '$%3.2f M_{\odot} \leq M_{\star} \leq %3.2f M_{\odot}$' % (highcut, lowcut),
+                   '$%3.2f M_{\odot} \leq M_{\star} \leq %3.2f M_{\odot}$' % (lowcut, highcut),
                    '$M_{\star} < %3.2f M_{\odot}$' % lowcut]
 
     return (highcut, lowcut, high, medium, low, annotations)
@@ -295,6 +295,38 @@ def money_plot_plain():
     # pl.axvspan(1.75, 3.5, color=c2, alpha=0.1)
 
     pl.ylim(0, 0.125)
+
+
+def radius_dist_old():
+    physmerge = cksgaia.io.load_table('cks3').dropna(subset=['gdir_prad'])
+    weights = pd.read_csv
+
+    print len(physmerge), (physmerge.gdir_srad_err1 / physmerge.gdir_srad).median()
+
+    rmask, rbin_centers, rN, re, result1, result2 = cksgaia.fitting.histfit(physmerge,
+                                                                           completeness=False,
+                                                                           verbose=False)
+
+    mask, bin_centers, N, e, result1, result2 = cksgaia.fitting.histfit(physmerge, completeness=True, boot_errors=False)
+
+    histfitplot(physmerge, bin_centers, N, e, mask, result1, result2, completeness=True, plotmod=False)
+    pl.grid(False)
+
+    rN = rN / (float(num_stars) * np.mean(physmerge['tr_prob']))
+    pl.step(rbin_centers, rN, color='0.5', where='mid', lw=3, linestyle='dotted')
+
+    c2 = (0, 146 / 255., 146 / 255.)
+    c1 = (146 / 255., 0, 0)
+
+    # pl.axvline(1.0, color=c1, linestyle='dashed', lw=2)
+    # pl.axvline(1.745, color=c1, linestyle='dashed', lw=2)
+    # pl.axvspan(1.0, 1.75, color=c1, alpha=0.1)
+
+    # pl.axvline(1.760, color=c2, linestyle='dashed', lw=2)
+    # pl.axvline(3.5, color=c2, linestyle='dashed', lw=2)
+    # pl.axvspan(1.75, 3.5, color=c2, alpha=0.1)
+
+    pl.ylim(0, 0.16)
 
 
 def mass_cuts():
@@ -801,15 +833,15 @@ def mean_values(plot_met=False):
     lowcut = np.percentile(physmerge['giso_smass'], 33)
 
     high = physmerge.query('giso_smass > @highcut')
-    kicselect = ikic.copy().query('m17_smet > @highcut')
+    kicselect = ikic.copy().query('m17_smass > @highcut')
     high = cksgaia.completeness.get_weights(high, kicselect)
 
     medium = physmerge.query('giso_smass <= @highcut & giso_smass >= @lowcut')
-    kicselect = ikic.copy().query('m17_smet <= @highcut & m17_smet >= @lowcut')
+    kicselect = ikic.copy().query('m17_smass <= @highcut & m17_smass >= @lowcut')
     medium = cksgaia.completeness.get_weights(medium, kicselect)
 
     low = physmerge.query('giso_smass < @lowcut')
-    kicselect = ikic.copy().query('m17_smet < @lowcut')
+    kicselect = ikic.copy().query('m17_smass < @lowcut')
     low = cksgaia.completeness.get_weights(low, kicselect)
 
     sn_smasses = []
@@ -895,7 +927,7 @@ def mean_values(plot_met=False):
     # pl.xlabel('average stellar mass [M$_{\odot}$]')
     # pl.ylabel('average insolation flux [S$_{\oplus}$]')
     pl.xlim(0.8, 1.25)
-    pl.ylim(10, 70)
+    # pl.ylim(10, 70)
     pl.xticks(xt)
 
     pl.annotate("{} < P <= {} days".format(sn_corners[0][0], sn_corners[1][0]), xy=(0.15, 0.75),
@@ -915,7 +947,7 @@ def mean_values(plot_met=False):
     # pl.xlabel('average stellar mass [M$_{\odot}$]')
     pl.ylabel('average insolation flux [S$_{\oplus}$]')
     pl.xlim(0.8, 1.25)
-    pl.ylim(80, 350)
+    # pl.ylim(80, 350)
     pl.xticks(xt)
 
     pl.annotate("{} < P <= {} days".format(e_corners[0][0], e_corners[1][0]), xy=(0.15, 0.75),
