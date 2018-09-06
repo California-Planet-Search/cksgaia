@@ -218,11 +218,12 @@ class ComparisonRadius(Comparison):
         if _mean > 1:
             s = r"{:.1f}\% larger".format(100*(_mean-1.0))
         else:
-            s = r"{:.1f}\% smaller".format(abs(100*(_mean-1.0)))
+            s = r"{:.2f}\% smaller".format(abs(100*(_mean-1.0)))
         return s
 
     def std_string(self):
-        s = r"{:.1f}\%".format(100*self.x3.std())
+        std = self.x3.std()
+        s = r"{:.1f}\%".format(100*std)
         return s
 
 def subplots_compare(x1, x2, x3, fig, axL, x1err=None, x2err=None, x3err=None, **kwargs):

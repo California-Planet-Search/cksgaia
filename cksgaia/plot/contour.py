@@ -340,6 +340,8 @@ def smass_contour():
     ct = [0.0, 0.01, 0.02, 0.03, 0.04]
     cmap = pl.colorbar(pad=0, ticks=ct, label="Relative Density of Planets")
 
+    pl.plot([0.6, 1.5], [1.5, 2.05], 'k--', lw=1)
+
     pl.xlabel('Stellar Mass [Solar masses]')
     pl.ylabel('Planet Size [Earth radii]')
 

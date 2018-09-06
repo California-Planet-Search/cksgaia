@@ -113,9 +113,9 @@ def planet():
         s = r""
         s+=r"{id_koicand:s} & "
         s+=r"{koi_period:0.1f} & "
-        s+=r"{koi_ror:.5f}  & "  
+        s+=r"{koi_ror:.3f}  & "
         s+=r"{gdir_prad:.2f} & "  
-        s+=r"{giso_sma:.5f} & "  
+        s+=r"{giso_sma:.3f} & "
         s+=r"{giso_insol:.0f} \\  "
 
 
