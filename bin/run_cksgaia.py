@@ -287,7 +287,7 @@ class Workflow(object):
         d['period-contour-cks'] = cksgaia.plot.contour.period_contour_cks
         # d['insol-contour-anno'] = cksgaia.plot.contour.insol_contour_anno
         d['insol-contour-data'] = cksgaia.plot.contour.insol_contour_data
-        d['srad-contour'] = cksgaia.plot.contour.srad_contour
+        # d['srad-contour'] = cksgaia.plot.contour.srad_contour
         d['smass-contour'] = cksgaia.plot.contour.smass_contour
         # d['smass-cuts'] = cksgaia.plot.occur.mass_cuts
         # d['desert-edge'] = cksgaia.plot.occur.desert_edge
