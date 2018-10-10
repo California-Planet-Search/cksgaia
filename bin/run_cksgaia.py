@@ -128,7 +128,7 @@ def create_iso_batch(args):
     df['parallax_err'] /= 1e3
     df['feh_err'] = 0.04
     df.id_starname = df.id_starname.str.replace(' ','_')
-    df0 = df.copy() 
+    df0 = df.copy()
 
     # Direct method. Don't use spectroscopic logg values so as to not
     # pollute the parallax radii

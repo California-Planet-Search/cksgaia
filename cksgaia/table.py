@@ -138,7 +138,10 @@ def star_machine():
             'gaia2_sparallax', 'gaia2_sparallax_err',
             'gdir_srad', 'gdir_srad_err1', 'gdir_srad_err2',
             'giso_smass', 'giso_smass_err1', 'giso_smass_err2',
+            'giso_srad', 'giso_srad_err1', 'giso_srad_err2',
+            'giso_srho', 'giso_srho_err1', 'giso_srho_err2',
             'giso_slogage', 'giso_slogage_err1', 'giso_slogage_err2',
+            'giso2_sparallax', 'giso2_sparallax_err1', 'giso2_sparallax_err2',
             'gaia2_gflux_ratio', 'fur17_rcorr_avg']
 
     df = df[cols]
@@ -154,7 +157,10 @@ def star_machine():
 {gaia2_sparallax:.3f},{gaia2_sparallax_err:.3f},\
 {gdir_srad:.3f},{gdir_srad_err1:.3f},{gdir_srad_err2:.3f},\
 {giso_smass:.3f},{giso_smass_err1:.3f},{giso_smass_err2:.3f},\
+{giso_srad:.3f},{giso_srad_err1:.3f},{giso_srad_err2:.3f},\
+{giso_srho:.2f},{giso_srho_err1:.2f},{giso_srho_err2:.2f},\
 {giso_slogage:.2f},{giso_slogage_err1:.2f},{giso_slogage_err2:.2f},\
+{giso2_sparallax:.3f},{giso2_sparallax_err1:.3f},{giso2_sparallax_err2:.3f},\
 {gaia2_gflux_ratio:.3f},{fur17_rcorr_avg:.4f}".format(**row)
 
         lines.append(l)
