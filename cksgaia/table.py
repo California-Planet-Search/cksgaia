@@ -52,6 +52,22 @@ def bins_table():
     return lines
 
 
+def bins_table_machine():
+    physmerge = cksgaia.io.load_table(cksgaia.plot.config.filtered_sample)
+
+    rmask, rbin_centers, rN, re, result1, result2 = cksgaia.fitting.histfit(physmerge,
+                                                                           completeness=False,
+                                                                           verbose=False)
+
+    mask, bin_centers, N, e, result1, result2 = cksgaia.fitting.histfit(physmerge, completeness=True, boot_errors=False)
+
+    lines = ["bin_center,occ,occ_err"]
+    for i, rad in enumerate(bin_centers):
+        lines.append("%4.3f,%4.6f,%4.6f" % (rad, N[i], e[i]))
+
+    return lines
+
+
 def filters_table():
     physmerge = cksgaia.io.load_table('fulton17')
     crop = cksgaia.io.apply_filters(physmerge, mkplot=True, textable=True)

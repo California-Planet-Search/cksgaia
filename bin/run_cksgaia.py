@@ -315,6 +315,7 @@ class Workflow(object):
         d['weight-machine'] = cksgaia.table.weight_table_machine
         d['star-machine'] = cksgaia.table.star_machine
         d['planet-machine'] = cksgaia.table.planet_machine
+        d['bins-machine'] = cksgaia.table.bins_table_machine
         self.csv_dict = d
 
         d = OrderedDict()
