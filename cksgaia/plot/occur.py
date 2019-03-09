@@ -295,6 +295,12 @@ def money_plot_plain():
     # pl.axvspan(1.75, 3.5, color=c2, alpha=0.1)
 
     pl.ylim(0, 0.125)
+    pl.xlim(0.7, 4)
+    fig = pl.gcf()
+    fig.set_size_inches(6.3, 3.3)
+    fig.subplots_adjust(left=0.15, right=0.75)
+    ax = pl.gca()
+    ax.set_xscale('linear')
 
 
 def radius_dist_old():
