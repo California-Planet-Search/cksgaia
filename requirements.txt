@@ -1,6 +1,6 @@
 matplotlib==1.5.3
 astropysics
-numpy==1.10.4
+numpy==1.21.0
 scipy==0.17.1
 pandas==0.20.3
 corner==2.0.1
